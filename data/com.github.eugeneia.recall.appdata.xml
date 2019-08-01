@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2019 Max Rottenkolber <max@mr.gy> -->
+<component type="desktop">
+  <id>com.github.eugeneia.recall</id>
+  <metadata_license>CC0</metadata_license>
+  <name>Recall</name>
+  <summary>Search and find documents using full-text search</summary>
+  <description>
+    <p>Recall is a frontend to the Recoll full-text desktop search engine.</p>
+  </description>
+</component>
