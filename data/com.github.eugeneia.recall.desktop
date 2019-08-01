@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Recall
+GenericName=Document Search
+Comment=Find documents
+Categories=Utility;FileTools;
+Exec=com.github.eugeneia.recall
+Icon=application-default-icon
+Terminal=false
+Type=Application
+Keywords=Search;Document;Full;Text;Index;Lookup:Query;Recoll;Xapian;Files;Find;
