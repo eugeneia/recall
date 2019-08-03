@@ -30,6 +30,16 @@ public class Recall : Gtk.Application {
 
     protected override void activate () {
         var label = new Gtk.Label ("Search your library.");
+        /* Use an application stylesheet (CSS). */
+        var provider = new CssProvider ();
+        provider.load_from_resource (
+            "/com/github/eugeneia/recall/Application.css"
+        );
+        StyleContext.add_provider_for_screen (
+            Gdk.Screen.get_default (),
+            provider,
+            STYLE_PROVIDER_PRIORITY_APPLICATION
+        );
 
         var main_window = new Gtk.ApplicationWindow (this);
         main_window.default_height = 100;

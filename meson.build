@@ -1,18 +1,26 @@
-# project name and programming language
 project('com.github.eugeneia.recall', 'vala', 'c')
 
-# Include the translations module
+gnome = import('gnome')
 i18n = import('i18n')
 
 # Set our translation domain
 add_global_arguments('-DGETTEXT_PACKAGE="@0@"'.format (meson.project_name()), language:'c')
 
+# Build resources
+asresources = gnome.compile_resources (
+    'as-resources', join_paths ('data', 'gresource.xml'),
+    source_dir: 'data',
+    c_name: 'as'
+)
+
 # Create a new executable, list the files we want to compile, list the dependencies we need, and install
 executable(
     meson.project_name(),
     'src/Application.vala',
+    asresources,
     dependencies: [
-        dependency('gtk+-3.0')
+        dependency('gtk+-3.0'),
+        dependency('granite')
     ],
     install: true
 )

@@ -1,0 +1,97 @@
+/*
+* Copyright ⓒ 2019 Cassidy James Blaede (https://cassidyjames.com)
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public
+* License as published by the Free Software Foundation; either
+* version 2 of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* General Public License for more details.
+*
+* You should have received a copy of the GNU General Public
+* License along with this program; if not, write to the
+* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+* Boston, MA 02110-1301 USA
+*
+* Authored by: Cassidy James Blaede <c@ssidyjam.es>
+*/
+
+/*
+@define-color base_color mix(@GRAPE_900, @BLUEBERRY_900, 0.125);
+@define-color colorPrimary mix(@GRAPE_700, @BLUEBERRY_700, 0.33);
+@define-color colorAccent @GRAPE_500;
+@define-color textColorPrimary alpha(white, 0.9);
+@define-color textColorPrimaryShadow alpha(shade(@colorPrimary, 0.6), 0.4);
+
+.titlebar:not(.default-decoration) {
+  background-image:
+    linear-gradient(
+      to bottom,
+      alpha(white, 0.1),
+      alpha(black, 0.1)
+    ),
+    linear-gradient(120deg, @BLUEBERRY_700, @GRAPE_700 67%);
+  color: @textColorPrimary;
+}
+
+.titlebar button.raised {
+  background-image: linear-gradient(
+    to bottom,
+    alpha(white, 0.1),
+    alpha(black, 0.1)
+  );
+  border-color: shade(@colorPrimary, 0.75);
+  color: @textColorPrimary;
+  text-shadow: 0 1px @textColorPrimaryShadow;
+  box-shadow:
+    inset 0 0 0 1px alpha(shade(@colorPrimary, 1.4), 0.05),
+    inset 0 1px 0 0 alpha(shade(@colorPrimary, 1.4), 0.45),
+    inset 0 -1px 0 0 alpha(shade(@colorPrimary, 1.4), 0.15),
+    0 1px 0 0 alpha(shade(@colorPrimary, 1.4), 0.3);
+  -gtk-icon-shadow: 0 1px @textColorPrimaryShadow;
+}
+
+.titlebar button.raised:active,
+.titlebar button.raised:checked {
+    background-color: alpha(#000, 0.05);
+    background-image: none;
+    border-color: alpha(#000, 0.27);
+    box-shadow:
+        inset 0 0 0 1px alpha(#000, 0.05),
+        0 1px 0 0 alpha(@bg_highlight_color, 0.3);
+}
+
+.titlebar button.linked {
+  border-radius: 0;
+  border-left-width: 0;
+}
+
+.titlebar button.linked:first-child {
+  border-left-width: 1px;
+  border-top-left-radius: 2.5px;
+  border-bottom-left-radius: 2.5px;
+}
+
+.titlebar button.linked:last-child {
+  padding: 0;
+  border-top-right-radius: 2.5px;
+  border-bottom-right-radius: 2.5px;
+}
+
+.titlebar entry {
+  background: alpha(@GRAPE_900, 0.5);
+  color: @textColorPrimary;
+  text-shadow: none;
+}
+
+.titlebar entry image {
+    color: @textColorPrimary;
+}
+
+.titlebar entry image:hover {
+    color: alpha(@textColorPrimary, 0.75);
+}
+*/
