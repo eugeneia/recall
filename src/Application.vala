@@ -30,29 +30,6 @@ struct Result {
     string title;
 }
 
-ArrayList<Result?> stub_results (int nresults) {
-    var results = new ArrayList<Result?> ();
-    results.add ({
-        "application/pdf",
-        "file:///home/max/Documents/consulting/taxes/2015/est-2015.pdf",
-        "est-2015.pdf"
-    });
-    results.add ({
-        "application/pdf",
-        "file:///home/max/Documents/my-organization/deutschland/finanzamt/2013-anschreiben.pdf",
-        "2013-anschreiben.pdf"
-    });
-    results.add ({
-        "message/rfc822",
-        "file:///home/max/Mail/max@mr.gy/archive/2018/03/in/2018-03-05-kilian-kay-donnerstag-8.03.2018.mail",
-        "Donnerstag, 8.03.2018"
-    });
-    var ret = new ArrayList<Result?> ();
-    for (int i = 0; i < nresults; i ++)
-        ret.add (results[i%results.size]);
-	return ret;
-}
-
 public class Recall : Gtk.Application {
 
     public Recall () {
@@ -98,6 +75,8 @@ public class Recall : Gtk.Application {
         Paths.initialize (application_id, "");
         folder.set_current_folder (Paths.home_folder.get_path ());
 
+        folder.file_set.connect (() => do_search (search.buffer.text));
+
         return folder;
     }
 
@@ -113,6 +92,51 @@ public class Recall : Gtk.Application {
     private ScrolledWindow layout { get; set; }
     private ScrolledWindow layout_init () {
         return new ScrolledWindow (null, null);
+    }
+
+    /* Run recoll query, return stdout as string. */
+    private string recoll_query (string query) {
+        string[] args = {
+            "recoll", "-t", "-q",
+            "dir:%s %s".printf(folder.get_filename (), query)
+        };
+        string[] env = Environ.get ();
+        string stdout;
+        int status;
+
+        try {
+            Process.spawn_sync (
+                "/", args, env, SpawnFlags.SEARCH_PATH,
+                null, out stdout, null,
+                out status
+            );
+            if (status != 0)
+                throw new SpawnError.FAILED ("error while invoking recoll");
+        } catch (SpawnError e) {
+            stderr.printf("Error: %s\n", e.message);
+        }
+        return stdout;
+    }
+
+    /* Parse recoll query. */
+    private ArrayList<Result?> parse_results (string query_output) {
+        var results = new ArrayList<Result?> ();
+        var result_exp = new Regex (
+            "^([a-z-]+\\/[a-z-]+)\t\\[(.*)\\]\t\\[(.*)\\]\t[0-9]+\tbytes\t$"
+        );
+        string[] lines = Regex.split_simple ("\n", query_output);
+        for (int i = 2; i < (lines.length - 1); i++) {
+            MatchInfo result;
+            if (result_exp.match (lines[i], 0, out result))
+                results.add ({
+                    result.fetch(1),
+                    result.fetch(2),
+                    result.fetch(3)
+                });
+            else
+                stderr.printf("Could not parse result: %s\n", lines[i]);
+        }
+        return results;
     }
 
     /* Clear results in layout. */
@@ -206,12 +230,15 @@ public class Recall : Gtk.Application {
 
     /* Perform  search and update results shown in layout. */
     private void do_search (string query) {
-        var results = stub_results (query.length);
+        query = query._strip ();
         results_clear ();
-        if (results.size > 0)
-            results_show (results);
-        else if (query.length > 0)
-            results_none ();
+        if (query.length > 0) {
+            var results = parse_results (recoll_query (query));
+            if (results.size > 0)
+                results_show (results);
+            else
+                results_none ();
+        }
     }
 
     protected override void activate () {
