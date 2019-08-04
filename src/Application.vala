@@ -24,15 +24,20 @@ using Gtk;
 using Gdk;
 using Granite.Services;
 
-private errordomain ParseResult { ERROR }
+private const string APP_ID = "com.github.eugeneia.recall";
 
 public class Recall : Gtk.Application {
 
     public Recall () {
         Object (
-            application_id: "com.github.eugeneia.recall",
+            application_id: APP_ID,
             flags: ApplicationFlags.FLAGS_NONE
         );
+    }
+
+    public static GLib.Settings settings;
+    static construct {
+        settings = new GLib.Settings (APP_ID + ".settings");
     }
 
     private void bin_replace (Bin bin, Widget? widget) {
@@ -42,13 +47,11 @@ public class Recall : Gtk.Application {
         if (widget != null) bin.add (widget);
     }
 
-    private Gtk.Window main_window { get; set; }
-    private Gtk.Window main_window_init () {
-        var window = new ApplicationWindow (this);
-        window.set_titlebar (header);
-        window.default_width = 600;
-        window.default_height = 300;
+    private MainWindow main_window { get; set; }
+    private MainWindow main_window_init () {
+        var window = new MainWindow (this);
         window.title = "Recall";
+        window.set_titlebar (header);
         window.add (layout);
         return window;
     }
@@ -285,7 +288,7 @@ public class Recall : Gtk.Application {
 
     protected override void activate () {
         /* Initialize Paths service. */
-        Paths.initialize (application_id, "");
+        Paths.initialize (APP_ID, "");
 
         /* Use an application stylesheet (CSS). */
         var provider = new CssProvider ();
@@ -317,3 +320,57 @@ public class Recall : Gtk.Application {
         return app.run (args);
     }
 }
+
+private class MainWindow : ApplicationWindow {
+    public MainWindow (Gtk.Application app) {
+        Object (application: app);
+    }
+
+    construct {
+        int window_x, window_y;
+        var rect = Gtk.Allocation ();
+
+        Recall.settings.get ("window-position", "(ii)", out window_x, out window_y);
+        Recall.settings.get ("window-size", "(ii)", out rect.width, out rect.height);
+
+        if (window_x != -1 ||  window_y != -1)
+            move (window_x, window_y);
+
+        set_allocation (rect);
+
+        if (Recall.settings.get_boolean ("window-maximized"))
+            maximize ();
+
+        show_all ();
+    }
+
+    private uint configure_id = 0;
+    public override bool configure_event (EventConfigure event) {
+        if (configure_id != 0)
+            GLib.Source.remove (configure_id);
+
+        configure_id = Timeout.add (100, () => {
+            configure_id = 0;
+
+            if (is_maximized) {
+                Recall.settings.set_boolean ("window-maximized", true);
+            } else {
+                Recall.settings.set_boolean ("window-maximized", false);
+
+                Rectangle rect;
+                get_allocation (out rect);
+                Recall.settings.set ("window-size", "(ii)", rect.width, rect.height);
+
+                int root_x, root_y;
+                get_position (out root_x, out root_y);
+                Recall.settings.set ("window-position", "(ii)", root_x, root_y);
+            }
+
+            return false;
+        });
+
+        return base.configure_event (event);
+    }
+}
+
+private errordomain ParseResult { ERROR }
