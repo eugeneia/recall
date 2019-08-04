@@ -21,25 +21,23 @@
 
 @define-color colorPrimary @GRAPE_700;
 @define-color textColorPrimary @SILVER_100;
-@define-color textColorPrimaryShadow @SILVER_700;
-
-.titlebar button.raised,
-.titlebar button.raised:active
- { /* ??? */
-    color: @textColorPrimary;
-}
+@define-color textColorPrimaryShadow @GRAPE_900;
 
 .titlebar entry {
   background: alpha(@GRAPE_900, 0.5);
   color: @textColorPrimary;
-  text-shadow: none;
-  cursor: @textColorPrimary;
+  text-shadow: 1 1 @textColorPrimaryShadow;
+  caret-color: @textColorPrimary;
 }
 
 .titlebar entry image {
-    color: @textColorPrimary;
+  color: @textColorPrimary;
 }
 
 .titlebar entry image:hover {
-    color: alpha(@textColorPrimary, 0.75);
+  color: alpha(@textColorPrimary, 0.75);
+}
+
+.titlebar spinner {
+  color: @textColorPrimary;
 }
