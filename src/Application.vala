@@ -205,8 +205,7 @@ public class Recall : Gtk.Application {
 		        try {
 		            channel.read_line (out line, null, null);
 		        } catch (Error e) {
-		            stderr.printf
-		                ("Error: failed to read recoll output (%s)", e.message);
+		            critical ("Failed to read recoll output: %s", e.message);
 		            return false;
 		        }
 		        Gdk.Pixbuf icon;
@@ -216,8 +215,7 @@ public class Recall : Gtk.Application {
 		            results_add (list, icon, uri, title);
 		            nresults++;
 		        } catch (Error e) {
-		            stderr.printf
-		                ("Error: failed to parse result (%s)", e.message);
+		            warning ("Error: failed to parse result: %s", e.message);
 		        }
 		        return true;
             });
@@ -247,7 +245,8 @@ public class Recall : Gtk.Application {
                 out pid, null, out stdout_fd, null
             );
         } catch (SpawnError e) {
-            stderr.printf("Error: failed to spawn recoll (%s)\n", e.message);
+            critical ("Failed to spawn recoll: %s", e.message);
+            Process.exit (1);
         }
         output = new IOChannel.unix_new (stdout_fd);
         return pid;
@@ -256,7 +255,12 @@ public class Recall : Gtk.Application {
     /* Parse recoll output. */
     private Regex result_grammar { get; set; }
     private Regex result_grammar_init () {
-        return new Regex ("^(.*)\t\\[(.*)\\]\t\\[(.*)\\]\t[0-9]+\tbytes\t$");
+        try {
+            return new Regex ("^(.*)\t\\[(.*)\\]\t\\[(.*)\\]\t[0-9]+\tbytes\t$");
+        } catch (Error e) {
+            critical ("Failed to compile results_grammar.");
+            Process.exit (1);
+        }
     }
 
     private void parse_result
