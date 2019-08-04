@@ -24,11 +24,7 @@ using Gtk;
 using Gdk;
 using Granite.Services;
 
-struct Result {
-    string mime;
-    string uri;
-    string title;
-}
+private errordomain ParseResult { ERROR }
 
 public class Recall : Gtk.Application {
 
@@ -37,6 +33,13 @@ public class Recall : Gtk.Application {
             application_id: "com.github.eugeneia.recall",
             flags: ApplicationFlags.FLAGS_NONE
         );
+    }
+
+    private void bin_replace (Bin bin, Widget? widget) {
+        Widget? child = bin.get_child ();
+        if (child == widget) return;
+        if (child != null) bin.remove (child);
+        if (widget != null) bin.add (widget);
     }
 
     private Gtk.Window main_window { get; set; }
@@ -53,13 +56,14 @@ public class Recall : Gtk.Application {
     private HeaderBar header { get; set; }
     private HeaderBar header_init () {
         /*
-         * Header: window buttons | search folder | search bar | settings gear?
+         * Header: windowctl | folder | search | spinner | settings?
          */
         var header = new HeaderBar ();
         header.show_close_button = true;
         header.has_subtitle = false;
         header.pack_start (folder);
         header.custom_title = search;
+        header.pack_end (spinner);
         return header;
     }
 
@@ -70,13 +74,11 @@ public class Recall : Gtk.Application {
             _("Select folder"),
             FileChooserAction.SELECT_FOLDER
         );
-
-        /* Need to initialize Granite.Services.Paths to get homedir. */
-        Paths.initialize (application_id, "");
         folder.set_current_folder (Paths.home_folder.get_path ());
-
-        folder.file_set.connect (() => do_search (search.buffer.text));
-
+        folder.file_set.connect (() => {
+            previous_query = null; // force new query
+            do_search (search.buffer.text);
+        });
         return folder;
     }
 
@@ -89,117 +91,172 @@ public class Recall : Gtk.Application {
         return search;
     }
 
+    private Spinner spinner { get; set; }
+    private Spinner spinner_init () {
+        return new Spinner ();
+    }
+
     private ScrolledWindow layout { get; set; }
     private ScrolledWindow layout_init () {
         return new ScrolledWindow (null, null);
     }
 
+    private enum result { icon, uri, title }
+    private IconView results { get; set; }
+    private IconView results_init () {
+        var results = new IconView ();
+
+		results.set_pixbuf_column (result.icon);
+		results.set_tooltip_column (result.uri);
+		results.set_text_column (result.title);
+
+        results.item_orientation = Orientation.HORIZONTAL;
+        results.activate_on_single_click = true;
+
+        results.item_activated.connect ((path) => {
+            TreeIter item;
+            results.model.get_iter (out item, path);
+            Value uri;
+            results.model.get_value (item, result.uri, out uri);
+            try { AppInfo.launch_default_for_uri (uri as string, null); }
+            catch (Error e) {}
+        });
+
+        return results;
+    }
+
+    private Label no_results { get; set; }
+    private Label no_results_init () {
+        var no_results = new Label (null);
+        no_results.set_markup(
+        "<span color='grey' style='italic'>No results. :-/</span>"
+        );
+        return no_results;
+    }
+
+    private Gtk.ListStore new_results () {
+        Type[] result = {
+            typeof (Gdk.Pixbuf), // result.icon
+            typeof (string),     // result.uri
+            typeof (string)      // result.title
+        };
+        return new Gtk.ListStore.newv (result);
+    }
+    private void results_add
+        (Gtk.ListStore list, Gdk.Pixbuf icon, string uri, string title) {
+        TreeIter item;
+        list.append (out item);
+        list.set (item,
+            result.icon, icon,
+            result.uri, uri,
+            result.title, title,
+        -1);
+    }
+
+    /* Perform  search and update results shown in layout. */
+    private string? previous_query;
+    private void do_search (string query_ws) {
+        var query = query_ws.strip (); // strip whitespace prefix/suffix
+
+        /* Do nothing if query has not changed. */
+        if (query == previous_query)
+            return;
+        else
+            previous_query = query;
+
+        /* Show empty window if query is empty. */
+        if (query.length == 0) {
+            bin_replace (layout, null);
+            layout.show_all ();
+            return;
+        }
+
+        /* Otherwise start spinner to indicate query process... */
+        spinner.start ();
+
+        /* ...allocate a new list to append results to... */
+        int nresults = 0;
+        var list = new_results ();
+        results.model = list;
+
+        /* ...display the results view... */
+        bin_replace (layout, results);
+        layout.show_all ();
+
+        /* ...and invoke recoll with the query. */
+        IOChannel output;
+        var pid = run_recoll (query, out output);
+        output.add_watch
+            (IOCondition.IN | IOCondition.HUP, (channel, condition) => {
+                string line;
+                if (condition == IOCondition.HUP)
+                    return false;
+		        try {
+		            channel.read_line (out line, null, null);
+		        } catch (Error e) {
+		            stderr.printf
+		                ("Error: failed to read recoll output (%s)", e.message);
+		            return false;
+		        }
+		        Gdk.Pixbuf icon;
+		        string uri, title;
+		        try {
+		            parse_result (line, out icon, out uri, out title);
+		            results_add (list, icon, uri, title);
+		            nresults++;
+		        } catch (Error e) {
+		            stderr.printf
+		                ("Error: failed to parse result (%s)", e.message);
+		        }
+		        return true;
+            });
+        ChildWatch.add (pid, (pid, status) => {
+			Process.close_pid (pid);
+			spinner.stop ();
+			if (nresults == 0) {
+			    bin_replace(layout, no_results);
+			    layout.show_all ();
+			}
+		});
+    }
+
     /* Run recoll query, return stdout as string. */
-    private string recoll_query (string query) {
-        string[] args = {
+    private Pid run_recoll (string query, out IOChannel output) {
+        string[] cmd = {
             "recoll", "-t", "-q",
             "dir:%s %s".printf(folder.get_filename (), query)
         };
         string[] env = Environ.get ();
-        string stdout;
-        int status;
-
+        Pid pid;
+        int stdout_fd;
         try {
-            Process.spawn_sync (
-                "/", args, env, SpawnFlags.SEARCH_PATH,
-                null, out stdout, null,
-                out status
+            Process.spawn_async_with_pipes (
+                null, cmd, env,
+                SpawnFlags.SEARCH_PATH | SpawnFlags.DO_NOT_REAP_CHILD, null,
+                out pid, null, out stdout_fd, null
             );
-            if (status != 0)
-                throw new SpawnError.FAILED ("error while invoking recoll");
         } catch (SpawnError e) {
-            stderr.printf("Error: %s\n", e.message);
+            stderr.printf("Error: failed to spawn recoll (%s)\n", e.message);
         }
-        return stdout;
+        output = new IOChannel.unix_new (stdout_fd);
+        return pid;
     }
 
-    /* Parse recoll query. */
-    private ArrayList<Result?> parse_results (string query_output) {
-        var results = new ArrayList<Result?> ();
-        var result_exp = new Regex (
-            "^([a-z-]+\\/[a-z-]+)\t\\[(.*)\\]\t\\[(.*)\\]\t[0-9]+\tbytes\t$"
-        );
-        string[] lines = Regex.split_simple ("\n", query_output);
-        for (int i = 2; i < (lines.length - 1); i++) {
-            MatchInfo result;
-            if (result_exp.match (lines[i], 0, out result))
-                results.add ({
-                    result.fetch(1),
-                    result.fetch(2),
-                    result.fetch(3)
-                });
-            else
-                stderr.printf("Could not parse result: %s\n", lines[i]);
-        }
-        return results;
+    /* Parse recoll output. */
+    private Regex result_grammar { get; set; }
+    private Regex result_grammar_init () {
+        return new Regex ("^(.*)\t\\[(.*)\\]\t\\[(.*)\\]\t[0-9]+\tbytes\t$");
     }
 
-    /* Clear results in layout. */
-    private void results_clear () {
-        layout.forall ((result) => {
-            layout.remove (result);
-        });
-    }
-
-    /* Show results in layout. */
-    private void results_show (ArrayList<Result?> results) {
-        var view = results_view ();
-        view.item_orientation = Orientation.HORIZONTAL;
-        view.activate_on_single_click = true;
-
-        var model = results_model (results);
-
-        view.model = model;
-        view.item_activated.connect ((path) => {
-            string? uri = result_uri (model, path);
-            try { AppInfo.launch_default_for_uri (uri, null); }
-            catch (Error e) {}
-        });
-
-        layout.add (view);
-        layout.show_all ();
-    }
-
-    /* Create IconView for results model. */
-    private IconView results_view () {
-        var view = new IconView ();
-		view.set_pixbuf_column (0);
-		view.set_tooltip_column (1);
-		view.set_text_column (2);
-		return view;
-    }
-
-    /* Convert results to ListStore. */
-    private Gtk.ListStore results_model (ArrayList<Result?> results) {
-        var list = new Gtk.ListStore (3,
-            typeof (Gdk.Pixbuf), // Mime icon
-            typeof (string),     // URI
-            typeof (string)      // Title
-        );
-        TreeIter item;
-        foreach (var result in results) {
-            list.append (out item);
-            list.set (item,
-                0, mime_icon (result.mime),
-                1, result.uri,
-                2, result.title,
-            -1);
-        }
-        return list;
-    }
-
-    /* Get URI for path in ListStore. */
-    private string? result_uri (Gtk.ListStore results, TreePath path) {
-        TreeIter item;
-        results.get_iter (out item, path);
-        Value uri;
-        results.get_value (item, 1, out uri);
-        return uri as string;
+    private void parse_result
+        (string line, out Gdk.Pixbuf icon, out string uri, out string title)
+        throws ParseResult {
+        MatchInfo result;
+        if (result_grammar.match (line, 0, out result)) {
+            icon = mime_icon (result.fetch (1));
+            uri = result.fetch (2);
+            title = result.fetch (3);
+        } else throw new ParseResult.ERROR ("Could not parse result: %s\n", line);
     }
 
     /* Get icon for result item by mime type. */
@@ -218,30 +275,10 @@ public class Recall : Gtk.Application {
         }
     }
 
-    /* Indicate no available results in layout. */
-    private void results_none () {
-        var no_results = new Label (null);
-        no_results.set_markup(
-        "<span color='grey' style='italic'>No results. :-/</span>"
-        );
-        layout.add (no_results);
-        layout.show_all ();
-    }
-
-    /* Perform  search and update results shown in layout. */
-    private void do_search (string query) {
-        query = query._strip ();
-        results_clear ();
-        if (query.length > 0) {
-            var results = parse_results (recoll_query (query));
-            if (results.size > 0)
-                results_show (results);
-            else
-                results_none ();
-        }
-    }
-
     protected override void activate () {
+        /* Initialize Paths service. */
+        Paths.initialize (application_id, "");
+
         /* Use an application stylesheet (CSS). */
         var provider = new CssProvider ();
         provider.load_from_resource (
@@ -253,12 +290,16 @@ public class Recall : Gtk.Application {
             STYLE_PROVIDER_PRIORITY_APPLICATION
         );
 
-        /* Initialize widgets. */
+        /* Initialize widgets and models. */
         layout = layout_init ();
         folder = folder_init ();
         search = search_init ();
+        spinner = spinner_init ();
         header = header_init ();
         main_window = main_window_init ();
+        results = results_init ();
+        no_results = no_results_init ();
+        result_grammar = result_grammar_init ();
 
         main_window.show_all ();
     }
