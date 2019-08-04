@@ -61,8 +61,10 @@ public class Recall : Gtk.Application {
         var header = new HeaderBar ();
         header.show_close_button = true;
         header.has_subtitle = false;
+        header.pack_start (padding_widget (24));
         header.pack_start (folder);
         header.custom_title = search;
+        header.pack_end (padding_widget (24));
         header.pack_end (spinner);
         return header;
     }
@@ -94,6 +96,12 @@ public class Recall : Gtk.Application {
     private Spinner spinner { get; set; }
     private Spinner spinner_init () {
         return new Spinner ();
+    }
+
+    private Layout padding_widget (int width) {
+        var layout = new Layout ();
+        layout.margin_start = width;
+        return layout;
     }
 
     private ScrolledWindow layout { get; set; }
@@ -265,8 +273,8 @@ public class Recall : Gtk.Application {
         var theme = IconTheme.get_default ();
         var icon = theme.lookup_by_gicon (
             ContentType.get_icon (mime_type),
-            32,
-            IconLookupFlags.FORCE_SVG
+            48,
+            IconLookupFlags.FORCE_REGULAR
         );
         try {
             return icon.load_icon ();
