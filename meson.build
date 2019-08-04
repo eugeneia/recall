@@ -13,6 +13,13 @@ asresources = gnome.compile_resources (
     c_name: 'as'
 )
 
+# Install GSettings schemas
+install_data(
+    join_paths ('data', 'com.github.eugeneia.recall.gschema.xml'),
+    install_dir: join_paths(get_option('datadir'), 'glib-2.0', 'schemas')
+)
+meson.add_install_script('post_install.py')
+
 # Create a new executable, list the files we want to compile, list the dependencies we need, and install
 executable(
     meson.project_name(),
