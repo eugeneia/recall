@@ -233,7 +233,7 @@ public class Recall : Gtk.Application {
     private Pid run_recoll (string query, out IOChannel output) {
         string[] cmd = {
             "recoll", "-t", "-q",
-            "dir:%s %s".printf(folder.get_filename (), query)
+            "dir:\"%s\" %s".printf(folder.get_filename (), query)
         };
         string[] env = Environ.get ();
         Pid pid;
