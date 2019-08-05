@@ -19,6 +19,14 @@
  * Authored by: Max Rottenkolber <max@mr.gy>
  */
 
+/*
+ * FIXME: escape ampersand entities in tooltip (text?)
+ * TODO: Show path, title, ellipsis in IconView, full path in tooltip?
+ * TODO: Make files in iconview dragable, add show in file manager action
+ * TODO: Show welcome screen, index status
+ * TODO: Add settings gear/window
+ */
+
 using Gee;
 using Gtk;
 using Gdk;
