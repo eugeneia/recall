@@ -86,6 +86,7 @@ public class Recall : Gtk.Application {
             _("Select folder"),
             FileChooserAction.SELECT_FOLDER
         );
+        folder.create_folders = false;
         folder.set_current_folder (Paths.home_folder.get_path ());
         folder.file_set.connect (() => {
             previous_query = null; // force new query
