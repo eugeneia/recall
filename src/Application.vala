@@ -148,7 +148,8 @@ public class Recall : Gtk.Application {
     private Label no_results_init () {
         var no_results = new Label (null);
         no_results.set_markup(
-        "<span color='grey' style='italic'>No results. :-/</span>"
+        "<span color='grey' style='italic'>%s :-/</span>"
+            .printf(_("No results."))
         );
         return no_results;
     }
