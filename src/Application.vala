@@ -20,8 +20,8 @@
  */
 
 /*
- * FIXME: escape ampersand entities in tooltip (text?)
- * TODO: Show path, title, ellipsis in IconView, full path in tooltip?
+ * FIXME: FileChooserButton text color should be SILVER
+ * TODO: Right click to show item in file manager
  * TODO: Make files in iconview dragable, add show in file manager action
  * TODO: Show welcome screen, index status
  * TODO: Add settings gear/window
@@ -120,14 +120,14 @@ public class Recall : Gtk.Application {
         return new ScrolledWindow (null, null);
     }
 
-    private enum result { icon, uri, title }
+    private enum result { icon, uri, title, tooltip }
     private IconView results { get; set; }
     private IconView results_init () {
         var results = new IconView ();
 
 		results.set_pixbuf_column (result.icon);
-		results.set_tooltip_column (result.uri);
-		results.set_text_column (result.title);
+		results.set_markup_column (result.title);
+		results.set_tooltip_column (result.tooltip);
 
         results.item_orientation = Orientation.HORIZONTAL;
         results.activate_on_single_click = true;
@@ -144,6 +144,63 @@ public class Recall : Gtk.Application {
         return results;
     }
 
+    private Gtk.ListStore new_results () {
+        Type[] result = {
+            typeof (Gdk.Pixbuf), // result.icon
+            typeof (string),     // result.uri
+            typeof (string),     // result.title
+            typeof (string)      // result.tooltip
+        };
+        return new Gtk.ListStore.newv (result);
+    }
+    private void results_add
+        (Gtk.ListStore list, string type, string uri, string title) {
+        TreeIter item;
+        list.append (out item);
+        list.set (item,
+            result.icon, mime_icon (type),
+            result.uri, uri,
+            result.title, title_markup (uri, title),
+            result.tooltip, uri_tooltip (uri),
+        -1);
+    }
+
+    /* Get icon for result item by mime type. */
+	private Pixbuf default_icon;
+    private Pixbuf mime_icon (string mime_type) {
+        var theme = IconTheme.get_default ();
+        var icon = theme.lookup_by_gicon
+            (ContentType.get_icon (mime_type), 48, 0);
+        try {
+            return icon.load_icon ();
+        } catch (Error e) {
+            return default_icon;
+        }
+    }
+
+    /* Render tooltip text for URI. */
+    private string uri_tooltip (string uri) {
+        var file_prefix = "file://";
+        string tooltip;
+        if (uri.has_prefix (file_prefix))
+            tooltip = uri.slice(file_prefix.length, uri.length);
+        else
+            tooltip = uri;
+        return Markup.escape_text (tooltip);
+    }
+
+    /* Render title markup text. */
+    private string title_markup (string uri, string title) {
+        var base_uri = folder.get_uri ();
+        var path_start = base_uri.length + 1;
+        var last_folder = uri.last_index_of ("/");
+        var path_end = last_folder > path_start ? last_folder : path_start;
+        var relative_path = uri.slice (path_start, path_end);
+        var format = "%s <span size='smaller' color='#7e8087' style='italic'>%s</span>";
+        return format.printf
+            (Markup.escape_text (title), Markup.escape_text (relative_path));
+    }
+
     private Label no_results { get; set; }
     private Label no_results_init () {
         var no_results = new Label (null);
@@ -152,25 +209,6 @@ public class Recall : Gtk.Application {
             .printf(_("No results."))
         );
         return no_results;
-    }
-
-    private Gtk.ListStore new_results () {
-        Type[] result = {
-            typeof (Gdk.Pixbuf), // result.icon
-            typeof (string),     // result.uri
-            typeof (string)      // result.title
-        };
-        return new Gtk.ListStore.newv (result);
-    }
-    private void results_add
-        (Gtk.ListStore list, Gdk.Pixbuf icon, string uri, string title) {
-        TreeIter item;
-        list.append (out item);
-        list.set (item,
-            result.icon, icon,
-            result.uri, uri,
-            result.title, title,
-        -1);
     }
 
     /* Perform  search and update results shown in layout. */
@@ -217,11 +255,10 @@ public class Recall : Gtk.Application {
 		            critical ("Failed to read recoll output: %s", e.message);
 		            return false;
 		        }
-		        Gdk.Pixbuf icon;
-		        string uri, title;
+		        string type, uri, title;
 		        try {
-		            parse_result (line, out icon, out uri, out title);
-		            results_add (list, icon, uri, title);
+		            parse_result (line, out type, out uri, out title);
+		            results_add (list, type, uri, title);
 		            nresults++;
 		        } catch (Error e) {
 		            warning ("Error: failed to parse result: %s", e.message);
@@ -273,30 +310,14 @@ public class Recall : Gtk.Application {
     }
 
     private void parse_result
-        (string line, out Gdk.Pixbuf icon, out string uri, out string title)
+        (string line, out string type, out string uri, out string title)
         throws ParseResult {
         MatchInfo result;
         if (result_grammar.match (line, 0, out result)) {
-            icon = mime_icon (result.fetch (1));
+            type = result.fetch (1);
             uri = result.fetch (2);
             title = result.fetch (3);
         } else throw new ParseResult.ERROR ("Could not parse result: %s\n", line);
-    }
-
-    /* Get icon for result item by mime type. */
-	private Pixbuf default_icon;
-    private Pixbuf mime_icon (string mime_type) {
-        var theme = IconTheme.get_default ();
-        var icon = theme.lookup_by_gicon (
-            ContentType.get_icon (mime_type),
-            48,
-            IconLookupFlags.FORCE_REGULAR
-        );
-        try {
-            return icon.load_icon ();
-        } catch (Error e) {
-            return default_icon;
-        }
     }
 
     protected override void activate () {
