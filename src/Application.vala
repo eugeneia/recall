@@ -50,7 +50,6 @@ public class Recall : Gtk.Application {
     private MainWindow main_window { get; set; }
     private MainWindow main_window_init () {
         var window = new MainWindow (this);
-        window.title = "Recall";
         window.set_titlebar (header);
         window.add (layout);
         return window;
@@ -327,7 +326,7 @@ public class Recall : Gtk.Application {
 
 private class MainWindow : ApplicationWindow {
     public MainWindow (Gtk.Application app) {
-        Object (application: app);
+        Object (application: app, title: "Recall", icon_name: APP_ID);
     }
 
     construct {

@@ -15,10 +15,25 @@ asresources = gnome.compile_resources (
 
 # Install GSettings schemas
 install_data(
-    join_paths ('data', 'com.github.eugeneia.recall.gschema.xml'),
+    join_paths ('data', meson.project_name() + '.gschema.xml'),
     install_dir: join_paths(get_option('datadir'), 'glib-2.0', 'schemas')
 )
 meson.add_install_script('post_install.py')
+
+# Install icons
+icon_sizes = ['64', '128']
+foreach i : icon_sizes
+    install_data(
+        join_paths('data/icons', i + '.svg'),
+        install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', i + 'x' + i, 'apps'),
+        rename: meson.project_name() + '.svg'
+    )
+    install_data(
+        join_paths('data/icons', i + '.svg'),
+        install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', i + 'x' + i + '@2', 'apps'),
+        rename: meson.project_name() + '.svg'
+    )
+endforeach
 
 # Create a new executable, list the files we want to compile, list the dependencies we need, and install
 executable(
