@@ -196,7 +196,9 @@ public class Recall : Gtk.Application {
         var last_folder = uri.last_index_of ("/");
         var path_end = last_folder > path_start ? last_folder : path_start;
         var relative_path = uri.slice (path_start, path_end);
-        var format = "%s <span size='smaller' color='#7e8087' style='italic'>%s</span>";
+        var format =
+            "<span color='#333333'>%s</span> "
+            + "<span size='smaller' color='#7e8087' style='italic'>%s</span>";
         return format.printf
             (Markup.escape_text (title), Markup.escape_text (relative_path));
     }
