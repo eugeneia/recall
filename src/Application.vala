@@ -20,7 +20,6 @@
  */
 
 /*
- * FIXME: FileChooserButton text color should be SILVER
  * TODO: Make files in iconview dragable?
  * TODO: Show welcome screen, index status
  * TODO: Autoconfigure recoll on startup

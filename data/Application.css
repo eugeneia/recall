@@ -20,25 +20,4 @@
 * Authored by: Cassidy James Blaede <c@ssidyjam.es>, Max Rottenkolber <max@mr.gy>
 */
 
-@define-color colorPrimary @GRAPE_700;
-@define-color textColorPrimary @SILVER_100;
-@define-color textColorPrimaryShadow @GRAPE_900;
-
-.titlebar entry {
-  background: alpha(@GRAPE_900, 0.5);
-  color: @textColorPrimary;
-  text-shadow: 1px 1px @textColorPrimaryShadow;
-  caret-color: @textColorPrimary;
-}
-
-.titlebar entry image {
-  color: @textColorPrimary;
-}
-
-.titlebar entry image:hover {
-  color: alpha(@textColorPrimary, 0.75);
-}
-
-.titlebar spinner {
-  color: @textColorPrimary;
-}
+@define-color colorPrimary mix(@GRAPE_300, @BLUEBERRY_300, 0.25);
