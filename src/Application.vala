@@ -21,8 +21,11 @@
 
 /*
  * FIXME: FileChooserButton text color should be SILVER
- * TODO: Make files in iconview dragable, add show in file manager action
+ * TODO: Make files in iconview dragable?
  * TODO: Show welcome screen, index status
+ * TODO: Autoconfigure recoll on startup
+ * TODO: Parse/show number of results
+ * TODO: Add sort by mtime toggle
  * TODO: Add settings gear/window
  */
 
