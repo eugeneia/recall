@@ -21,7 +21,7 @@ install_data(
 meson.add_install_script('post_install.py')
 
 # Install icons
-icon_sizes = ['64', '128']
+icon_sizes = ['48', '64', '128']
 foreach i : icon_sizes
     install_data(
         join_paths('data/icons', i + '.svg'),
