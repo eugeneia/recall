@@ -21,7 +21,6 @@
 
 /*
  * FIXME: FileChooserButton text color should be SILVER
- * TODO: Right click to show item in file manager
  * TODO: Make files in iconview dragable, add show in file manager action
  * TODO: Show welcome screen, index status
  * TODO: Add settings gear/window
@@ -124,24 +123,46 @@ public class Recall : Gtk.Application {
     private IconView results { get; set; }
     private IconView results_init () {
         var results = new IconView ();
+        var file_manager = AppInfo.get_default_for_type ("inode/directory", true);
 
 		results.set_pixbuf_column (result.icon);
 		results.set_markup_column (result.title);
 		results.set_tooltip_column (result.tooltip);
 
         results.item_orientation = Orientation.HORIZONTAL;
-        results.activate_on_single_click = true;
 
-        results.item_activated.connect ((path) => {
-            TreeIter item;
-            results.model.get_iter (out item, path);
-            Value uri;
-            results.model.get_value (item, result.uri, out uri);
-            try { AppInfo.launch_default_for_uri (uri as string, null); }
+        results.button_release_event.connect ((event) => {
+            var path = results.get_path_at_pos ((int) event.x, (int) event.y);
+            if (path == null) {
+                results.unselect_all ();
+                return true;
+            }
+            results.select_path (path);
+            var uri = results_get (path);
+            /* On right click, open item in file_manager if its a file. */
+            if (event.button == 3)
+                if (uri.has_prefix ("file://")) {
+                    var args = new GLib.List<string> ();
+                    args.append (uri);
+                    try { file_manager.launch_uris(args, null); }
+                    catch (Error e) {}
+                    return true;
+                }
+            /* Otherwise, try to open item in default application. */
+            try  { AppInfo.launch_default_for_uri (uri, null); }
             catch (Error e) {}
+            return true;
         });
 
         return results;
+    }
+
+    private string results_get (TreePath path) {
+        TreeIter item;
+        results.model.get_iter (out item, path);
+        Value uri;
+        results.model.get_value (item, result.uri, out uri);
+        return uri as string;
     }
 
     private Gtk.ListStore new_results () {
