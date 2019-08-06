@@ -201,10 +201,10 @@ public class Recall : Gtk.Application {
 
     /* Render tooltip text for URI. */
     private string uri_tooltip (string uri) {
-        var file_prefix = "file://";
+        var base_uri = folder.get_uri ();
         string tooltip;
-        if (uri.has_prefix (file_prefix))
-            tooltip = uri.slice(file_prefix.length, uri.length);
+        if (uri.has_prefix ("file://"))
+            tooltip = uri.slice(base_uri.length + 1, uri.length);
         else
             tooltip = uri;
         return Markup.escape_text (tooltip);
