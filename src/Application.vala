@@ -21,7 +21,7 @@
 
 /*
  * TODO: Make files in iconview dragable?
- * TODO: Show welcome screen, index status
+ * TODO: Update index status on welcome screen periodically
  * TODO: Autoconfigure recoll on startup
  * TODO: Parse/show number of results
  * TODO: Add sort by mtime toggle
@@ -31,7 +31,9 @@
 using Gee;
 using Gtk;
 using Gdk;
-using Granite.Services;
+using Granite;
+using Services;
+using Widgets;
 
 private const string APP_ID = "com.github.eugeneia.recall";
 
@@ -118,7 +120,59 @@ public class Recall : Gtk.Application {
 
     private ScrolledWindow layout { get; set; }
     private ScrolledWindow layout_init () {
-        return new ScrolledWindow (null, null);
+        var layout = new ScrolledWindow (null, null);
+        layout.add (welcome);
+        return layout;
+    }
+
+    private Welcome welcome { get; set; }
+    private Welcome welcome_init () {
+        var welcome = new Welcome
+            ("Recall", "Search your document library quickly.");
+        welcome.append (
+            "system-search",
+            "Search as you type",
+            "Recall uses a powerful query language.\n" +
+            "You could look up files  containing vanilla OR banana cherry."
+        );
+        int nfiles; index_status(out nfiles);
+        welcome.append (
+            "scanner",
+            "Get results instantly",
+            "A database supporting fast lookup of all your files contents is\n" +
+            "being compiled in real-time as we speak.\n" +
+            "%d files have been scanned so far.".printf (nfiles)
+        );
+        welcome.set_item_sensitivity (1, false);
+        welcome.activated.connect ((index) => {
+            var query_docs = "file:///usr/share/recoll/doc/usermanual.html#RCL.SEARCH.LANG";
+            try { AppInfo.launch_default_for_uri (query_docs, null); }
+            catch (Error e) {}
+        });
+
+        return welcome;
+    }
+
+    private int index_status (out int nfiles) {
+        int status = 0;
+        nfiles = 0;
+        try {
+            var @idxstatus = File.new_build_filename
+                (Paths.home_folder.get_path (), ".recoll/idxstatus.txt")
+                .read ();
+            var stream = new DataInputStream (@idxstatus);
+            var line = stream.read_line ();
+            while (line != null) {
+                var field = Regex.split_simple (" = ", line);
+                if (field[0] == "phase")
+                    status = int.parse (field[1]);
+                if (field[0] == "totfiles")
+                    nfiles = int.parse (field[1]);
+                line = stream.read_line ();
+            }
+        } catch (Error e) {
+        }
+        return status;
     }
 
     private enum result { icon, uri, title, tooltip }
@@ -247,9 +301,9 @@ public class Recall : Gtk.Application {
         else
             previous_query = query;
 
-        /* Show empty window if query is empty. */
+        /* Show welcome dialog if query is empty. */
         if (query.length == 0) {
-            bin_replace (layout, null);
+            bin_replace (layout, welcome);
             layout.show_all ();
             return;
         }
@@ -361,6 +415,7 @@ public class Recall : Gtk.Application {
         );
 
         /* Initialize widgets and models. */
+        welcome = welcome_init ();
         layout = layout_init ();
         folder = folder_init ();
         search = search_init ();
