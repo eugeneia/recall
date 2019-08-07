@@ -130,12 +130,18 @@ public class Recall : Gtk.Application {
     private Welcome welcome_init () {
         var welcome = new Welcome
             ("Recall", "Search your document library quickly.");
-        welcome.append (
+        var query_note = welcome.append (
             "system-search",
             "Search as you type",
-            "Recall uses a powerful query language.\n" +
-            "You could look up files  containing vanilla OR banana cherry."
+            "Recall uses a powerful query language, you could look up files\n" +
+            "containing vanilla OR banana cherry."
         );
+        var open_note = welcome.append (
+            "document-open",
+            "Open results with a single click",
+            "Or show them in Files with a right click."
+        );
+        welcome.set_item_sensitivity (open_note, false);
         welcome_set_indexing (welcome);
         welcome.activated.connect ((index) => {
             var query_docs = "file:///usr/share/recoll/doc/usermanual.html#RCL.SEARCH.LANG";
@@ -155,7 +161,7 @@ public class Recall : Gtk.Application {
             "scanner",
             "Get results instantly",
             "A database supporting fast lookup of all your files contents is\n" +
-            "being compiled in real-time as we speak.\n" +
+            "being compiled in real-time as we speak.\n\n" +
             "%d files have been scanned so far.".printf (nfiles)
         );
         welcome.set_item_sensitivity (welcome_indexing, false);
