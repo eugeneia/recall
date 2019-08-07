@@ -20,11 +20,10 @@
  */
 
 /*
- * TODO: Make files in iconview dragable?
- * TODO: Update index status on welcome screen periodically
  * TODO: Autoconfigure recoll on startup
  * TODO: Parse/show number of results
  * TODO: Add sort by mtime toggle
+ * TODO: Make files in iconview dragable?
  * TODO: Add settings gear/window
  */
 
@@ -121,6 +120,12 @@ public class Recall : Gtk.Application {
         notebook.insert_page (layout, null, pages.results);
         notebook.insert_page (no_results, null, pages.no_results);
         notebook.page = pages.welcome;
+        Timeout.add_seconds (3, () => {
+            /* Periodically update welcome info (index status). */
+            if (notebook.page == pages.welcome)
+                welcome_set_indexing (welcome);
+            return Source.CONTINUE;
+        });
         return notebook;
     }
 
@@ -141,15 +146,7 @@ public class Recall : Gtk.Application {
             "Recall uses a powerful query language.\n" +
             "You could look up files  containing vanilla OR banana cherry."
         );
-        int nfiles; index_status(out nfiles);
-        welcome.append (
-            "scanner",
-            "Get results instantly",
-            "A database supporting fast lookup of all your files contents is\n" +
-            "being compiled in real-time as we speak.\n" +
-            "%d files have been scanned so far.".printf (nfiles)
-        );
-        welcome.set_item_sensitivity (1, false);
+        welcome_set_indexing (welcome);
         welcome.activated.connect ((index) => {
             var query_docs = "file:///usr/share/recoll/doc/usermanual.html#RCL.SEARCH.LANG";
             try { AppInfo.launch_default_for_uri (query_docs, null); }
@@ -157,6 +154,22 @@ public class Recall : Gtk.Application {
         });
 
         return welcome;
+    }
+
+    private int? welcome_indexing = null;
+    private void welcome_set_indexing (Welcome welcome) {
+        if (welcome_indexing != null)
+            welcome.remove_item (welcome_indexing);
+        int nfiles; index_status(out nfiles);
+        welcome_indexing = welcome.append (
+            "scanner",
+            "Get results instantly",
+            "A database supporting fast lookup of all your files contents is\n" +
+            "being compiled in real-time as we speak.\n" +
+            "%d files have been scanned so far.".printf (nfiles)
+        );
+        welcome.set_item_sensitivity (welcome_indexing, false);
+        welcome.show_all ();
     }
 
     private int index_status (out int nfiles) {
