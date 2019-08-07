@@ -57,6 +57,16 @@ i18n.merge_file(
     install_dir: join_paths(get_option('datadir'), 'applications')
 )
 
+#Translate and install our .contract file
+i18n.merge_file(
+    input: join_paths('data', meson.project_name() + '.contract.in'),
+    output: meson.project_name() + '.contract',
+    po_dir: join_paths(meson.source_root(), 'po'),
+    type: 'desktop',
+    install: true,
+    install_dir: join_paths(get_option('datadir'), 'contractor')
+)
+
 #Translate and install our .appdata file
 i18n.merge_file(
     input: join_paths('data', meson.project_name() + '.appdata.xml.in'),

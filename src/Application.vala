@@ -40,7 +40,7 @@ public class Recall : Gtk.Application {
     public Recall () {
         Object (
             application_id: APP_ID,
-            flags: ApplicationFlags.FLAGS_NONE
+            flags: ApplicationFlags.HANDLES_COMMAND_LINE
         );
     }
 
@@ -78,7 +78,10 @@ public class Recall : Gtk.Application {
             FileChooserAction.SELECT_FOLDER
         );
         folder.create_folders = false;
-        folder.set_current_folder (Paths.home_folder.get_path ());
+        if (initial_prefix == null)
+            folder.set_current_folder (Paths.home_folder.get_path ());
+        else
+            folder.set_current_folder (initial_prefix);
         folder.file_set.connect (() => {
             previous_query = null; // force new query
             do_search (search.buffer.text);
@@ -503,6 +506,16 @@ public class Recall : Gtk.Application {
 
         main_window.show_all ();
     }
+
+    string? initial_prefix;
+    public override int command_line (ApplicationCommandLine cmd) {
+        var arg = cmd.get_arguments ()[1];
+        var file = cmd.create_file_for_arg (arg);
+        initial_prefix = file.get_path ();
+        stdout.printf("init folder: %s\n", initial_prefix);
+        activate ();
+        return 0;
+	}
 
     public static int main (string[] args) {
         var app = new Recall ();
