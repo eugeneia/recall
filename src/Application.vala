@@ -51,18 +51,11 @@ public class Recall : Gtk.Application {
         settings = new GLib.Settings (APP_ID + ".settings");
     }
 
-    private void bin_replace (Bin bin, Widget? widget) {
-        Widget? child = bin.get_child ();
-        if (child == widget) return;
-        if (child != null) bin.remove (child);
-        if (widget != null) bin.add (widget);
-    }
-
     private MainWindow main_window { get; set; }
     private MainWindow main_window_init () {
         var window = new MainWindow (this);
         window.set_titlebar (header);
-        window.add (layout);
+        window.add (notebook);
         return window;
     }
 
@@ -113,15 +106,28 @@ public class Recall : Gtk.Application {
     }
 
     private Layout padding_widget (int width) {
-        var layout = new Layout ();
-        layout.margin_start = width;
-        return layout;
+        var padding = new Layout ();
+        padding.margin_start = width;
+        return padding;
+    }
+
+    private enum pages { welcome, results, no_results }
+    private Notebook notebook { get; set; }
+    private Notebook notebook_init () {
+        var notebook = new Notebook ();
+        notebook.show_border = false;
+        notebook.show_tabs = false;
+        notebook.insert_page (welcome, null, pages.welcome);
+        notebook.insert_page (layout, null, pages.results);
+        notebook.insert_page (no_results, null, pages.no_results);
+        notebook.page = pages.welcome;
+        return notebook;
     }
 
     private ScrolledWindow layout { get; set; }
     private ScrolledWindow layout_init () {
         var layout = new ScrolledWindow (null, null);
-        layout.add (welcome);
+        layout.add (results);
         return layout;
     }
 
@@ -303,8 +309,7 @@ public class Recall : Gtk.Application {
 
         /* Show welcome dialog if query is empty. */
         if (query.length == 0) {
-            bin_replace (layout, welcome);
-            layout.show_all ();
+            notebook.page = pages.welcome;
             return;
         }
 
@@ -317,8 +322,7 @@ public class Recall : Gtk.Application {
         results.model = list;
 
         /* ...display the results view... */
-        bin_replace (layout, results);
-        layout.show_all ();
+        notebook.page = pages.results;
 
         /* ...and invoke recoll with the query. */
         IOChannel output;
@@ -347,10 +351,8 @@ public class Recall : Gtk.Application {
         ChildWatch.add (pid, (pid, status) => {
 			Process.close_pid (pid);
 			spinner.stop ();
-			if (nresults == 0) {
-			    bin_replace(layout, no_results);
-			    layout.show_all ();
-			}
+			if (nresults == 0)
+			    notebook.page = pages.no_results;
 		});
     }
 
@@ -416,15 +418,16 @@ public class Recall : Gtk.Application {
 
         /* Initialize widgets and models. */
         welcome = welcome_init ();
+        results = results_init ();
+        result_grammar = result_grammar_init ();
         layout = layout_init ();
+        no_results = no_results_init ();
+        notebook = notebook_init ();
         folder = folder_init ();
         search = search_init ();
         spinner = spinner_init ();
         header = header_init ();
         main_window = main_window_init ();
-        results = results_init ();
-        no_results = no_results_init ();
-        result_grammar = result_grammar_init ();
 
         main_window.show_all ();
     }
