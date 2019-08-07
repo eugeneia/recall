@@ -65,11 +65,8 @@ public class Recall : Gtk.Application {
          */
         var header = new HeaderBar ();
         header.show_close_button = true;
-        header.has_subtitle = false;
-        header.pack_start (padding_widget (24));
         header.pack_start (folder);
         header.custom_title = search;
-        header.pack_end (padding_widget (24));
         header.pack_end (spinner);
         return header;
     }
@@ -93,7 +90,7 @@ public class Recall : Gtk.Application {
     private SearchEntry search { get; set; }
     private SearchEntry search_init () {
         var search = new SearchEntry ();
-        search.max_width_chars = 100;
+        search.max_width_chars = 200;
         search.placeholder_text = _("Search for files related to…");
         search.search_changed.connect (() => do_search (search.buffer.text));
         return search;
@@ -102,12 +99,6 @@ public class Recall : Gtk.Application {
     private Spinner spinner { get; set; }
     private Spinner spinner_init () {
         return new Spinner ();
-    }
-
-    private Layout padding_widget (int width) {
-        var padding = new Layout ();
-        padding.margin_start = width;
-        return padding;
     }
 
     private enum pages { welcome, results, no_results }
