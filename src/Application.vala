@@ -20,7 +20,6 @@
  */
 
 /*
- * TODO: Autoconfigure recoll on startup
  * TODO: Parse/show number of results
  * TODO: Add sort by mtime toggle
  * TODO: Make files in iconview dragable?
@@ -168,7 +167,7 @@ public class Recall : Gtk.Application {
         nfiles = 0;
         try {
             var @idxstatus = File.new_build_filename
-                (Paths.home_folder.get_path (), ".recoll/idxstatus.txt")
+                (confdir_path, "idxstatus.txt")
                 .read ();
             var stream = new DataInputStream (@idxstatus);
             var line = stream.read_line ();
@@ -363,7 +362,7 @@ public class Recall : Gtk.Application {
     /* Run recoll query, return stdout as string. */
     private Pid run_recoll (string query, out IOChannel output) {
         string[] cmd = {
-            "recoll", "-t", "-q",
+            "recoll", "-t", "-q", "-c", confdir_path,
             "dir:\"%s\" %s".printf(folder.get_filename (), query)
         };
         string[] env = Environ.get ();
@@ -405,6 +404,66 @@ public class Recall : Gtk.Application {
         } else throw new ParseResult.ERROR ("Could not parse result: %s\n", line);
     }
 
+    private string confdir_path { get; set; }
+    private void autoconfigure () {
+        Paths.ensure_directory_exists (Paths.user_config_folder);
+        confdir_path = Paths.user_config_folder.get_path ();
+        /* Autogenerate recoll.conf in confdir. */
+        var recoll_conf = File.new_build_filename (confdir_path, "recoll.conf");
+        if (!recoll_conf.query_exists ()) {
+            try {
+                var filestream = recoll_conf.create_readwrite (0);
+                var datastream = new DataOutputStream (filestream.output_stream);
+                datastream.put_string (
+                    "skippedNames = .*\n"
+                );
+            } catch (Error e) {
+                critical ("Failed to create %s: %s",
+                    recoll_conf.get_path (), e.message);
+                Process.exit (1);
+            }
+        }
+        /* Autosetup autostart of recollindex for confdir. */
+        var index_autostart = File.new_build_filename (
+            Paths.xdg_config_home_folder.get_path (),
+            "autostart",
+            APP_ID+".desktop"
+        );
+        if (index_autostart.query_exists ())
+            return;
+        /* Appears to be first start: run recollindex... */
+        string[] cmd = { "recollindex", "-c", confdir_path, "-m", "-w", "0" };
+        string[] env = Environ.get ();
+        try {
+            Process.spawn_sync (null, cmd, env, SpawnFlags.SEARCH_PATH, null);
+        } catch (SpawnError e) {
+            critical ("Failed to spawn recollindex: %s", e.message);
+            Process.exit (1);
+        }
+        /*  ...and create autostart entry. */
+        try {
+            var filestream = index_autostart.create_readwrite (0);
+            var datastream = new DataOutputStream (filestream.output_stream);
+            datastream.put_string (
+                "[Desktop Entry]\n" +
+                "Name=Recall Indexer\n" +
+                "GenericName=%s\n".printf(_("Document Search Indexing")) +
+                "Comment=%s\n".printf(_("Automatically index docments in real-time")) +
+                "Categories=Utility;FileTools;\n" +
+                "Exec=recollindex -c %s -D -w 60 -m\n".printf(confdir_path) +
+                "Icon=%s\n".printf(APP_ID) +
+                "Terminal=false\n" +
+                "Type=Application\n" +
+                "Keywords=Search;Document;Full;Text;Index;Lookup:Query;Recoll;Xapian;Files;Find;\n" +
+                "X-GNOME-Autostart-enabled=true\n"
+            );
+        } catch (Error e) {
+            critical ("Failed to create %s: %s",
+                index_autostart.get_path (), e.message);
+            Process.exit (1);
+        }
+    }
+
     protected override void activate () {
         /* Initialize Paths service. */
         Paths.initialize (APP_ID, "");
@@ -419,6 +478,9 @@ public class Recall : Gtk.Application {
             provider,
             STYLE_PROVIDER_PRIORITY_APPLICATION
         );
+
+        /* Autoconfigure recollindex. */
+        autoconfigure ();
 
         /* Initialize widgets and models. */
         welcome = welcome_init ();
