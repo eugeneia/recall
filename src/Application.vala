@@ -419,58 +419,83 @@ public class Recall : Gtk.Application {
         confdir_path = Paths.user_config_folder.get_path ();
         /* Autogenerate recoll.conf in confdir. */
         var recoll_conf = File.new_build_filename (confdir_path, "recoll.conf");
-        if (!recoll_conf.query_exists ()) {
-            try {
-                var filestream = recoll_conf.create_readwrite (0);
-                var datastream = new DataOutputStream (filestream.output_stream);
-                datastream.put_string (
-                    "skippedNames = .*\n"
-                );
-            } catch (Error e) {
+        if (!recoll_conf.query_exists ())
+            try { create_conf (recoll_conf); }
+            catch (Error e) {
                 critical ("Failed to create %s: %s",
                     recoll_conf.get_path (), e.message);
                 Process.exit (1);
             }
-        }
         /* Autosetup autostart of recollindex for confdir. */
         var index_autostart = File.new_build_filename (
             Paths.xdg_config_home_folder.get_path (),
             "autostart",
             APP_ID+".desktop"
         );
-        if (index_autostart.query_exists ())
-            return;
-        /* Appears to be first start: run recollindex... */
+        if (!index_autostart.query_exists ())
+            try { create_autostart (index_autostart); }
+            catch (Error e) {
+                critical ("Failed to create %s: %s",
+                    recoll_conf.get_path (), e.message);
+                Process.exit (1);
+            }
+        /* Spawn recollindex if its not already running. */
+        if (!recollindex_isalive ()) {
+            try { spawn_recollindex (); }
+            catch (SpawnError e) {
+                critical ("Failed to spawn recollindex: %s", e.message);
+                Process.exit (1);
+            }
+        }
+    }
+
+    private void create_conf (File file) throws Error {
+        var filestream = file.create_readwrite (0);
+        var datastream = new DataOutputStream (filestream.output_stream);
+        datastream.put_string (
+            "skippedNames = .*\n"
+        );
+    }
+
+    private void create_autostart (File file) throws Error {
+        var filestream = file.create_readwrite (0);
+        var datastream = new DataOutputStream (filestream.output_stream);
+        datastream.put_string (
+            "[Desktop Entry]\n" +
+            "Name=Recall Indexer\n" +
+            "GenericName=%s\n".printf(_("Document Search Indexing")) +
+            "Comment=%s\n".printf(_("Automatically index docments in real-time")) +
+            "Categories=Utility;FileTools;\n" +
+            "Exec=recollindex -c %s -D -x -m\n".printf(confdir_path) +
+            "Icon=%s\n".printf(APP_ID) +
+            "Terminal=false\n" +
+            "Type=Application\n" +
+            "Keywords=Search;Document;Full;Text;Index;Lookup:Query;Recoll;Xapian;Files;Find;\n" +
+            "X-GNOME-Autostart-enabled=true\n"
+        );
+    }
+
+    private void spawn_recollindex () throws SpawnError {
         string[] cmd = { "recollindex", "-c", confdir_path, "-m", "-w", "0" };
         string[] env = Environ.get ();
-        try {
-            Process.spawn_sync (null, cmd, env, SpawnFlags.SEARCH_PATH, null);
-        } catch (SpawnError e) {
-            critical ("Failed to spawn recollindex: %s", e.message);
-            Process.exit (1);
+        Process.spawn_sync (null, cmd, env, SpawnFlags.SEARCH_PATH, null);
+    }
+
+    private bool recollindex_isalive () {
+        var pidfile = File.new_build_filename (confdir_path, "index.pid");
+        if (pidfile.query_exists ()) {
+            Posix.pid_t? pid = null;
+            try {
+                var filestream = pidfile.read ();
+                var datastream = new DataInputStream (filestream);
+                pid = int.parse (datastream.read_line ());
+            } catch (Error e) {
+                warning ("Could not read pidfile: %s", pidfile.get_path ());
+            }
+            if (pid != null && Posix.kill (pid, 0) == 0)
+                return true;
         }
-        /*  ...and create autostart entry. */
-        try {
-            var filestream = index_autostart.create_readwrite (0);
-            var datastream = new DataOutputStream (filestream.output_stream);
-            datastream.put_string (
-                "[Desktop Entry]\n" +
-                "Name=Recall Indexer\n" +
-                "GenericName=%s\n".printf(_("Document Search Indexing")) +
-                "Comment=%s\n".printf(_("Automatically index docments in real-time")) +
-                "Categories=Utility;FileTools;\n" +
-                "Exec=recollindex -c %s -D -w 60 -m\n".printf(confdir_path) +
-                "Icon=%s\n".printf(APP_ID) +
-                "Terminal=false\n" +
-                "Type=Application\n" +
-                "Keywords=Search;Document;Full;Text;Index;Lookup:Query;Recoll;Xapian;Files;Find;\n" +
-                "X-GNOME-Autostart-enabled=true\n"
-            );
-        } catch (Error e) {
-            critical ("Failed to create %s: %s",
-                index_autostart.get_path (), e.message);
-            Process.exit (1);
-        }
+        return false;
     }
 
     protected override void activate () {
@@ -510,9 +535,10 @@ public class Recall : Gtk.Application {
     string? initial_prefix;
     public override int command_line (ApplicationCommandLine cmd) {
         var arg = cmd.get_arguments ()[1];
-        var file = cmd.create_file_for_arg (arg);
-        initial_prefix = file.get_path ();
-        stdout.printf("init folder: %s\n", initial_prefix);
+        if (arg != null) {
+            var file = cmd.create_file_for_arg (arg);
+            initial_prefix = file.get_path ();
+        }
         activate ();
         return 0;
 	}

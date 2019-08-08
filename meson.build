@@ -42,7 +42,8 @@ executable(
     asresources,
     dependencies: [
         dependency('gtk+-3.0'),
-        dependency('granite')
+        dependency('granite'),
+        meson.get_compiler('vala').find_library('posix')
     ],
     install: true
 )
