@@ -103,30 +103,31 @@ public class Recall : Gtk.Application {
         return new Spinner ();
     }
 
-    private enum pages { welcome, results, no_results }
+    private enum Pages { WELCOME, RESULTS, NO_RESULTS }
     private Notebook notebook { get; set; }
     private Notebook notebook_init () {
         var notebook = new Notebook ();
         notebook.show_border = false;
         notebook.show_tabs = false;
-        notebook.insert_page (welcome, null, pages.welcome);
-        notebook.insert_page (layout, null, pages.results);
-        notebook.insert_page (no_results, null, pages.no_results);
-        notebook.page = pages.welcome;
+        notebook.insert_page (welcome, null, Pages.WELCOME);
+        notebook.insert_page (results_window, null, Pages.RESULTS);
+        notebook.insert_page (no_results, null, Pages.NO_RESULTS);
+        notebook.page = Pages.WELCOME;
         Timeout.add_seconds (3, () => {
             /* Periodically update welcome info (index status). */
-            if (notebook.page == pages.welcome)
+            if (notebook.page == Pages.WELCOME)
                 welcome_set_indexing (welcome);
             return Source.CONTINUE;
         });
         return notebook;
     }
 
-    private ScrolledWindow layout { get; set; }
-    private ScrolledWindow layout_init () {
-        var layout = new ScrolledWindow (null, null);
-        layout.add (results);
-        return layout;
+    private ScrolledWindow results_window { get; set; }
+    private ScrolledWindow results_window_init () {
+        var results_window = new ScrolledWindow (null, null);
+        results_window.add (results_view);
+        results_window.edge_reached.connect (() => results.more ());
+        return results_window;
     }
 
     private Welcome welcome { get; set; }
@@ -193,26 +194,26 @@ public class Recall : Gtk.Application {
         return status;
     }
 
-    private enum result { icon, uri, title, tooltip }
-    private IconView results { get; set; }
-    private IconView results_init () {
-        var results = new IconView ();
+    private Results? results = null;
+    private IconView results_view { get; set; }
+    private IconView results_view_init () {
+        var results_view = new IconView ();
         var file_manager = AppInfo.get_default_for_type ("inode/directory", true);
 
-		results.set_pixbuf_column (result.icon);
-		results.set_markup_column (result.title);
-		results.set_tooltip_column (result.tooltip);
+		results_view.set_pixbuf_column (Results.Column.ICON);
+		results_view.set_markup_column (Results.Column.TITLE);
+		results_view.set_tooltip_column (Results.Column.URI);
 
-        results.item_orientation = Orientation.HORIZONTAL;
+        results_view.item_orientation = Orientation.HORIZONTAL;
 
-        results.button_release_event.connect ((event) => {
-            var path = results.get_path_at_pos ((int) event.x, (int) event.y);
+        results_view.button_release_event.connect ((event) => {
+            var path = results_view.get_path_at_pos ((int) event.x, (int) event.y);
             if (path == null) {
-                results.unselect_all ();
+                results_view.unselect_all ();
                 return true;
             }
-            results.select_path (path);
-            var uri = results_get (path);
+            results_view.select_path (path);
+            var uri = results.get_uri (path);
             /* On right click, open item in file_manager if its a file. */
             if (event.button == 3)
                 if (uri.has_prefix ("file://")) {
@@ -228,74 +229,7 @@ public class Recall : Gtk.Application {
             return true;
         });
 
-        return results;
-    }
-
-    private string results_get (TreePath path) {
-        TreeIter item;
-        results.model.get_iter (out item, path);
-        Value uri;
-        results.model.get_value (item, result.uri, out uri);
-        return uri as string;
-    }
-
-    private Gtk.ListStore new_results () {
-        Type[] result = {
-            typeof (Gdk.Pixbuf), // result.icon
-            typeof (string),     // result.uri
-            typeof (string),     // result.title
-            typeof (string)      // result.tooltip
-        };
-        return new Gtk.ListStore.newv (result);
-    }
-    private void results_add
-        (Gtk.ListStore list, string type, string uri, string title) {
-        TreeIter item;
-        list.append (out item);
-        list.set (item,
-            result.icon, mime_icon (type),
-            result.uri, uri,
-            result.title, title_markup (uri, title),
-            result.tooltip, uri_tooltip (uri),
-        -1);
-    }
-
-    /* Get icon for result item by mime type. */
-	private Pixbuf default_icon;
-    private Pixbuf mime_icon (string mime_type) {
-        var theme = IconTheme.get_default ();
-        var icon = theme.lookup_by_gicon
-            (ContentType.get_icon (mime_type), 48, 0);
-        try {
-            return icon.load_icon ();
-        } catch (Error e) {
-            return default_icon;
-        }
-    }
-
-    /* Render tooltip text for URI. */
-    private string uri_tooltip (string uri) {
-        var base_uri = folder.get_uri ();
-        string tooltip;
-        if (uri.has_prefix ("file://"))
-            tooltip = uri.slice(base_uri.length + 1, uri.length);
-        else
-            tooltip = uri;
-        return Markup.escape_text (tooltip);
-    }
-
-    /* Render title markup text. */
-    private string title_markup (string uri, string title) {
-        var base_uri = folder.get_uri ();
-        var path_start = base_uri.length + 1;
-        var last_folder = uri.last_index_of ("/");
-        var path_end = last_folder > path_start ? last_folder : path_start;
-        var relative_path = uri.slice (path_start, path_end);
-        var format =
-            "<span color='#333333'>%s</span> "
-            + "<span size='smaller' color='#7e8087' style='italic'>%s</span>";
-        return format.printf
-            (Markup.escape_text (title), Markup.escape_text (relative_path));
+        return results_view;
     }
 
     private Label no_results { get; set; }
@@ -308,7 +242,7 @@ public class Recall : Gtk.Application {
         return no_results;
     }
 
-    /* Perform  search and update results shown in layout. */
+    /* Perform  search and update results shown in results_window. */
     private string? previous_query;
     private void do_search (string query_ws) {
         var query = query_ws.strip (); // strip whitespace prefix/suffix
@@ -321,20 +255,20 @@ public class Recall : Gtk.Application {
 
         /* Show welcome dialog if query is empty. */
         if (query.length == 0) {
-            notebook.page = pages.welcome;
+            notebook.page = Pages.WELCOME;
             return;
         }
 
         /* Otherwise start spinner to indicate query process... */
         spinner.start ();
 
-        /* ...allocate a new list to append results to... */
-        int nresults = 0;
-        var list = new_results ();
-        results.model = list;
+        /* ...allocate new Results collection... */
+        var search_results = new Results (folder.get_uri ());
+        results = search_results;
+        results_view.model = search_results.model;
 
         /* ...display the results view... */
-        notebook.page = pages.results;
+        notebook.page = Pages.RESULTS;
 
         /* ...and invoke recoll with the query. */
         IOChannel output;
@@ -350,21 +284,14 @@ public class Recall : Gtk.Application {
 		            critical ("Failed to read recoll output: %s", e.message);
 		            return false;
 		        }
-		        string type, uri, title;
-		        try {
-		            parse_result (line, out type, out uri, out title);
-		            results_add (list, type, uri, title);
-		            nresults++;
-		        } catch (Error e) {
-		            warning ("Error: failed to parse result: %s", e.message);
-		        }
+		        search_results.parse (line);
 		        return true;
             });
         ChildWatch.add (pid, (pid, status) => {
 			Process.close_pid (pid);
 			spinner.stop ();
-			if (nresults == 0)
-			    notebook.page = pages.no_results;
+			if (search_results.nresults == 0)
+			    notebook.page = Pages.NO_RESULTS;
 		});
     }
 
@@ -389,28 +316,6 @@ public class Recall : Gtk.Application {
         }
         output = new IOChannel.unix_new (stdout_fd);
         return pid;
-    }
-
-    /* Parse recoll output. */
-    private Regex result_grammar { get; set; }
-    private Regex result_grammar_init () {
-        try {
-            return new Regex ("^(.*)\t\\[(.*)\\]\t\\[(.*)\\]\t[0-9]+\tbytes\t$");
-        } catch (Error e) {
-            critical ("Failed to compile results_grammar.");
-            Process.exit (1);
-        }
-    }
-
-    private void parse_result
-        (string line, out string type, out string uri, out string title)
-        throws ParseResult {
-        MatchInfo result;
-        if (result_grammar.match (line, 0, out result)) {
-            type = result.fetch (1);
-            uri = result.fetch (2);
-            title = result.fetch (3);
-        } else throw new ParseResult.ERROR ("Could not parse result: %s\n", line);
     }
 
     private string confdir_path { get; set; }
@@ -520,9 +425,8 @@ public class Recall : Gtk.Application {
 
         /* Initialize widgets and models. */
         welcome = welcome_init ();
-        results = results_init ();
-        result_grammar = result_grammar_init ();
-        layout = layout_init ();
+        results_view = results_view_init ();
+        results_window = results_window_init ();
         no_results = no_results_init ();
         notebook = notebook_init ();
         folder = folder_init ();
@@ -603,4 +507,133 @@ private class MainWindow : ApplicationWindow {
     }
 }
 
-private errordomain ParseResult { ERROR }
+private class Results : Object {
+
+    public Results (string base_uri) {
+        this.base_uri = base_uri;
+        this.list = new Gtk.ListStore.newv (columns);
+        this.result_grammar = result_grammar_init ();
+    }
+
+    public TreeModel model { get { return list; } }
+
+    public int nresults { get { return results.size; } }
+
+    public enum Column { ICON, URI, TITLE, TOOLTIP }
+
+    public string get_uri (TreePath path) {
+        TreeIter item;
+        list.get_iter (out item, path);
+        Value uri;
+        list.get_value (item, Column.URI, out uri);
+        return uri as string;
+    }
+
+    public void parse (string line) {
+        Result? result = parse_result (line);
+        if (result != null) {
+            results.add (result);
+            if (results_added < initial_items)
+                more (1);
+        }
+    }
+
+    public void more (int n = initial_items) {
+        while (n > 0 && results_added < results.size) {
+            add(results[results_added]);
+            results_added++;
+            n--;
+        }
+    }
+
+    private string base_uri { get; set; }
+
+    private static Type[] columns = {
+            typeof (Gdk.Pixbuf), // Column.ICON
+            typeof (string),     // Column.URI
+            typeof (string),     // Column.TITLE
+            typeof (string)      // Column.TOOLTIP
+    };
+
+    private ArrayList<Result?> results = new ArrayList<Result?> ();
+    private int results_added = 0;
+
+    private Gtk.ListStore list { get; set; }
+    public const int initial_items = 100;
+
+    private void add (Result result) {
+        TreeIter item;
+        list.append (out item);
+        list.set (item,
+            Column.ICON, mime_icon (result.type),
+            Column.URI, result.uri,
+            Column.TITLE, title_markup (result.uri, result.title),
+            Column.TOOLTIP, uri_tooltip (result.uri),
+        -1);
+    }
+
+    /* Get icon for result item by mime type. */
+    private IconTheme icon_theme = IconTheme.get_default ();
+	private Pixbuf default_icon;
+    private Pixbuf mime_icon (string mime_type) {
+        var icon = icon_theme.lookup_by_gicon
+            (ContentType.get_icon (mime_type), 48, 0);
+        try {
+            return icon.load_icon ();
+        } catch (Error e) {
+            return default_icon;
+        }
+    }
+
+    /* Render tooltip text for URI. */
+    private string uri_tooltip (string uri) {
+        string tooltip;
+        if (uri.has_prefix ("file://"))
+            tooltip = uri.slice(base_uri.length + 1, uri.length);
+        else
+            tooltip = uri;
+        return Markup.escape_text (tooltip);
+    }
+
+    /* Render title markup text. */
+    private string title_markup (string uri, string title) {
+        var path_start = base_uri.length + 1;
+        var last_folder = uri.last_index_of ("/");
+        var path_end = last_folder > path_start ? last_folder : path_start;
+        var relative_path = uri.slice (path_start, path_end);
+        var format =
+            "<span color='#333333'>%s</span> "
+            + "<span size='smaller' color='#7e8087' style='italic'>%s</span>";
+        return format.printf
+            (Markup.escape_text (title), Markup.escape_text (relative_path));
+    }
+
+    /* Parse recoll output. */
+    private struct Result {
+        string type;
+        string uri;
+        string title;
+    }
+    private Regex result_grammar { get; set; }
+    private Regex result_grammar_init () {
+        try {
+            return new Regex ("^(.*)\t\\[(.*)\\]\t\\[(.*)\\]\t[0-9]+\tbytes\t$");
+        } catch (Error e) {
+            critical ("Failed to compile results_grammar.");
+            Process.exit (1);
+        }
+    }
+    private Result? parse_result (string line) {
+        MatchInfo result;
+        if (result_grammar.match (line, 0, out result)) {
+            return {
+                type: result.fetch (1),
+                uri: result.fetch (2),
+                title: result.fetch (3)
+            };
+        } else {
+            warning ("Error: failed to parse result: %s", line);
+            return null;
+        }
+    }
+}
