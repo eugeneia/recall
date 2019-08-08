@@ -484,15 +484,17 @@ public class Recall : Gtk.Application {
     private bool recollindex_isalive () {
         var pidfile = File.new_build_filename (confdir_path, "index.pid");
         if (pidfile.query_exists ()) {
-            Posix.pid_t? pid = null;
+            Posix.pid_t pid = 0;
             try {
                 var filestream = pidfile.read ();
                 var datastream = new DataInputStream (filestream);
-                pid = int.parse (datastream.read_line ());
+                var line = datastream.read_line ();
+                if (line != null)
+                    pid = int.parse (line);
             } catch (Error e) {
                 warning ("Could not read pidfile: %s", pidfile.get_path ());
             }
-            if (pid != null && Posix.kill (pid, 0) == 0)
+            if (pid != 0 && Posix.kill (pid, 0) == 0)
                 return true;
         }
         return false;
