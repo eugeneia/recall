@@ -20,7 +20,6 @@
  */
 
 /*
- * TODO: Parse/show number of results
  * TODO: Add sort by mtime toggle
  * TODO: Make files in iconview dragable?
  * TODO: Add settings gear/window
@@ -60,13 +59,12 @@ public class Recall : Gtk.Application {
     private HeaderBar header { get; set; }
     private HeaderBar header_init () {
         /*
-         * Header: windowctl | folder | search | spinner | settings?
+         * Header: windowctl | folder | search | settings?
          */
         var header = new HeaderBar ();
         header.show_close_button = true;
         header.pack_start (folder);
         header.custom_title = search;
-        header.pack_end (spinner);
         return header;
     }
 
@@ -98,20 +96,14 @@ public class Recall : Gtk.Application {
         return search;
     }
 
-    private Spinner spinner { get; set; }
-    private Spinner spinner_init () {
-        return new Spinner ();
-    }
-
-    private enum Pages { WELCOME, RESULTS, NO_RESULTS }
+    private enum Pages { WELCOME, RESULTS }
     private Notebook notebook { get; set; }
     private Notebook notebook_init () {
         var notebook = new Notebook ();
         notebook.show_border = false;
         notebook.show_tabs = false;
         notebook.insert_page (welcome, null, Pages.WELCOME);
-        notebook.insert_page (results_window, null, Pages.RESULTS);
-        notebook.insert_page (no_results, null, Pages.NO_RESULTS);
+        notebook.insert_page (results_overlay, null, Pages.RESULTS);
         notebook.page = Pages.WELCOME;
         Timeout.add_seconds (3, () => {
             /* Periodically update welcome info (index status). */
@@ -120,6 +112,27 @@ public class Recall : Gtk.Application {
             return Source.CONTINUE;
         });
         return notebook;
+    }
+
+    private OverlayBar results_info { get; set; }
+    private OverlayBar results_info_init () {
+        var results_info = new OverlayBar (results_overlay);
+        return results_info;
+    }
+    private void results_info_set (int total_results) {
+        if (total_results == 0)
+            results_info.label = "No result";
+        else if (total_results == 1)
+            results_info.label = _("One result");
+        else
+            results_info.label = _("%d results").printf (total_results);
+    }
+
+    private Overlay results_overlay { get; set; }
+    private Overlay results_overlay_init () {
+        var overlay = new Overlay ();
+        overlay.add (results_window);
+        return overlay;
     }
 
     private ScrolledWindow results_window { get; set; }
@@ -134,7 +147,7 @@ public class Recall : Gtk.Application {
     private Welcome welcome_init () {
         var welcome = new Welcome
             ("Recall", "Search your document library quickly.");
-        var query_note = welcome.append (
+        welcome.append (
             "system-search",
             "Search as you type",
             "Recall uses a powerful query language, you could look up files\n" +
@@ -232,16 +245,6 @@ public class Recall : Gtk.Application {
         return results_view;
     }
 
-    private Label no_results { get; set; }
-    private Label no_results_init () {
-        var no_results = new Label (null);
-        no_results.set_markup(
-        "<span color='grey' style='italic'>%s :-/</span>"
-            .printf(_("No results."))
-        );
-        return no_results;
-    }
-
     /* Perform  search and update results shown in results_window. */
     private string? previous_query;
     private void do_search (string query_ws) {
@@ -260,7 +263,7 @@ public class Recall : Gtk.Application {
         }
 
         /* Otherwise start spinner to indicate query process... */
-        spinner.start ();
+        results_info.active = true;
 
         /* ...allocate new Results collection... */
         var search_results = new Results (folder.get_uri ());
@@ -289,17 +292,16 @@ public class Recall : Gtk.Application {
             });
         ChildWatch.add (pid, (pid, status) => {
 			Process.close_pid (pid);
-			spinner.stop ();
-			if (search_results.nresults == 0)
-			    notebook.page = Pages.NO_RESULTS;
+			results_info.active = false;
+			results_info_set (search_results.total_results);
 		});
     }
 
     /* Run recoll query, return stdout as string. */
     private Pid run_recoll (string query, out IOChannel output) {
         string[] cmd = {
-            "recoll", "-t", "-q", "-c", confdir_path,
-            "dir:\"%s\" %s".printf(folder.get_filename (), query)
+            "recoll", "-c", confdir_path, "-t", "-q",
+            "dir:\"%s\"".printf(folder.get_filename ()), query
         };
         string[] env = Environ.get ();
         Pid pid;
@@ -427,11 +429,11 @@ public class Recall : Gtk.Application {
         welcome = welcome_init ();
         results_view = results_view_init ();
         results_window = results_window_init ();
-        no_results = no_results_init ();
+        results_overlay = results_overlay_init ();
+        results_info = results_info_init ();
         notebook = notebook_init ();
         folder = folder_init ();
         search = search_init ();
-        spinner = spinner_init ();
         header = header_init ();
         main_window = main_window_init ();
 
@@ -515,9 +517,11 @@ private class Results : Object {
         this.result_grammar = result_grammar_init ();
     }
 
-    public TreeModel model { get { return list; } }
+    public string? recoll_query = null;
 
-    public int nresults { get { return results.size; } }
+    public int? total_results = null;
+
+    public TreeModel model { get { return list; } }
 
     public enum Column { ICON, URI, TITLE, TOOLTIP }
 
@@ -530,6 +534,14 @@ private class Results : Object {
     }
 
     public void parse (string line) {
+        if (recoll_query == null) {
+            parse_query (line);
+            return;
+        }
+        if (total_results == null) {
+            parse_total_results (line);
+            return;
+        }
         Result? result = parse_result (line);
         if (result != null) {
             results.add (result);
@@ -635,5 +647,11 @@ private class Results : Object {
             warning ("Error: failed to parse result: %s", line);
             return null;
         }
+    }
+    private void parse_query (string line) {
+        recoll_query = line;
+    }
+    private void parse_total_results (string line) {
+        total_results = int.parse (line);
     }
 }
