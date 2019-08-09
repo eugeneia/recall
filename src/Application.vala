@@ -20,9 +20,9 @@
  */
 
 /*
- * TODO: Add sort by mtime toggle
  * TODO: Make files in iconview dragable?
- * TODO: Add settings gear/window
+ * TODO: Add settings gear/window (configure stemming?)
+ * FIXME: IconView icon rendering for hidpi
  */
 
 using Gee;
@@ -65,6 +65,7 @@ public class Recall : Gtk.Application {
         header.show_close_button = true;
         header.pack_start (folder);
         header.custom_title = search;
+        header.pack_end (sort_mode);
         return header;
     }
 
@@ -94,6 +95,26 @@ public class Recall : Gtk.Application {
         search.placeholder_text = _("Search for files related to…");
         search.search_changed.connect (() => do_search (search.buffer.text));
         return search;
+    }
+
+    private ModeSwitch sort_mode { get; set; }
+    private ModeSwitch sort_mode_init () {
+        var sort_mode = new ModeSwitch.from_icon_name
+            ("view-sort-ascending-symbolic", "document-open-recent-symbolic");
+        sort_mode.valign = Align.CENTER;
+        search.margin_start = 8;
+        search.margin_end = 8;
+        sort_mode.primary_icon_tooltip_text =
+            _("Show most relevant results first");
+        sort_mode.secondary_icon_tooltip_text =
+            _("Show newest results first");
+        sort_mode.active = Recall.settings.get_boolean ("sort-mode");
+        sort_mode.notify["active"].connect (() => {
+            previous_query = null; // force new query
+            do_search (search.buffer.text);
+            Recall.settings.set_boolean ("sort-mode", sort_mode.active);
+        });
+        return sort_mode;
     }
 
     private enum Pages { WELCOME, RESULTS }
@@ -233,6 +254,12 @@ public class Recall : Gtk.Application {
             }
             results_view.select_path (path);
             var uri = results.get_uri (path);
+            /* Scroll to beginning of month when item is a month separator. */
+            if (uri.has_prefix ("-recall-month-seperator://")) {
+                results_view.scroll_to_path (path, true, 0, 0);
+                results_view.unselect_all ();
+                return true;
+            }
             /* On right click, open item in file_manager if its a file. */
             if (event.button == 3)
                 if (uri.has_prefix ("file://")) {
@@ -279,7 +306,7 @@ public class Recall : Gtk.Application {
            for our results_view.
            NOTE: if at a later time search_results != this.results, we know that
            this search was superseded by a new search! */
-        var search_results = new Results (folder.get_uri ());
+        var search_results = new Results (folder.get_uri (), sort_mode.active);
         results = search_results;
         results_view.model = search_results.model;
 
@@ -312,8 +339,12 @@ public class Recall : Gtk.Application {
     private Pid run_recoll (string query, out IOChannel output) {
         string[] cmd = {
             "recoll", "-c", confdir_path, "-t", "-F", Results.FORMAT,
+            "", "", "", // sorting flags 6,7,8
             "-q", "dir:\"%s\"".printf(folder.get_filename ()), query
         };
+        if (sort_mode.active) {
+            cmd[6] = "-S"; cmd[7] = "mtime"; cmd[8] = "-D";
+        }
         string[] env = Environ.get ();
         var flags = SpawnFlags.SEARCH_PATH
             | SpawnFlags.DO_NOT_REAP_CHILD
@@ -447,6 +478,7 @@ public class Recall : Gtk.Application {
         notebook = notebook_init ();
         folder = folder_init ();
         search = search_init ();
+        sort_mode = sort_mode_init ();
         header = header_init ();
         main_window = main_window_init ();
 
@@ -524,8 +556,9 @@ private class MainWindow : ApplicationWindow {
 
 private class Results : Object {
 
-    public Results (string base_uri) {
+    public Results (string base_uri, bool newest_first) {
         this.base_uri = base_uri;
+        this.newest_first = newest_first;
         this.list = new Gtk.ListStore.newv (columns);
     }
 
@@ -588,6 +621,8 @@ private class Results : Object {
     public const int initial_items = 100;
 
     private void add (Result result) {
+        if (newest_first && next_month (result.mtime))
+            add_month_separator (result.mtime);
         TreeIter item;
         list.append (out item);
         list.set (item,
@@ -632,6 +667,33 @@ private class Results : Object {
             + "<span size='smaller' color='#7e8087' style='italic'>%s</span>";
         return format.printf
             (Markup.escape_text (title), Markup.escape_text (relative_path));
+    }
+
+    /* Add date separator item. */
+    bool newest_first = false;
+    int previous_month = int.MAX;
+    private int absolute_month (Time time) {
+        return time.month + time.year * 12;
+    }
+    private bool next_month (int mtime) {
+        var time = Time.gm ((int) mtime);
+        return absolute_month(time) < previous_month;
+    }
+    public Pixbuf calendar_icon { get; construct; }
+    construct {
+        calendar_icon = icon_theme.load_icon
+            ("office-calendar-symbolic", 48, 0);
+    }
+    private void add_month_separator (int mtime) {
+        var time = Time.gm ((int) mtime);
+        previous_month = absolute_month (time);
+        TreeIter item;
+        list.append (out item);
+        list.set (item,
+            Column.ICON, calendar_icon,
+            Column.URI, "-recall-month-seperator://%d".printf (mtime),
+            Column.TITLE, "<i>%s</i>".printf(time.format("%B %Y")),
+        -1);
     }
 
     /* Parse recoll output. */

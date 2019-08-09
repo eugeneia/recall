@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
   <schema path="/com/github/eugeneia/recall/settings/" id="com.github.eugeneia.recall.settings">
+    <key name="sort-mode" type="b">
+      <default>false</default>
+      <summary>Result sorting mode</summary>
+      <description>Sort order of results (false: most relevant first, true: newest first)</description>
+    </key>
     <key name="window-maximized" type="b">
       <default>false</default>
       <summary>Whether the window was maximized on last run</summary>
