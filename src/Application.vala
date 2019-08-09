@@ -221,7 +221,7 @@ public class Recall : Gtk.Application {
 
 		results_view.set_pixbuf_column (Results.Column.ICON);
 		results_view.set_markup_column (Results.Column.TITLE);
-		results_view.set_tooltip_column (Results.Column.URI);
+		results_view.set_tooltip_column (Results.Column.TOOLTIP);
 
         results_view.item_orientation = Orientation.HORIZONTAL;
 
