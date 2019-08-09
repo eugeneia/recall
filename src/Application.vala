@@ -308,20 +308,22 @@ public class Recall : Gtk.Application {
 		});
     }
 
-    /* Run recoll query, return stdout as string. */
+    /* Run recoll query asynchronously, return IOChannel for stdout. */
     private Pid run_recoll (string query, out IOChannel output) {
         string[] cmd = {
             "recoll", "-c", confdir_path, "-t", "-q",
             "dir:\"%s\"".printf(folder.get_filename ()), query
         };
         string[] env = Environ.get ();
+        var flags = SpawnFlags.SEARCH_PATH
+            | SpawnFlags.DO_NOT_REAP_CHILD
+            | SpawnFlags.STDERR_TO_DEV_NULL;
         Pid pid;
         int stdout_fd;
         try {
             Process.spawn_async_with_pipes (
-                null, cmd, env,
-                SpawnFlags.SEARCH_PATH | SpawnFlags.DO_NOT_REAP_CHILD, null,
-                out pid, null, out stdout_fd, null
+                null, cmd, env, flags, null, out pid,
+                null, out stdout_fd, null
             );
         } catch (SpawnError e) {
             critical ("Failed to spawn recoll: %s", e.message);
