@@ -119,13 +119,19 @@ public class Recall : Gtk.Application {
         var results_info = new OverlayBar (results_overlay);
         return results_info;
     }
-    private void results_info_set (int total_results) {
+    private void results_info_set (int? total_results) {
+        if (total_results == null) {
+            results_info.label = "Searching";
+            results_info.active = true;
+            return;
+        }
         if (total_results == 0)
             results_info.label = "No result";
         else if (total_results == 1)
             results_info.label = _("One result");
         else
             results_info.label = _("%d results").printf (total_results);
+        results_info.active = false;
     }
 
     private Overlay results_overlay { get; set; }
@@ -247,53 +253,58 @@ public class Recall : Gtk.Application {
 
     /* Perform  search and update results shown in results_window. */
     private string? previous_query;
-    private void do_search (string query_ws) {
-        var query = query_ws.strip (); // strip whitespace prefix/suffix
-
-        /* Do nothing if query has not changed. */
+    private void do_search (string current_query) {
+        /* Cleap up whitespace prefix and suffix from query. If the cleaned up
+           query is identical to the previous query we bail (do nothing),
+           otherwise save query as previous query and continue. */
+        var query = current_query.strip ();
         if (query == previous_query)
             return;
         else
             previous_query = query;
 
-        /* Show welcome dialog if query is empty. */
+        /* If the query is empty we just show the welcome dialog. */
         if (query.length == 0) {
             notebook.page = Pages.WELCOME;
             return;
         }
 
-        /* Otherwise start spinner to indicate query process... */
-        results_info.active = true;
+        /* If we got a non-empty query we show the results view, indicate
+           progress by resetting the info overlay. */
+        notebook.page = Pages.RESULTS;
+        results_info_set (null);
 
-        /* ...allocate new Results collection... */
+        /* Allocate a new results collection and store a reference to it in
+           this.results for use by results_view. Set the collection as the model
+           for our results_view.
+           NOTE: if at a later time search_results != this.results, we know that
+           this search was superseded by a new search! */
         var search_results = new Results (folder.get_uri ());
         results = search_results;
         results_view.model = search_results.model;
 
-        /* ...display the results view... */
-        notebook.page = Pages.RESULTS;
-
-        /* ...and invoke recoll with the query. */
+        /* Run recoll query, consume asynchronously results as they become
+           available until output is complete or the search is superseded. */
         IOChannel output;
         var pid = run_recoll (query, out output);
-        output.add_watch
-            (IOCondition.IN | IOCondition.HUP, (channel, condition) => {
-                string line;
-                if (condition == IOCondition.HUP)
-                    return false;
+        output.add_watch (IOCondition.IN, (channel, condition) => {
+            string line;
+            if (search_results == results)
 		        try {
 		            channel.read_line (out line, null, null);
+		            search_results.parse (line);
+		            return true;
 		        } catch (Error e) {
 		            critical ("Failed to read recoll output: %s", e.message);
-		            return false;
 		        }
-		        search_results.parse (line);
-		        return true;
-            });
+		    return false;
+        });
+        /* On completion, indicate total results in info overlay unless the
+           search has been superseded. */
         ChildWatch.add (pid, (pid, status) => {
 			Process.close_pid (pid);
-			results_info.active = false;
-			results_info_set (search_results.total_results);
+			if (search_results == results)
+			    results_info_set (search_results.total_results);
 		});
     }
 
