@@ -311,8 +311,8 @@ public class Recall : Gtk.Application {
     /* Run recoll query asynchronously, return IOChannel for stdout. */
     private Pid run_recoll (string query, out IOChannel output) {
         string[] cmd = {
-            "recoll", "-c", confdir_path, "-t", "-q",
-            "dir:\"%s\"".printf(folder.get_filename ()), query
+            "recoll", "-c", confdir_path, "-t", "-F", Results.FORMAT,
+            "-q", "dir:\"%s\"".printf(folder.get_filename ()), query
         };
         string[] env = Environ.get ();
         var flags = SpawnFlags.SEARCH_PATH
@@ -527,8 +527,9 @@ private class Results : Object {
     public Results (string base_uri) {
         this.base_uri = base_uri;
         this.list = new Gtk.ListStore.newv (columns);
-        this.result_grammar = result_grammar_init ();
     }
+
+    public static string FORMAT = "mtype url title filename mtime";
 
     public string? recoll_query = null;
 
@@ -638,28 +639,23 @@ private class Results : Object {
         string type;
         string uri;
         string title;
-    }
-    private Regex result_grammar { get; set; }
-    private Regex result_grammar_init () {
-        try {
-            return new Regex ("^(.*)\t\\[(.*)\\]\t\\[(.*)\\]\t[0-9]+\tbytes\t$");
-        } catch (Error e) {
-            critical ("Failed to compile results_grammar.");
-            Process.exit (1);
-        }
+        int mtime;
     }
     private Result? parse_result (string line) {
-        MatchInfo result;
-        if (result_grammar.match (line, 0, out result)) {
-            return {
-                type: result.fetch (1),
-                uri: result.fetch (2),
-                title: result.fetch (3)
-            };
-        } else {
+        var fields = line.split (" ");
+        if (fields.length < 4) {
             warning ("Error: failed to parse result: %s", line);
             return null;
         }
+        Result result = {};
+        result.type = (string) Base64.decode (fields[0]);
+        result.uri =  (string) Base64.decode (fields[1]);
+        result.title = (string) Base64.decode (fields[2]);
+        if (result.title == "")
+            /* Fallback to filename. */
+            result.title = (string) Base64.decode (fields[3]);
+        result.mtime = int.parse ((string) Base64.decode (fields[4]));
+        return result;
     }
     private void parse_query (string line) {
         recoll_query = line;
