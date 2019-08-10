@@ -560,6 +560,8 @@ private class Results : Object {
         this.base_uri = base_uri;
         this.newest_first = newest_first;
         this.list = new Gtk.ListStore.newv (columns);
+        this.default_icon = default_icon_init ();
+        this.calendar_icon = calendar_icon_init ();
     }
 
     public static string FORMAT = "mtype url title filename mtime";
@@ -635,10 +637,24 @@ private class Results : Object {
 
     /* Get icon for result item by mime type. */
     private IconTheme icon_theme = IconTheme.get_default ();
-	private Pixbuf default_icon;
+	private Pixbuf default_icon { get; set; }
+	private Pixbuf? default_icon_init () {
+	    var default_icon_name = "application-octet-stream";
+	    try {
+	        return icon_theme.load_icon (default_icon_name, 48, 0);
+	    } catch (Error e) {
+	        critical (
+	            "Failed to load default_icon (%s): %s",
+	            default_icon_name, e.message
+	        );
+	        return null;
+	    }
+	}
     private Pixbuf mime_icon (string mime_type) {
+        if (mime_type == "") return default_icon;
         var icon = icon_theme.lookup_by_gicon
             (ContentType.get_icon (mime_type), 48, 0);
+        if (icon == null) return default_icon;
         try {
             return icon.load_icon ();
         } catch (Error e) {
@@ -679,10 +695,18 @@ private class Results : Object {
         var time = Time.gm ((int) mtime);
         return absolute_month(time) < previous_month;
     }
-    public Pixbuf calendar_icon { get; construct; }
-    construct {
-        calendar_icon = icon_theme.load_icon
-            ("office-calendar-symbolic", 48, 0);
+    private Pixbuf calendar_icon { get; set; }
+    private Pixbuf? calendar_icon_init () {
+        var calendar_icon_name = "office-calendar-symbolic";
+        try {
+            return icon_theme.load_icon ("office-calendar-symbolic", 48, 0);
+        } catch (Error e) {
+            critical (
+                "Failed to load calendar_icon (%s): %s",
+                calendar_icon_name, e.message
+            );
+            return null;
+        }
     }
     private void add_month_separator (int mtime) {
         var time = Time.gm ((int) mtime);
