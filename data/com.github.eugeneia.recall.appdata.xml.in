@@ -12,4 +12,15 @@
       initial index to be built. Expect a delay before search results become
       comprehensive.</p>
   </description>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/eugeneia/recall/master/data/most-relevant.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://github.com/eugeneia/recall/blob/master/data/most-recent.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://github.com/eugeneia/recall/blob/master/data/context-menu.png</image>
+    </screenshot>
+  </screenshots>
 </component>
