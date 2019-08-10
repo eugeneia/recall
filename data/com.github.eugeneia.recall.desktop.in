@@ -8,3 +8,8 @@ Icon=com.github.eugeneia.recall
 Terminal=false
 Type=Application
 Keywords=Search;Document;Full;Text;Index;Lookup:Query;Recoll;Xapian;Files;Find;
+Actions=New;
+
+[Desktop Action New]
+Name=New Search
+Exec=com.github.eugeneia.recall
