@@ -40,6 +40,7 @@ public class Recall : Gtk.Application {
         Object (
             application_id: APP_ID,
             flags: ApplicationFlags.HANDLES_COMMAND_LINE
+                | ApplicationFlags.NON_UNIQUE
         );
     }
 
