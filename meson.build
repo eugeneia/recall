@@ -18,7 +18,13 @@ install_data(
     join_paths ('data', meson.project_name() + '.gschema.xml'),
     install_dir: join_paths(get_option('datadir'), 'glib-2.0', 'schemas')
 )
-meson.add_install_script('post_install.py')
+
+# Install /etc/sysctl.d config
+install_data(
+    join_paths ('data', meson.project_name() + '.sysctl.conf'),
+    rename: '30-' + meson.project_name() + '.conf',
+    install_dir: join_paths(get_option('sysconfdir'), 'sysctl.d')
+)
 
 # Install icons
 icon_sizes = ['48', '64', '128']
@@ -78,3 +84,6 @@ i18n.merge_file(
 )
 
 subdir('po')
+
+# Post-install actions
+meson.add_install_script('post_install.py')
