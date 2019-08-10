@@ -1,5 +1,7 @@
-com.github.eugeneia.recall (0.1elementary1) UNRELEASED; urgency=low
+com.github.eugeneia.recall (0.8elementary1) UNRELEASED; urgency=low
 
-  * Initial Release.  * 
+  [ Max Rottenkolber ]
+  * Initial Release.
+  * Lots of things
 
- -- max <max@eros>  Wed, 07 Aug 2019 23:30:31 +0200
+ -- Max Rottenkolber <max@mr.gy>  Sat, 10 Aug 2019 02:26:43 +0200
