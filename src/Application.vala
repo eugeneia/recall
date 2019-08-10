@@ -665,9 +665,11 @@ private class Results : Object {
 
     /* Render tooltip text for URI. */
     private string uri_tooltip (string uri) {
+        var path_start = base_uri.length;
+        if (base_uri == "file:///") path_start--; else path_start++;
         string tooltip;
         if (uri.has_prefix ("file://"))
-            tooltip = uri.slice(base_uri.length + 1, uri.length);
+            tooltip = uri.slice(path_start, uri.length);
         else
             tooltip = uri;
         return Markup.escape_text (tooltip);
@@ -675,7 +677,8 @@ private class Results : Object {
 
     /* Render title markup text. */
     private string title_markup (string uri, string title) {
-        var path_start = base_uri.length + 1;
+        var path_start = base_uri.length;
+        if (base_uri == "file:///") path_start--; else path_start++;
         var last_folder = uri.last_index_of ("/");
         var path_end = last_folder > path_start ? last_folder : path_start;
         var relative_path = uri.slice (path_start, path_end);
