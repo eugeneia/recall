@@ -2,7 +2,7 @@
 <!-- Copyright 2019 Max Rottenkolber <max@mr.gy> -->
 <component type="desktop">
   <id>com.github.eugeneia.recall</id>
-  <metadata_license>CC0</metadata_license>
+  <metadata_license>GPL-3.0+</metadata_license>
   <name>Recall</name>
   <summary>Search and find documents using full-text search</summary>
   <description>
@@ -12,15 +12,61 @@
       initial index to be built. Expect a delay before search results become
       comprehensive.</p>
   </description>
+  <provides>
+    <binary>com.github.eugeneia.recall</binary>
+  </provides>
+  <releases>
+    <release version="0.8.1" date="2019-08-11">
+      <description>
+        <p>Initial release! 🎉</p>
+      </description>
+    </release>
+  </releases>
   <screenshots>
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/eugeneia/recall/master/data/most-relevant.png</image>
     </screenshot>
     <screenshot>
-      <image>https://github.com/eugeneia/recall/blob/master/data/most-recent.png</image>
+      <image>https://raw.githubusercontent.com/eugeneia/recall/master/data/most-recent.png</image>
     </screenshot>
     <screenshot>
-      <image>https://github.com/eugeneia/recall/blob/master/data/context-menu.png</image>
+      <image>https://raw.githubusercontent.com/eugeneia/recall/master/data/context-menu.png</image>
     </screenshot>
   </screenshots>
+  <developer_name>Max Rottenkolber</developer_name>
+  <url type="homepage">https://github.com/eugeneia/recall</url>
+  <custom>
+    <value key="x-appcenter-color-primary">#AFA1F8</value>
+    <value key="x-appcenter-color-primary-text">#333</value>
+    <value key="x-appcenter-suggested-price">15</value>
+  </custom>
+<content_rating type="oars-1.1">
+    <content_attribute id="violence-cartoon">none</content_attribute>
+    <content_attribute id="violence-fantasy">none</content_attribute>
+    <content_attribute id="violence-realistic">none</content_attribute>
+    <content_attribute id="violence-bloodshed">none</content_attribute>
+    <content_attribute id="violence-sexual">none</content_attribute>
+    <content_attribute id="violence-desecration">none</content_attribute>
+    <content_attribute id="violence-slavery">none</content_attribute>
+    <content_attribute id="violence-worship">none</content_attribute>
+    <content_attribute id="drugs-alcohol">none</content_attribute>
+    <content_attribute id="drugs-narcotics">none</content_attribute>
+    <content_attribute id="drugs-tobacco">none</content_attribute>
+    <content_attribute id="sex-nudity">none</content_attribute>
+    <content_attribute id="sex-themes">none</content_attribute>
+    <content_attribute id="sex-homosexuality">intense</content_attribute>
+    <content_attribute id="sex-prostitution">none</content_attribute>
+    <content_attribute id="sex-adultery">none</content_attribute>
+    <content_attribute id="sex-appearance">none</content_attribute>
+    <content_attribute id="language-profanity">none</content_attribute>
+    <content_attribute id="language-humor">none</content_attribute>
+    <content_attribute id="language-discrimination">none</content_attribute>
+    <content_attribute id="social-chat">none</content_attribute>
+    <content_attribute id="social-info">none</content_attribute>
+    <content_attribute id="social-audio">none</content_attribute>
+    <content_attribute id="social-location">none</content_attribute>
+    <content_attribute id="social-contacts">none</content_attribute>
+    <content_attribute id="money-purchasing">none</content_attribute>
+    <content_attribute id="money-gambling">none</content_attribute>
+  </content_rating>
 </component>

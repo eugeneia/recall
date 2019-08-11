@@ -1,6 +1,6 @@
 [Contractor Entry]
-Name=Search Directory
-Description=Full-text search in Directory
+Name=Search Folder
+Description=Full-text search in Folder
 Icon=com.github.eugeneia.recall
 MimeType=inode/directory
 Exec=com.github.eugeneia.recall %f
