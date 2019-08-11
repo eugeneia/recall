@@ -1,8 +1,9 @@
-com.github.eugeneia.recall (0.8.2) UNRELEASED; urgency=low
+com.github.eugeneia.recall (0.8.3) UNRELEASED; urgency=low
 
   [ Max Rottenkolber ]
   * Initial Release.
   * Lots of things
   * Fix search command building weirdness
+  * Appdata fixes
 
- -- Max Rottenkolber <max@mr.gy>  Sun, 11 Aug 2019 20:35:31 +0200
+ -- Max Rottenkolber <max@mr.gy>  Sun, 11 Aug 2019 22:00:47 +0200
