@@ -2,12 +2,16 @@
 <!-- Copyright 2019 Max Rottenkolber <max@mr.gy> -->
 <component type="desktop">
   <id>com.github.eugeneia.recall</id>
-  <metadata_license>GPL-3.0+</metadata_license>
+  <metadata_license>CC-0-1.0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
   <name>Recall</name>
-  <summary>Search and find documents using full-text search</summary>
+  <summary>Search for documents using full-text search</summary>
   <description>
-    <p>Recall is a frontend to the Recoll full-text desktop search engine.</p>
-    <p>An read-time indexing process is started automatically in the background
+    <p>Recall lets you search your document library using a powerful query
+    language. Searches results appear instantly as you type, and a context menu
+    entry (contractor) offers you to quickly search any folder from Files.</p>
+    <p>Recall is a front-end to the Recoll full-text desktop search engine.</p>
+    <p>A real-time indexing process is started automatically in the background
       and keeps running even when Recall is closed. It may take a while for the
       initial index to be built. Expect a delay before search results become
       comprehensive.</p>
