@@ -340,11 +340,15 @@ public class Recall : Gtk.Application {
     private Pid run_recoll (string query, out IOChannel output) {
         string[] cmd = {
             "recoll", "-c", confdir_path, "-t", "-F", Results.FORMAT,
-            "", "", "", // sorting flags 6,7,8
+            // [6] (where sort flags go)
             "-q", "dir:\"%s\"".printf(folder.get_filename ()), query
         };
         if (sort_mode.active) {
-            cmd[6] = "-S"; cmd[7] = "mtime"; cmd[8] = "-D";
+            string[] sort_flags = {"-S", "mtime", "-D"};
+            Array<unowned string> cmd_array = new Array<unowned string> ();
+            cmd_array.append_vals (cmd, cmd.length);
+            cmd_array.insert_vals (6, sort_flags, sort_flags.length);
+            cmd = cmd_array.data;
         }
         string[] env = Environ.get ();
         var flags = SpawnFlags.SEARCH_PATH
