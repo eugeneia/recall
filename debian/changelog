@@ -1,4 +1,4 @@
-com.github.eugeneia.recall (0.8.4) UNRELEASED; urgency=low
+com.github.eugeneia.recall (0.8.5) UNRELEASED; urgency=low
 
   [ Max Rottenkolber ]
   * Initial Release.
@@ -6,5 +6,6 @@ com.github.eugeneia.recall (0.8.4) UNRELEASED; urgency=low
   * Fix search command building weirdness
   * Appdata fixes
   * Appdata license
+  * Take screenshots with default window controls
 
- -- Max Rottenkolber <max@mr.gy>  Mon, 12 Aug 2019 00:20:22 +0200
+ -- Max Rottenkolber <max@mr.gy>  Thu, 15 Aug 2019 11:06:06 +0200
