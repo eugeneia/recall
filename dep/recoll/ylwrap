@@ -1,0 +1,57 @@
+#! /bin/sh
+
+# ylwrap - wrapper for lex/yacc invocations.  Local version, the
+# autotools scriptversion=2015-08-06.06; # UTC doesnt work for us
+# because it does not move location.hh position.hh stack.hh into the
+# appropriate directory (which is a bug, but it's simpler to rewrite a
+# simple version for our needs than to fix the original).
+
+fatal() {
+    echo $* 1>&2
+    exit 1
+}
+usage() {
+    fatal "Usage: ylwrap query/wasaparse.y"
+}
+
+test $# -ge 1 || usage
+
+toptmpdir=/tmp/rclylwrap$$
+tmpdir=${toptmpdir}/tmp
+mkdir -p "${tmpdir}"
+
+cleanup() {
+    rm -rf "${toptmpdir}"/tmp/*
+    rmdir "${tmpdir}"
+    rmdir "${toptmpdir}"
+}
+
+trap cleanup 0 2 15 
+
+# First arg is the input file
+
+input=$1
+inputdir=`dirname $1`
+curdir=`pwd` || exit 1
+absinput="${curdir}/${input}"
+
+(cd "${tmpdir}"; bison -d -y $absinput)
+ls $tmpdir
+
+for f in location.hh position.hh stack.hh; do
+    cmp -s "${tmpdir}"/$f "${inputdir}"/$f || cp -p "${tmpdir}"/$f "${inputdir}"
+done
+
+# Note that we'd prefer to use wasaparse.h instead of wasaparse.hpp,
+# but automake generates a dist list with wasaparse.hpp, so no choice.
+
+# Fix the include line in y.tab.c (it wants to include y.tab.h, but we already
+# include it as wasaparse.hpp
+(cd "${tmpdir}"; \
+    sed -e 's/#include "y.tab.h"//' < y.tab.c > toto; \
+    mv -f toto y.tab.c)
+
+cmp -s "${tmpdir}"/y.tab.c "${inputdir}"/wasaparse.cpp || \
+        cp -p "${tmpdir}"/y.tab.c "${inputdir}"/wasaparse.cpp
+cmp -s "${tmpdir}"/y.tab.h "${inputdir}"/wasaparse.hpp || \
+        cp -p "${tmpdir}"/y.tab.h "${inputdir}"/wasaparse.hpp

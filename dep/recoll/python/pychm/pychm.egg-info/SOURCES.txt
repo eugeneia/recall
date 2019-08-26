@@ -1,0 +1,10 @@
+setup.py
+/home/dockes/projets/fulltext/recoll/src/python/pychm/../../python/pychm/chm/__init__.py
+/home/dockes/projets/fulltext/recoll/src/python/pychm/../../python/pychm/chm/chm.py
+/home/dockes/projets/fulltext/recoll/src/python/pychm/../../python/pychm/chm/chmlib.py
+/home/dockes/projets/fulltext/recoll/src/python/pychm/../../python/pychm/pychm.egg-info/PKG-INFO
+/home/dockes/projets/fulltext/recoll/src/python/pychm/../../python/pychm/pychm.egg-info/SOURCES.txt
+/home/dockes/projets/fulltext/recoll/src/python/pychm/../../python/pychm/pychm.egg-info/dependency_links.txt
+/home/dockes/projets/fulltext/recoll/src/python/pychm/../../python/pychm/pychm.egg-info/top_level.txt
+/home/dockes/projets/fulltext/recoll/src/python/pychm/chm/extra.c
+/home/dockes/projets/fulltext/recoll/src/python/pychm/chm/swig_chm.c
