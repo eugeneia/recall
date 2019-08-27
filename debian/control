@@ -6,11 +6,18 @@ Build-Depends: meson,
                debhelper (>= 9),
                libgtk-3-dev,
                valac (>= 0.40.0),
-               libgranite-dev
+               libgranite-dev,
+               bison, xsltproc, libxapian-dev, libxslt1-dev, libchm-dev, python-dev, python3-dev
 Standards-Version: 3.9.3
 
 Package: com.github.eugeneia.recall
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, recoll
-Description: Recall
- Full-text document search for your library.
+Depends: ${misc:Depends}, ${shlibs:Depends},
+         python, python3,
+         antiword, wv, poppler-utils, unrtf, libimage-exiftool-perl
+Conflicts: recoll
+Replaces: recoll
+Description: Recall, search for documents using full-text search
+ Recall lets you search your document library using a powerful query language.
+ Searches results appear instantly as you type, and a context menu entry
+ (contractor) offers you to quickly search any folder from Files. 

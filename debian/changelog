@@ -1,4 +1,4 @@
-com.github.eugeneia.recall (0.8.5) UNRELEASED; urgency=low
+com.github.eugeneia.recall (0.9.0ubuntu1) UNRELEASED; urgency=low
 
   [ Max Rottenkolber ]
   * Initial Release.
@@ -8,4 +8,7 @@ com.github.eugeneia.recall (0.8.5) UNRELEASED; urgency=low
   * Appdata license
   * Take screenshots with default window controls
 
- -- Max Rottenkolber <max@mr.gy>  Thu, 15 Aug 2019 11:06:06 +0200
+  [ Max Rottenkolber ]
+  * Vendor recollq
+
+ -- Max Rottenkolber <max@mr.gy>  Tue, 27 Aug 2019 12:18:48 +0200

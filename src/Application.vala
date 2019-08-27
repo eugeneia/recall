@@ -339,9 +339,9 @@ public class Recall : Gtk.Application {
     /* Run recoll query asynchronously, return IOChannel for stdout. */
     private Pid run_recoll (string query, out IOChannel output) {
         string[] cmd = {
-            "recoll", "-c", confdir_path, "-t", "-F", Results.FORMAT,
+            "recollq", "-c", confdir_path, "-t", "-F", Results.FORMAT,
             // [6] (where sort flags go)
-            "-q", "dir:\"%s\"".printf(folder.get_filename ()), query
+            "dir:\"%s\"".printf(folder.get_filename ()), query
         };
         if (sort_mode.active) {
             string[] sort_flags = {"-S", "mtime", "-D"};

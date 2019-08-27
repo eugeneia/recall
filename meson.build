@@ -87,3 +87,6 @@ subdir('po')
 
 # Post-install actions
 meson.add_install_script('post_install.py')
+
+# External dependency building/installation
+meson.add_install_script('deps_install.sh')
