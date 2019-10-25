@@ -3,7 +3,7 @@
 <component type="desktop">
   <id>com.github.eugeneia.recall</id>
   <metadata_license>CC-BY-3.0</metadata_license>
-  <project_license>GPL-3.0+</project_license>
+  <project_license>GPL-2.0+</project_license>
   <name>Recall</name>
   <summary>Search for documents using full-text search</summary>
   <description>
