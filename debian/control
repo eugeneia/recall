@@ -17,7 +17,7 @@ Depends: ${misc:Depends}, ${shlibs:Depends},
          antiword, wv, poppler-utils, unrtf, libimage-exiftool-perl
 Conflicts: recoll
 Replaces: recoll
-Description: Recall, search for documents using full-text search
+Description: Find documents using full-text search
  Recall lets you search your document library using a powerful query language.
  Searches results appear instantly as you type, and a context menu entry
  (contractor) offers you to quickly search any folder from Files. 
