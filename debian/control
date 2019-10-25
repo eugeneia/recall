@@ -12,5 +12,7 @@ Standards-Version: 3.9.3
 Package: com.github.eugeneia.recall
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, recoll
-Description: Recall
- Full-text document search for your library.
+Description: Find documents using full-text search
+ Recall lets you search your document library using a powerful query language.
+ Searches results appear instantly as you type, and a context menu entry
+ (contractor) offers you to quickly search any folder from Files.
