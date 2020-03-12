@@ -24,7 +24,7 @@ class WarExtractor:
             ok = False
         return (ok, docdata, tarinfo.name, iseof)
 
-    def closefile():
+    def closefile(self):
         self.tar = None
         
     ###### File type handler api, used by rclexecm ---------->

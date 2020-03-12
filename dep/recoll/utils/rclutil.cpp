@@ -83,7 +83,7 @@ static bool path_isdriveabs(const string& s)
 #include <Shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
 
-static string path_thisexecpath()
+string path_thisexecpath()
 {
     wchar_t text[MAX_PATH];
     GetModuleFileNameW(NULL, text, MAX_PATH);
@@ -175,7 +175,7 @@ bool path_empty(const string& path)
     if (path_isdir(path)) {
         string reason;
         std::set<string> entries;
-        if (!readdir(path, reason, entries) || entries.empty()) {
+        if (!listdir(path, reason, entries) || entries.empty()) {
             return true;
         }
         return false;

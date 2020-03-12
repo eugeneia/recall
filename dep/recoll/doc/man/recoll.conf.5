@@ -61,7 +61,7 @@ embedded spaces can be quoted with double-quotes.
 Space-separated list of files or
 directories to recursively index. Default to ~ (indexes
 $HOME). You can use symbolic links in the list, they will be followed,
-independantly of the value of the followLinks variable.
+independently of the value of the followLinks variable.
 .TP
 .BI "monitordirs = "string
 Space-separated list of files or directories to monitor for
@@ -117,12 +117,12 @@ filesystem paths. Must be defined at the top level of the configuration
 file, not in a subsection. Can contain files and directories. The database and
 configuration directories will automatically be added. The expressions
 are matched using 'fnmatch(3)' with the FNM_PATHNAME flag set by
-default. This means that '/' characters must be matched explicitely. You
+default. This means that '/' characters must be matched explicitly. You
 can set 'skippedPathsFnmPathname' to 0 to disable the use of FNM_PATHNAME
 (meaning that '/*/dir3' will match '/dir1/dir2/dir3'). The default value
 contains the usual mount point for removable media to remind you that it
 is a bad idea to have Recoll work on these (esp. with the monitor: media
-gets indexed on mount, all data gets erased on unmount). Explicitely
+gets indexed on mount, all data gets erased on unmount). Explicitly
 adding '/media/xxx' to the 'topdirs' variable will override
 this.
 .TP
@@ -292,8 +292,7 @@ will reduce the index size. This can only be set for a whole index, not
 for a subtree.
 .TP
 .BI "dehyphenate = "bool
-Determines if we index
-'coworker' also when the input is 'co-worker'. This is new
+Determines if we index 'coworker' also when the input is 'co-worker'. This is new
 in version 1.22, and on by default. Setting the variable to off allows
 restoring the previous behaviour.
 .TP

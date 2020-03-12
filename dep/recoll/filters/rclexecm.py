@@ -48,6 +48,21 @@ def subprocfile(fn):
     else:
         return fn
 
+def configparamtrue(value):
+    if not value:
+        return False
+    try:
+        ivalue = int(value)
+        if ivalue:
+            return True
+        else:
+            return False
+    except:
+        pass
+    if value[0] in 'tT':
+        return True
+    return False
+
 my_config = rclconfig.RclConfig()
 
 ############################################
@@ -386,6 +401,7 @@ def main(proto, extract):
 
     if len(args) != 1:
         usage()
+    path = args[0]
         
     def mimetype_with_file(f):
         cmd = 'file -i "' + f + '"'
@@ -402,11 +418,16 @@ def main(proto, extract):
     def debprint(out, s):
         if not actAsSingle:
             proto.breakwrite(out, makebytes(s+'\n'))
-            
-    params = {'filename:': makebytes(args[0])}
-    # Some filters (e.g. rclaudio) need/get a MIME type from the indexer
-    mimetype = mimetype_with_file(args[0])
-    params['mimetype:'] = mimetype
+
+    params = {'filename:': makebytes(path)}
+
+    # Some filters (e.g. rclaudio) need/get a MIME type from the indexer.
+    # We make a half-assed attempt to emulate:
+    mimetype = my_config.mimeType(path)
+    if not mimetype and not _mswindows:
+        mimetype = mimetype_with_file(path)
+    if mimetype:
+        params['mimetype:'] = mimetype
 
     if not extract.openfile(params):
         print("Open error", file=sys.stderr)

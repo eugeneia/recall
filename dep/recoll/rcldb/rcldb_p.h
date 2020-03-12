@@ -29,7 +29,7 @@
 #include "workqueue.h"
 #endif // IDX_THREADS
 #include "xmacros.h"
-
+#include "log.h"
 
 namespace Rcl {
 

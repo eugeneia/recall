@@ -77,7 +77,7 @@ int RclCompleterModel::rowCount(const QModelIndex &) const
 QVariant RclCompleterModel::data(const QModelIndex &index, int role) const
 {
     LOGDEB1("RclCompleterModel::data: row: " << index.row() << " role " <<
-           role << "\n");
+            role << "\n");
     if (role != Qt::DisplayRole && role != Qt::EditRole &&
         role != Qt::DecorationRole) {
         return QVariant();
@@ -151,6 +151,7 @@ void RclCompleterModel::onPartialWord(
         }
     }
     endResetModel();
+    QTimer::singleShot(0, m_parent, SLOT(onCompleterShown()));
 }
 
 void SSearch::init()
@@ -172,16 +173,18 @@ void SSearch::init()
             SLOT(searchTypeChanged(int)));
 
     m_completermodel = new RclCompleterModel(this);
-    QCompleter *completer = new QCompleter(m_completermodel, this);
-    completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-    completer->setFilterMode(Qt::MatchContains);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setMaxVisibleItems(completervisibleitems);
-    queryText->setCompleter(completer);
+    m_completer = new QCompleter(m_completermodel, this);
+    m_completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    m_completer->setFilterMode(Qt::MatchContains);
+    m_completer->setCaseSensitivity(Qt::CaseInsensitive);
+    m_completer->setMaxVisibleItems(completervisibleitems);
+    queryText->setCompleter(m_completer);
+    m_completer->popup()->installEventFilter(this);
+    queryText->installEventFilter(this);
     connect(this, SIGNAL(partialWord(int, const QString&, const QString&)),
             m_completermodel,
             SLOT(onPartialWord(int,const QString&,const QString&)));
-    connect(completer, SIGNAL(activated(const QString&)), this,
+    connect(m_completer, SIGNAL(activated(const QString&)), this,
             SLOT(onCompletionActivated(const QString&)));
     connect(historyPB, SIGNAL(clicked()), this, SLOT(onHistoryClicked()));
 }
@@ -203,6 +206,78 @@ QString SSearch::currentText()
 void SSearch::clearAll()
 {
     queryText->clear();
+}
+
+void SSearch::onCompleterShown()
+{
+    LOGDEB("SSearch::onCompleterShown\n");
+    QCompleter *completer = queryText->completer();
+    if (!completer) {
+        LOGDEB0("SSearch::onCompleterShown: no completer\n");
+        return;
+    }
+    QAbstractItemView *popup =  completer->popup();
+    if (!popup) {
+        LOGDEB0("SSearch::onCompleterShown: no popup\n");
+        return;
+    }
+    QVariant data = popup->model()->data(popup->currentIndex());
+    if (!data.isValid()) {
+        LOGDEB0("SSearch::onCompleterShown: data not valid\n");
+        return;
+    }
+    // Test if the completer text begins with the current input.
+    QString text = data.toString();
+    if (!text.lastIndexOf(queryText->text()) == 0) {
+        return;
+    }
+    
+    LOGDEB0("SSearch::onCompleterShown:" <<  
+            " current [" << qs2utf8s(currentText()) <<
+            "] saved [" << qs2utf8s(m_savedEditText) <<
+            "] popup [" << qs2utf8s(text) << "]\n");
+
+    // We append the completion part to the end of the current input,
+    // line, and select it so that the user has a clear indication of
+    // what will happen if they type Enter.
+    int pos = queryText->cursorPosition();
+    int len = text.size() - currentText().size();
+    queryText->setText(text);
+    queryText->setCursorPosition(pos);
+    queryText->setSelection(pos, len);
+}
+
+// This is to avoid that if the user types Backspace or Del while we
+// have inserted / selected the current completion, the lineedit text
+// goes back to what it was, the completion fires, and it looks like
+// nothing was typed. So we disable the completion if a
+bool SSearch::eventFilter(QObject *target, QEvent *event)
+{
+    Q_UNUSED(target);
+    LOGDEB1("SSearch::eventFilter: event\n");
+    if (event->type() != QEvent::KeyPress) {
+        return false;
+    }
+    LOGDEB1("SSearch::eventFilter: KeyPress event. Target " << target <<
+            " popup "<<m_completer->popup() << " lineedit "<<queryText<< "\n");
+
+    QKeyEvent *keyEvent = (QKeyEvent *)event;
+    if (keyEvent->key() == Qt::Key_Backspace) {
+        LOGDEB("SSearch::eventFilter: backspace\n");
+        queryText->setCompleter(nullptr);
+        queryText->backspace();
+        return true;
+    } else if (keyEvent->key()==Qt::Key_Delete) {
+        LOGDEB("SSearch::eventFilter: delete\n");
+        queryText->setCompleter(nullptr);
+        queryText->del();
+        return true;
+    } else {
+        if (nullptr == queryText->completer()) {
+            queryText->setCompleter(m_completer);
+        }
+    }        
+    return false;
 }
 
 // onCompletionActivated() is called when an entry is selected in the
@@ -245,7 +320,8 @@ void SSearch::onCompletionActivated(const QString& text)
 
 void SSearch::onHistoryClicked()
 {
-     if (m_completermodel) {
+    if (m_completermodel) {
+        queryText->setCompleter(m_completer);
         m_completermodel->onPartialWord(SST_LANG, "", "");
         queryText->completer()->complete();
     }
@@ -298,20 +374,43 @@ void SSearch::searchTypeChanged(int typ)
     switch (typ) {
     case SST_LANG:
         queryText->setToolTip(
-            tr(
-"Enter query language expression. Cheat sheet:<br>\n"
-"<i>term1 term2</i> : 'term1' and 'term2' in any field.<br>\n"
-"<i>field:term1</i> : 'term1' in field 'field'.<br>\n"
-" Standard field names/synonyms:<br>\n"
-"  title/subject/caption, author/from, recipient/to, filename, ext.<br>\n"
-" Pseudo-fields: dir, mime/format, type/rclcat, date, size.<br>\n"
-" Two date interval exemples: 2009-03-01/2009-05-20  2009-03-01/P2M.<br>\n"
-"<i>term1 term2 OR term3</i> : term1 AND (term2 OR term3).<br>\n"
-"  You can use parentheses to make things clearer.<br>\n"
-"<i>\"term1 term2\"</i> : phrase (must occur exactly). Possible modifiers:<br>\n"
-"<i>\"term1 term2\"p</i> : unordered proximity search with default distance.<br>\n"
-"Use <b>Show Query</b> link when in doubt about result and see manual (&lt;F1>) for more detail.\n"
-                ));
+            // Do not modify the text here, test with the
+            // sshelp/qhelp.html file and a browser, then use
+            // sshelp/helphtmltoc.sh to turn to code and insert here
+            tr("<html><head><style>") +
+            tr("table, th, td {") +
+            tr("border: 1px solid black;") +
+            tr("border-collapse: collapse;") +
+            tr("}") +
+            tr("th,td {") +
+            tr("text-align: center;") +
+            tr("}") +
+            tr("</style></head><body>") +
+            tr("<p>Query language cheat-sheet. In doubt: click <b>Show Query</b>.&nbsp;") +
+            tr("You should really look at the manual (F1)</p>") +
+            tr("<table border='1' cellspacing='0'>") +
+            tr("<tr><th>What</th><th>Examples</th>") +
+            tr("<tr><td>And</td><td>one two&nbsp;&nbsp;&nbsp;one AND two&nbsp;&nbsp;&nbsp;one && two</td></tr>") +
+            tr("<tr><td>Or</td><td>one OR two&nbsp;&nbsp;&nbsp;one || two</td></tr>") +
+            tr("<tr><td>Complex boolean. OR has priority, use parentheses&nbsp;") +
+            tr("where needed</td><td>(one AND two) OR three</td></tr>") +
+            tr("<tr><td>Not</td><td>-term</td></tr>") +
+            tr("<tr><td>Phrase</td><td>\"pride and prejudice\"</td></tr>") +
+            tr("<tr><td>Ordered proximity (slack=1)</td><td>\"pride prejudice\"o1</td></tr>") +
+            tr("<tr><td>Unordered proximity (slack=1)</td><td>\"prejudice pride\"po1</td></tr>") +
+            tr("<tr><td>Unordered prox. (default slack=10)</td><td>\"prejudice&nbsp;pride\"p</td></tr>") +
+            tr("<tr><td>No stem expansion: capitalize</td><td>Floor</td></tr>") +
+            tr("<tr><td>Field-specific</td><td>author:austen&nbsp;&nbsp;title:prejudice</td></tr>") +
+            tr("<tr><td>AND inside field (no order)</td><td>author:jane,austen</td></tr>") +
+            tr("<tr><td>OR inside field</td><td>author:austen/bronte</td></tr>") +
+            tr("<tr><td>Field names</td><td>title/subject/caption&nbsp;&nbsp;author/from<br>recipient/to&nbsp;&nbsp;filename&nbsp;&nbsp;ext</td></tr>") +
+            tr("<tr><td>Directory path filter</td><td>dir:/home/me&nbsp;&nbsp;dir:doc</td></tr>") +
+            tr("<tr><td>MIME type filter</td><td>mime:text/plain mime:video/*</td></tr>") +
+            tr("<tr><td>Date intervals</td><td>date:2018-01-01/2018-31-12<br>") +
+            tr("date:2018&nbsp;&nbsp;date:2018-01-01/P12M</td></tr>") +
+            tr("<tr><td>Size</td><td>size&gt;100k size&lt;1M</td></tr>") +
+            tr("</table></body></html>")
+            );
         break;
     case SST_FNM:
         queryText->setToolTip(tr("Enter file name wildcard expression."));
@@ -325,7 +424,7 @@ void SSearch::searchTypeChanged(int typ)
 
 void SSearch::startSimpleSearch()
 {
-    if (queryText->completer()->popup()->isVisible()) {
+    if (queryText->completer() && queryText->completer()->popup()->isVisible()) {
         return;
     }
     string u8 = qs2u8s(queryText->text());
@@ -341,8 +440,16 @@ void SSearch::startSimpleSearch()
     QString txt = currentText().trimmed();
     if (txt.isEmpty())
         return;
-    prefs.ssearchHistory.insert(0, txt);
-    prefs.ssearchHistory.removeDuplicates();
+    if (prefs.historysize) {
+        prefs.ssearchHistory.insert(0, txt);
+        prefs.ssearchHistory.removeDuplicates();
+    }
+    if (prefs.historysize >= 0) {
+        for (int i = (int)prefs.ssearchHistory.count();
+             i > prefs.historysize; i--) {
+            prefs.ssearchHistory.removeLast();
+        }
+    }
 }
 
 void SSearch::setPrefs()

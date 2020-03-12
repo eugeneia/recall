@@ -79,7 +79,7 @@ DEF_CSTR(dj_keyipath, "ipath");
 DEF_CSTR(dj_keyfn, "filename");
 DEF_CSTR(dj_keyauthor, "author");
 DEF_CSTR(dj_keymd, "modificationdate");
-// charset and mimetype are explicitely blocked from going into the doc meta
+// charset and mimetype are explicitly blocked from going into the doc meta
 DEF_CSTR(dj_keycharset, "charset");
 DEF_CSTR(dj_keymt, "mimetype");
 

@@ -16,6 +16,8 @@
  */
 #include "autoconfig.h"
 
+#include <malloc.h>
+
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxslt/transform.h>
@@ -45,6 +47,14 @@ public:
     virtual ~FileScanXML() {
         if (ctxt) {
             xmlFreeParserCtxt(ctxt);
+			// This should not be necessary (done by free), but see
+			// http://xmlsoft.org/xmlmem.html#Compacting The
+			// malloc_trim() and mallopt() doc seems to be a bit
+			// misleading, there is probably a frag size under which
+			// free() does not try to malloc_trim() at all
+#ifdef HAVE_MALLOC_TRIM
+			malloc_trim(0);
+#endif /* HAVE_MALLOC_TRIM */
         }
     }
 

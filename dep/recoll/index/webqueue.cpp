@@ -45,6 +45,8 @@
 
 using namespace std;
 
+#define DOTFILEPREFIX "_"
+
 // The browser plugin creates a file named .xxx (where xxx is the name
 // for the main file in the queue), to hold external metadata (http or
 // created by the plugin).  This class reads the .xxx, dotfile, and turns
@@ -53,18 +55,17 @@ class WebQueueDotFile {
 public:
     WebQueueDotFile(RclConfig *conf, const string& fn)
         : m_conf(conf), m_fn(fn)
-    {}
+        {}
 
     // Read input line, strip it of eol and return as c++ string
-    bool readLine(string& line)
-    {
+    bool readLine(ifstream& input, string& line) {
         static const int LL = 2048;
         char cline[LL]; 
         cline[0] = 0;
-        m_input.getline(cline, LL-1);
-        if (!m_input.good()) {
-            if (m_input.bad()) {
-                LOGERR("WebQueueDotFileRead: input.bad()\n" );
+        input.getline(cline, LL-1);
+        if (!input.good()) {
+            if (input.bad()) {
+                LOGERR("WebQueueDotFileRead: input.bad()\n");
             }
             return false;
         }
@@ -74,18 +75,18 @@ public:
             ll--;
         }
         line.assign(cline, ll);
-        LOGDEB2("WebQueueDotFile:readLine: ["  << (line) << "]\n" );
+        LOGDEB2("WebQueueDotFile:readLine: [" << line << "]\n");
         return true;
     }
 
     // Process a Web queue dot file and set interesting stuff in the doc
-    bool toDoc(Rcl::Doc& doc)
-    {
+    bool toDoc(Rcl::Doc& doc) {
         string line;
+        ifstream input;
 
-	m_input.open(m_fn.c_str(), ios::in);
-        if (!m_input.good()) {
-            LOGERR("WebQueueDotFile: open failed for ["  << (m_fn) << "]\n" );
+        input.open(m_fn.c_str(), ios::in);
+        if (!input.good()) {
+            LOGERR("WebQueueDotFile: open failed for [" << m_fn << "]\n");
             return false;
         }
 
@@ -93,13 +94,13 @@ public:
         // - url
         // - hit type: we only know about Bookmark and WebHistory for now
         // - content-type.
-        if (!readLine(line))
+        if (!readLine(input, line))
             return false;
         doc.url = line;
-        if (!readLine(line))
+        if (!readLine(input, line))
             return false;
         doc.meta[Rcl::Doc::keybght] = line;
-        if (!readLine(line))
+        if (!readLine(input, line))
             return false;
         doc.mimetype = line;
 
@@ -118,7 +119,7 @@ public:
         // parse, and finally insert the key/value pairs into the doc
         // meta[] array
         for (;;) {
-            if (!readLine(line)) {
+            if (!readLine(input, line)) {
                 // Eof hopefully
                 break;
             }
@@ -164,18 +165,17 @@ public:
         m_fields.set(cstr_bgc_mimetype, doc.mimetype, cstr_null);
 
         return true;
-    }    
+    }
 
     RclConfig *m_conf;
     ConfSimple m_fields;
     string m_fn;
-    ifstream m_input;
 };
 
 // Initialize. Compute paths and create a temporary directory that will be
 // used by internfile()
 WebQueueIndexer::WebQueueIndexer(RclConfig *cnf, Rcl::Db *db,
-                                       DbIxStatusUpdater *updfunc)
+                                 DbIxStatusUpdater *updfunc)
     : m_config(cnf), m_db(db), m_cache(0), m_updater(updfunc), 
       m_nocacheindex(false)
 {
@@ -186,7 +186,7 @@ WebQueueIndexer::WebQueueIndexer(RclConfig *cnf, Rcl::Db *db,
 
 WebQueueIndexer::~WebQueueIndexer()
 {
-    LOGDEB("WebQueueIndexer::~\n" );
+    LOGDEB("WebQueueIndexer::~\n");
     deleteZ(m_cache);
 }
 
@@ -203,12 +203,12 @@ bool WebQueueIndexer::indexFromCache(const string& udi)
     string hittype;
 
     if (!m_cache || !m_cache->getFromCache(udi, dotdoc, data, &hittype)) {
-	LOGERR("WebQueueIndexer::indexFromCache: cache failed\n" );
+        LOGERR("WebQueueIndexer::indexFromCache: cache failed\n");
         return false;
     }
 
     if (hittype.empty()) {
-        LOGERR("WebQueueIndexer::index: cc entry has no hit type\n" );
+        LOGERR("WebQueueIndexer::index: cc entry has no hit type\n");
         return false;
     }
         
@@ -219,17 +219,17 @@ bool WebQueueIndexer::indexFromCache(const string& udi)
     } else {
         Rcl::Doc doc;
         FileInterner interner(data, m_config, 
-			      FileInterner::FIF_doUseInputMimetype,
+                              FileInterner::FIF_doUseInputMimetype,
                               dotdoc.mimetype);
         FileInterner::Status fis;
         try {
             fis = interner.internfile(doc);
         } catch (CancelExcept) {
-            LOGERR("WebQueueIndexer: interrupted\n" );
+            LOGERR("WebQueueIndexer: interrupted\n");
             return false;
         }
         if (fis != FileInterner::FIDone) {
-            LOGERR("WebQueueIndexer: bad status from internfile\n" );
+            LOGERR("WebQueueIndexer: bad status from internfile\n");
             return false;
         }
 
@@ -258,14 +258,15 @@ bool WebQueueIndexer::index()
 {
     if (!m_db)
         return false;
-    LOGDEB("WebQueueIndexer::processqueue: ["  << (m_queuedir) << "]\n" );
+    LOGDEB("WebQueueIndexer::processqueue: [" << m_queuedir << "]\n");
     m_config->setKeyDir(m_queuedir);
     if (!path_makepath(m_queuedir, 0700)) {
-	LOGERR("WebQueueIndexer:: can't create queuedir ["  << (m_queuedir) << "] errno "  << (errno) << "\n" );
-	return false;
+        LOGERR("WebQueueIndexer:: can't create queuedir [" << m_queuedir <<
+               "] errno " << errno << "\n");
+        return false;
     }
     if (!m_cache || !m_cache->cc()) {
-        LOGERR("WebQueueIndexer: cache initialization failed\n" );
+        LOGERR("WebQueueIndexer: cache initialization failed\n");
         return false;
     }
     CirCache *cc = m_cache->cc();
@@ -279,11 +280,11 @@ bool WebQueueIndexer::index()
             if (!eof)
                 return false;
         }
-		int nentries = 0;
+        int nentries = 0;
         do {
             string udi;
             if (!cc->getCurrentUdi(udi)) {
-                LOGERR("WebQueueIndexer:: cache file damaged\n" );
+                LOGERR("WebQueueIndexer:: cache file damaged\n");
                 break;
             }
             if (udi.empty())
@@ -296,29 +297,29 @@ bool WebQueueIndexer::index()
                     indexFromCache(udi);
                     updstatus(udi);
                 } catch (CancelExcept) {
-                    LOGERR("WebQueueIndexer: interrupted\n" );
+                    LOGERR("WebQueueIndexer: interrupted\n");
                     return false;
                 }
             }
-			nentries++;
+            nentries++;
         } while (cc->next(eof));
     }
 
     // Finally index the queue
     FsTreeWalker walker(FsTreeWalker::FtwNoRecurse);
-    walker.addSkippedName(".*");
+    walker.addSkippedName(DOTFILEPREFIX "*");
     FsTreeWalker::Status status = walker.walk(m_queuedir, *this);
-    LOGDEB("WebQueueIndexer::processqueue: done: status "  << (status) << "\n" );
+    LOGDEB("WebQueueIndexer::processqueue: done: status " << status << "\n");
     return true;
 }
 
 // Index a list of files (sent by the real time monitor)
 bool WebQueueIndexer::indexFiles(list<string>& files)
 {
-    LOGDEB("WebQueueIndexer::indexFiles\n" );
+    LOGDEB("WebQueueIndexer::indexFiles\n");
 
     if (!m_db) {
-        LOGERR("WebQueueIndexer::indexfiles no db??\n" );
+        LOGERR("WebQueueIndexer::indexfiles no db??\n");
         return false;
     }
     for (list<string>::iterator it = files.begin(); it != files.end();) {
@@ -327,7 +328,7 @@ bool WebQueueIndexer::indexFiles(list<string>& files)
         }
         string father = path_getfather(*it);
         if (father.compare(m_queuedir)) {
-            LOGDEB("WebQueueIndexer::indexfiles: skipping ["  << *it << "] (nq)\n" );
+            LOGDEB("WebQueueIndexer::indexfiles: skipping [" << *it << "] (nq)\n");
             it++; continue;
         }
         // Pb: we are often called with the dot file, before the
@@ -343,13 +344,14 @@ bool WebQueueIndexer::indexFiles(list<string>& files)
         }
         struct stat st;
         if (path_fileprops(*it, &st) != 0) {
-            LOGERR("WebQueueIndexer::indexfiles: cant stat ["  << *it << "]\n" );
+            LOGERR("WebQueueIndexer::indexfiles: cant stat [" << *it << "]\n");
             it++; continue;
         }
-	if (!S_ISREG(st.st_mode)) {
-	    LOGDEB("WebQueueIndexer::indexfiles: skipping ["  << *it << "] (nr)\n" );
+        if (!S_ISREG(st.st_mode)) {
+            LOGDEB("WebQueueIndexer::indexfiles: skipping [" << *it <<
+                   "] (nr)\n");
             it++; continue;
-	}
+        }
 
         processone(*it, &st, FsTreeWalker::FtwRegular);
         it = files.erase(it);
@@ -362,8 +364,8 @@ bool WebQueueIndexer::indexFiles(list<string>& files)
 
 FsTreeWalker::Status 
 WebQueueIndexer::processone(const string &path,
-                               const struct stat *stp,
-                               FsTreeWalker::CbFlag flg)
+                            const struct stat *stp,
+                            FsTreeWalker::CbFlag flg)
 {
     if (!m_db) //??
         return FsTreeWalker::FtwError;
@@ -374,8 +376,8 @@ WebQueueIndexer::processone(const string &path,
         return FsTreeWalker::FtwOk;
 
     string dotpath = path_cat(path_getfather(path), 
-                              string(".") + path_getsimple(path));
-    LOGDEB("WebQueueIndexer: prc1: ["  << (path) << "]\n" );
+                              string(DOTFILEPREFIX) + path_getsimple(path));
+    LOGDEB("WebQueueIndexer: prc1: [" << path << "]\n");
 
     WebQueueDotFile dotfile(m_config, dotpath);
     Rcl::Doc dotdoc;
@@ -389,7 +391,7 @@ WebQueueIndexer::processone(const string &path,
     udipath = path_cat(dotdoc.meta[Rcl::Doc::keybght], url_gpath(dotdoc.url));
     make_udi(udipath, cstr_null, udi);
 
-    LOGDEB("WebQueueIndexer: prc1: udi ["  << (udi) << "]\n" );
+    LOGDEB("WebQueueIndexer: prc1: udi [" << udi << "]\n");
     char ascdate[30];
     sprintf(ascdate, "%ld", long(stp->st_mtime));
 
@@ -421,11 +423,11 @@ WebQueueIndexer::processone(const string &path,
         try {
             fis = interner.internfile(doc);
         } catch (CancelExcept) {
-            LOGERR("WebQueueIndexer: interrupted\n" );
+            LOGERR("WebQueueIndexer: interrupted\n");
             goto out;
         }
         if (fis != FileInterner::FIDone && fis != FileInterner::FIAgain) {
-            LOGERR("WebQueueIndexer: bad status from internfile\n" );
+            LOGERR("WebQueueIndexer: bad status from internfile\n");
             // TOBEDONE: internfile can return FIAgain here if it is
             // paging a big text file, we should loop. Means we're
             // only indexing the first page for text/plain files
@@ -451,18 +453,19 @@ WebQueueIndexer::processone(const string &path,
     {
         // doc fields not in meta, needing saving to the cache
         dotfile.m_fields.set("fmtime", dotdoc.fmtime, cstr_null);
-	// fbytes is used for historical reasons, should be pcbytes, but makes
-	// no sense to change.
+        // fbytes is used for historical reasons, should be pcbytes, but makes
+        // no sense to change.
         dotfile.m_fields.set(cstr_fbytes, dotdoc.pcbytes, cstr_null);
         dotfile.m_fields.set("udi", udi, cstr_null);
         string fdata;
         file_to_string(path, fdata);
         if (!m_cache || !m_cache->cc()) {
-            LOGERR("WebQueueIndexer: cache initialization failed\n" );
+            LOGERR("WebQueueIndexer: cache initialization failed\n");
             goto out;
         }
         if (!m_cache->cc()->put(udi, &dotfile.m_fields, fdata, 0)) {
-            LOGERR("WebQueueIndexer::prc1: cache_put failed; "  << (m_cache->cc()->getReason()) << "\n" );
+            LOGERR("WebQueueIndexer::prc1: cache_put failed; " <<
+                   m_cache->cc()->getReason() << "\n");
             goto out;
         }
     }
@@ -470,9 +473,12 @@ WebQueueIndexer::processone(const string &path,
     dounlink = true;
 out:
     if (dounlink) {
-        unlink(path.c_str());
-        unlink(dotpath.c_str());
+        if (unlink(path.c_str())) {
+            LOGSYSERR("WebQueueIndexer::processone", "unlink", path);
+        }
+        if (unlink(dotpath.c_str())) {
+            LOGSYSERR("WebQueueIndexer::processone", "unlink", dotpath);
+        }
     }
     return FsTreeWalker::FtwOk;
 }
-

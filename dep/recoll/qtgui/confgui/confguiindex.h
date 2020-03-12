@@ -30,78 +30,61 @@
 #include <QDialogButtonBox>
 #include <QTabWidget>
 #include <QListWidgetItem>
+#include <QStringList>
 
 #include <string>
-#include <list>
-using std::string;
-using std::list;
+#include <vector>
+
+#include "confgui.h"
 
 class ConfNull;
 class RclConfig;
-class ConfParamW;
-class ConfParamDNLW;
 
-namespace confgui {
-
-class ConfIndexW : public QDialog {
+class ConfIndexW : public QWidget {
     Q_OBJECT
 public:
-    ConfIndexW(QWidget *parent, RclConfig *config);
+    ConfIndexW(QWidget *parent, RclConfig *config)
+        : m_parent(parent), m_rclconf(config) {}
+
 public slots:
+    void showPrefs(bool modal);
     void acceptChanges();
-    void rejectChanges();
-    void reloadPanels();
+    QWidget *getDialog() {return m_w;}
+    
 private:
+    void initPanels();
+    bool setupTopPanel(int idx);
+    bool setupWebHistoryPanel(int idx);
+    bool setupSearchPanel(int idx);
+
+    QWidget *m_parent;
     RclConfig *m_rclconf;
-    ConfNull  *m_conf;
-    list<QWidget *> m_widgets;
-    QTabWidget       *tabWidget;
-    QDialogButtonBox *buttonBox;
+    ConfNull  *m_conf{nullptr};
+    confgui::ConfTabsW *m_w{nullptr};
+    QStringList m_stemlangs;
 };
 
-/** 
- * A panel with the top-level parameters which can't be redefined in 
- * subdirectoriess:
- */
-class ConfTopPanelW : public QWidget {
-    Q_OBJECT
-public:
-    ConfTopPanelW(QWidget *parent, ConfNull *config);
-};
 
-/**
- * A panel for the parameters that can be changed in subdirectories:
- */
-class ConfSubPanelW : public QWidget {
-    Q_OBJECT
+/** A special panel for parameters which may change in subdirectories: */
+class ConfSubPanelW : public QWidget, public confgui::ConfPanelWIF {
+    Q_OBJECT;
+
 public:
-    ConfSubPanelW(QWidget *parent, ConfNull *config, RclConfig *rclconf);
+    ConfSubPanelW(QWidget *parent, ConfNull **config, RclConfig *rclconf);
+
+    virtual void storeValues();
+    virtual void loadValues();
 
 private slots:
     void subDirChanged(QListWidgetItem *, QListWidgetItem *);
     void subDirDeleted(QString);
     void restoreEmpty();
 private:
-    string            m_sk;
-    ConfParamDNLW    *m_subdirs;
-    list<ConfParamW*> m_widgets;
-    ConfNull         *m_config;
+    std::string            m_sk;
+    ConfNull         **m_config;
+    confgui::ConfParamDNLW    *m_subdirs;
+    std::vector<confgui::ConfParamW*> m_widgets;
     QGroupBox        *m_groupbox;
-    void reloadAll();
 };
-
-class ConfBeaglePanelW : public QWidget {
-    Q_OBJECT
-public:
-    ConfBeaglePanelW(QWidget *parent, ConfNull *config);
-};
-
-class ConfSearchPanelW : public QWidget {
-    Q_OBJECT
-public:
-    ConfSearchPanelW(QWidget *parent, ConfNull *config);
-};
-
-} // Namespace confgui
 
 #endif /* _confguiindex_h_included_ */

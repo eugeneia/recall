@@ -1,35 +1,18 @@
-/* Copyright (C) 2014 J.F.Dockes
- *	 This program is free software; you can redistribute it and/or modify
- *	 it under the terms of the GNU Lesser General Public License as published by
- *	 the Free Software Foundation; either version 2.1 of the License, or
- *	 (at your option) any later version.
+/* Copyright (C) 2014-2019 J.F.Dockes
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation; either version 2.1 of the License, or
+ *  (at your option) any later version.
  *
- *	 This program is distributed in the hope that it will be useful,
- *	 but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *	 GNU Lesser General Public License for more details.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
  *
- *	 You should have received a copy of the GNU Lesser General Public License
- *	 along with this program; if not, write to the
- *	 Free Software Foundation, Inc.,
- *	 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-/* Copyright (C) 2006-2016 J.F.Dockes
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
- *   02110-1301 USA
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program; if not, write to the
+ *  Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 #ifndef _LOG_H_X_INCLUDED_
 #define _LOG_H_X_INCLUDED_
@@ -57,7 +40,7 @@
 class Logger {
 public:
     /** Initialize logging to file name. Use "stderr" for stderr
-       output. Creates the singleton logger object */
+        output. Creates the singleton logger object */
     static Logger *getTheLog(const std::string& fn);
 
     bool reopen(const std::string& fn);
@@ -97,7 +80,7 @@ private:
 #define LOGGER_PRT (Logger::getTheLog("")->getstream())
 
 #if LOGGER_THREADSAFE
-#define LOGGER_LOCK \
+#define LOGGER_LOCK                                                     \
     std::unique_lock<std::recursive_mutex> lock(Logger::getTheLog("")->getmutex())
 #else
 #define LOGGER_LOCK
@@ -107,63 +90,63 @@ private:
 #define LOGGER_LOCAL_LOGINC 0
 #endif
 
-#define LOGGER_LEVEL (Logger::getTheLog("")->getloglevel() + \
+#define LOGGER_LEVEL (Logger::getTheLog("")->getloglevel() +    \
                       LOGGER_LOCAL_LOGINC)
 
-#define LOGGER_DOLOG(L,X) LOGGER_PRT << ":" << L << ":" <<            \
-                                  __FILE__ << ":" << __LINE__ << "::" << X \
+#define LOGGER_DOLOG(L,X) LOGGER_PRT << ":" << L << ":" <<              \
+                                                                      __FILE__ << ":" << __LINE__ << "::" << X \
     << std::flush
 
 #if LOGGER_STATICVERBOSITY >= 7
-#define LOGDEB2(X) {                                                    \
-        if (LOGGER_LEVEL >= Logger::LLDEB2) {                           \
-            LOGGER_LOCK;                                                \
-            LOGGER_DOLOG(Logger::LLDEB2, X);                            \
-        }                                                               \
+#define LOGDEB2(X) {                            \
+        if (LOGGER_LEVEL >= Logger::LLDEB2) {   \
+            LOGGER_LOCK;                        \
+            LOGGER_DOLOG(Logger::LLDEB2, X);    \
+        }                                       \
     }
 #else
 #define LOGDEB2(X)
 #endif
 
 #if LOGGER_STATICVERBOSITY >= 6
-#define LOGDEB1(X) {                                                    \
-        if (LOGGER_LEVEL >= Logger::LLDEB1) {                           \
-            LOGGER_LOCK;                                                \
-            LOGGER_DOLOG(Logger::LLDEB1, X);                            \
-        }                                                               \
+#define LOGDEB1(X) {                            \
+        if (LOGGER_LEVEL >= Logger::LLDEB1) {   \
+            LOGGER_LOCK;                        \
+            LOGGER_DOLOG(Logger::LLDEB1, X);    \
+        }                                       \
     }
 #else
 #define LOGDEB1(X)
 #endif
 
 #if LOGGER_STATICVERBOSITY >= 5
-#define LOGDEB0(X) {                                                    \
-        if (LOGGER_LEVEL >= Logger::LLDEB0) {                           \
-            LOGGER_LOCK;                                                \
-            LOGGER_DOLOG(Logger::LLDEB0, X);                            \
-        }                                                               \
+#define LOGDEB0(X) {                            \
+        if (LOGGER_LEVEL >= Logger::LLDEB0) {   \
+            LOGGER_LOCK;                        \
+            LOGGER_DOLOG(Logger::LLDEB0, X);    \
+        }                                       \
     }
 #else
 #define LOGDEB0(X)
 #endif
 
 #if LOGGER_STATICVERBOSITY >= 4
-#define LOGDEB(X) {                                                     \
-        if (LOGGER_LEVEL >= Logger::LLDEB) {                            \
-            LOGGER_LOCK;                                                \
-            LOGGER_DOLOG(Logger::LLDEB, X);                             \
-        }                                                               \
+#define LOGDEB(X) {                             \
+        if (LOGGER_LEVEL >= Logger::LLDEB) {    \
+            LOGGER_LOCK;                        \
+            LOGGER_DOLOG(Logger::LLDEB, X);     \
+        }                                       \
     }
 #else
 #define LOGDEB(X)
 #endif
 
 #if LOGGER_STATICVERBOSITY >= 3
-#define LOGINF(X) {                                                     \
-        if (LOGGER_LEVEL >= Logger::LLINF) {                            \
-            LOGGER_LOCK;                                                \
-            LOGGER_DOLOG(Logger::LLINF, X);                             \
-        }                                                               \
+#define LOGINF(X) {                             \
+        if (LOGGER_LEVEL >= Logger::LLINF) {    \
+            LOGGER_LOCK;                        \
+            LOGGER_DOLOG(Logger::LLINF, X);     \
+        }                                       \
     }
 #else
 #define LOGINF(X)
@@ -171,22 +154,22 @@ private:
 #define LOGINFO LOGINF
 
 #if LOGGER_STATICVERBOSITY >= 2
-#define LOGERR(X) {                                                     \
-        if (LOGGER_LEVEL >= Logger::LLERR) {                            \
-            LOGGER_LOCK;                                                \
-            LOGGER_DOLOG(Logger::LLERR, X);                             \
-        }                                                               \
+#define LOGERR(X) {                             \
+        if (LOGGER_LEVEL >= Logger::LLERR) {    \
+            LOGGER_LOCK;                        \
+            LOGGER_DOLOG(Logger::LLERR, X);     \
+        }                                       \
     }
 #else
 #define LOGERR(X)
 #endif
 
 #if LOGGER_STATICVERBOSITY >= 1
-#define LOGFAT(X) {                                                     \
-        if (LOGGER_LEVEL >= Logger::LLFAT) {                            \
-            LOGGER_LOCK;                                                \
-            LOGGER_DOLOG(Logger::LLFAT, X);                             \
-        }                                                               \
+#define LOGFAT(X) {                             \
+        if (LOGGER_LEVEL >= Logger::LLFAT) {    \
+            LOGGER_LOCK;                        \
+            LOGGER_DOLOG(Logger::LLFAT, X);     \
+        }                                       \
     }
 #else
 #define LOGFAT(X)
@@ -198,20 +181,18 @@ private:
         LOGERR(who << ": " << what << "("  << arg << "): errno " << errno << \
                ": " << strerror(errno) << std::endl);                   \
     }
-#else // !WINDOWS->
-#if (_POSIX_C_SOURCE >= 200112L) && !  _GNU_SOURCE
-#define LOGSYSERR(who, what, arg) {                                     \
-        char buf[200]; buf[0] = 0; strerror_r(errno, buf, 200);         \
-        LOGERR(who << ": " << what << "("  << arg << "): errno " << errno << \
-               ": " << buf << std::endl);                               \
-    }
-#else
+#else // not WINDOWS or sun
+
+inline char *_log_check_strerror_r(int, char *errbuf) {return errbuf;}
+inline char *_log_check_strerror_r(char *cp, char *){return cp;}
+
 #define LOGSYSERR(who, what, arg) {                                     \
         char buf[200]; buf[0] = 0;                                      \
         LOGERR(who << ": " << what << "("  << arg << "): errno " << errno << \
-               ": " << strerror_r(errno, buf, 200) << std::endl);       \
+               ": " << _log_check_strerror_r(                           \
+                   strerror_r(errno, buf, 200), buf) << std::endl);     \
     }
-#endif
+
 #endif // not windows
 
 #endif /* _LOG_H_X_INCLUDED_ */

@@ -18,7 +18,6 @@
 
 #include <math.h>
 
-#include <map>
 #include <unordered_map>
 #include <deque>
 #include <algorithm>
@@ -119,10 +118,12 @@ public:
 
         // Take note of the group (phrase/near) terms because we need
         // to compute the position lists for them.
-        for (const auto& group : hdata.groups) {
-            if (group.size() > 1) {
-                for (const auto& term: group) {
-                    m_gterms.insert(term);
+        for (const auto& tg : hdata.index_term_groups) {
+            if (tg.kind != HighlightData::TermGroup::TGK_TERM) {
+                for (const auto& group : tg.orgroups) {
+                    for (const auto& term: group) {
+                        m_gterms.insert(term);
+                    }
                 }
             }
         }
@@ -134,16 +135,20 @@ public:
         LOGDEB2("takeword: " << term << endl);
         // Limit time taken with monster documents. The resulting
         // abstract will be incorrect or inexistant, but this is
-        // better than taking forever (the default cutoff is 10E6)
+        // better than taking forever (the default cutoff value comes
+        // from the snippetMaxPosWalk configuration parameter, and is
+        // 10E6)
         if (maxtermcount && termcount++ > maxtermcount) {
             LOGINF("Rclabsfromtext: stopping because maxtermcount reached: "<<
                    maxtermcount << endl);
+            retflags |= ABSRES_TRUNC;
             return false;
         }
         // Also limit the number of fragments (just in case safety)
         if (m_fragments.size() > maxtermcount / 100) {
             LOGINF("Rclabsfromtext: stopping because maxfragments reached: "<<
                    maxtermcount/100 << endl);
+            retflags |= ABSRES_TRUNC;
             return false;
         }
         // Remember recent past
@@ -200,7 +205,7 @@ public:
 #endif
             m_curfragcoef += coef;
             m_remainingWords = m_ctxwords + 1;
-            if (m_extcount > 3) {
+            if (m_extcount > 5) {
                 // Limit expansion of contiguous fragments (this is to
                 // avoid common terms in search causing long
                 // heavyweight meaningless fragments. Also, limit length).
@@ -264,8 +269,7 @@ public:
 
 
     // After the text is split: use the group terms positions lists to
-    // find the group matches. We process everything as NEAR (no
-    // PHRASE specific processing).
+    // find the group matches.
     void updgroups() {
         LOGDEB("TextSplitABS: stored total " << m_fragments.size() <<
                " fragments" << endl);
@@ -274,8 +278,9 @@ public:
         // Look for matches to PHRASE and NEAR term groups and finalize
         // the matched regions list (sort it by increasing start then
         // decreasing length). We process all groups as NEAR (ignore order).
-        for (unsigned int i = 0; i < m_hdata.groups.size(); i++) {
-            if (m_hdata.groups[i].size() > 1) {
+        for (unsigned int i = 0; i < m_hdata.index_term_groups.size(); i++) {
+            if (m_hdata.index_term_groups[i].kind !=
+                HighlightData::TermGroup::TGK_TERM) {
                 matchGroup(m_hdata, i, m_plists, m_gpostobytes, tboffs);
             }
         }
@@ -326,6 +331,10 @@ public:
 
         return;
     }
+
+    int getretflags() {
+        return retflags;
+    }
     
 private:
     // Past terms because we need to go back for context before a hit
@@ -350,8 +359,8 @@ private:
     // Group terms, extracted from m_hdata 
     unordered_set<string> m_gterms;
     // group/near terms word positions.
-    map<string, vector<int> > m_plists;
-    map<int, pair<int, int> > m_gpostobytes;
+    unordered_map<string, vector<int> > m_plists;
+    unordered_map<int, pair<int, int> > m_gpostobytes;
     
     // Input
     unordered_set<string> m_terms;
@@ -364,6 +373,7 @@ private:
 
     unsigned int termcount{0};
     unsigned int maxtermcount{0};
+    int retflags{0};
 };
 
 int Query::Native::abstractFromText(
@@ -375,7 +385,8 @@ int Query::Native::abstractFromText(
     int ctxwords,
     unsigned int maxtotaloccs,
     vector<Snippet>& vabs,
-    Chrono& chron
+    Chrono& chron,
+    bool sortbypage
     )
 {
     (void)chron;
@@ -423,13 +434,21 @@ int Query::Native::abstractFromText(
     // Sort the fragments by decreasing weight
     const vector<MatchFragment>& res1 = splitter.getFragments();
     vector<MatchFragment> result(res1.begin(), res1.end());
-    std::sort(result.begin(), result.end(),
-              [](const MatchFragment& a,
-                 const MatchFragment& b) -> bool { 
-                  return a.coef > b.coef; 
-              }
-        );
-
+    if (sortbypage) {
+        std::sort(result.begin(), result.end(),
+                  [](const MatchFragment& a,
+                     const MatchFragment& b) -> bool { 
+                      return a.hitpos < b.hitpos; 
+                  }
+            );
+    } else {
+        std::sort(result.begin(), result.end(),
+                  [](const MatchFragment& a,
+                     const MatchFragment& b) -> bool { 
+                      return a.coef > b.coef; 
+                  }
+            );
+    }
     vector<int> vpbreaks;
     ndb->getPagePositions(docid, vpbreaks);
 
@@ -453,18 +472,19 @@ int Query::Native::abstractFromText(
             inslen += endhit.size();
         }
 #endif
-        LOGDEB0("=== FRAGMENT: Coef: " << entry.coef << ": " << frag << endl);
         int page = 0;
         if (vpbreaks.size() > 1) {
             page = ndb->getPageNumberForPosition(vpbreaks, entry.hitpos);
             if (page < 0)
                 page = 0;
         }
+        LOGDEB0("=== FRAGMENT: p. " << page << " Coef: " << entry.coef <<
+                ": " << frag << endl);
         vabs.push_back(Snippet(page, frag).setTerm(entry.term));
         if (count++ >= maxtotaloccs)
             break;
     }
-    return ABSRES_OK;
+    return ABSRES_OK | splitter.getretflags();
 }
 
 }

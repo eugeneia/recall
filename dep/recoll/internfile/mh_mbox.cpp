@@ -16,6 +16,7 @@
  */
 
 #include "autoconfig.h"
+
 #define _FILE_OFFSET_BITS 64
 
 #include <errno.h>
@@ -40,7 +41,7 @@
 using namespace std;
 
 // Define maximum message size for safety. 100MB would seem reasonable
-static const unsigned int max_mbox_member_size = 100 * 1024 * 1024;
+static unsigned int max_mbox_member_size = 100 * 1024 * 1024;
 
 // The mbox format uses lines beginning with 'From ' as separator.
 // Mailers are supposed to quote any other lines beginning with 
@@ -131,24 +132,29 @@ public:
 
     ~MboxCache() {}
 
-    int64_t get_offset(RclConfig *config, const string& udi, int msgnum) {
-        LOGDEB0("MboxCache::get_offsets: udi [" << udi << "] msgnum "
+    int64_t get_offset(RclConfig *config, const string& udi, int msgnum,
+        int64_t filesize) {
+        LOGDEB0("MboxCache::get_offset: udi [" << udi << "] msgnum "
                 << msgnum << "\n");
         if (!ok(config)) {
-            LOGDEB("MboxCache::get_offsets: init failed\n");
+            LOGDEB("MboxCache::get_offset: init failed\n");
             return -1;
         }
         std::unique_lock<std::mutex> locker(o_mcache_mutex);
         string fn = makefilename(udi);
         ifstream instream(fn.c_str(),  std::ifstream::binary);
         if (!instream.good()) {
-            LOGSYSERR("MboxCache::get_offsets", "open", fn);
-            return false;
+            if (filesize > m_minfsize) {
+                LOGSYSERR("MboxCache::get_offset", "open", fn);
+            } else {
+                LOGDEB("MboxCache::get_offset: no cache for " << fn << endl);
+            }
+            return -1;
         }
         char blk1[M_o_b1size];
         instream.read(blk1, M_o_b1size);
         if (!instream.good()) {
-            LOGSYSERR("MboxCache::get_offsets", "read blk1", "");
+            LOGSYSERR("MboxCache::get_offset", "read blk1", "");
             return -1;
         }
         ConfSimple cf(string(blk1, M_o_b1size));
@@ -158,21 +164,21 @@ public:
                     << udi << "], fudi [" << fudi << "]\n");
             return -1;
         }
-        LOGDEB1("MboxCache::get_offsets: reading offsets file at offs "
+        LOGDEB1("MboxCache::get_offset: reading offsets file at offs "
                 << cacheoffset(msgnum) << "\n");
         instream.seekg(cacheoffset(msgnum));
         if (!instream.good()) {
-            LOGSYSERR("MboxCache::get_offsets", "seek",
+            LOGSYSERR("MboxCache::get_offset", "seek",
                       lltodecstr(cacheoffset(msgnum)));
             return -1;
         }
         int64_t offset = -1;
         instream.read((char*)&offset, sizeof(int64_t));
         if (!instream.good()) {
-            LOGSYSERR("MboxCache::get_offsets", "read", "");
+            LOGSYSERR("MboxCache::get_offset", "read", "");
             return -1;
         }
-        LOGDEB0("MboxCache::get_offsets: ret " << offset << "\n");
+        LOGDEB0("MboxCache::get_offset: ret " << offset << "\n");
         return offset;
     }
 
@@ -295,6 +301,14 @@ MimeHandlerMbox::MimeHandlerMbox(RclConfig *cnf, const std::string& id)
 	: RecollFilter(cnf, id)
 {
     m = new Internal(this);
+
+    string smbs;
+    m_config->getConfParam("mboxmaxmsgmbs", smbs);
+    if (!smbs.empty()) {
+        max_mbox_member_size  = (unsigned int)atoi(smbs.c_str()) *1024*1024;
+    }
+    LOGDEB0("MimeHandlerMbox::MimeHandlerMbox: max_mbox_member_size (MB): " <<
+            max_mbox_member_size / (1024*1024) << endl);
 }
 
 MimeHandlerMbox::~MimeHandlerMbox()
@@ -371,7 +385,8 @@ bool MimeHandlerMbox::Internal::tryUseCache(int mtarg)
     if (pthis->m_udi.empty()) {
         goto out;
     }
-    if ((off = o_mcache.get_offset(pthis->m_config, pthis->m_udi, mtarg)) < 0) {
+    if ((off = o_mcache.get_offset(pthis->m_config, pthis->m_udi, mtarg,
+                                   fsize)) < 0) {
         goto out;
     }
     instream.seekg(off);
@@ -448,20 +463,20 @@ bool MimeHandlerMbox::next_document()
         if (!m->instream.good()) {
             ifstream::iostate st = m->instream.rdstate();
             if (st &  std::ifstream::eofbit) {
-                LOGDEB0("MimeHandlerMbox:next: eof\n");
+                LOGDEB0("MimeHandlerMbox:next: eof at " << message_end << endl);
+            } else {
+                if (st &  std::ifstream::failbit) {
+                    LOGDEB0("MimeHandlerMbox:next: failbit\n");
+                    LOGSYSERR("MimeHandlerMbox:next:", "", "");
+                }
+                if (st &  std::ifstream::badbit) {
+                    LOGDEB0("MimeHandlerMbox:next: badbit\n");
+                    LOGSYSERR("MimeHandlerMbox:next:", "", "");
+                }
+                if (st &  std::ifstream::goodbit) {
+                    LOGDEB1("MimeHandlerMbox:next: good\n");
+                }
             }
-            if (st &  std::ifstream::failbit) {
-                LOGDEB0("MimeHandlerMbox:next: fail\n");
-                LOGSYSERR("MimeHandlerMbox:next:", "", "");
-            }
-            if (st &  std::ifstream::badbit) {
-                LOGDEB0("MimeHandlerMbox:next: bad\n");
-                LOGSYSERR("MimeHandlerMbox:next:", "", "");
-            }
-            if (st &  std::ifstream::goodbit) {
-                LOGDEB0("MimeHandlerMbox:next: good\n");
-            }
-            LOGDEB0("MimeHandlerMbox:next: eof at " << message_end << endl);
             iseof = true;
             m->msgnum++;
             break;

@@ -42,6 +42,7 @@
 #include <qlist.h>
 #include <QTimer>
 #include <QListWidget>
+#include <QSettings>
 
 #include "recoll.h"
 #include "guiutils.h"
@@ -103,8 +104,13 @@ void UIPrefsDialog::init()
 // Update dialog state from stored prefs
 void UIPrefsDialog::setFromPrefs()
 {
+    // Most values are stored in the prefs struct. Some rarely used
+    // ones go directly through the settings
+    QSettings settings("Recoll.org", "recoll");
+
     // Entries per result page spinbox
     pageLenSB->setValue(prefs.respagesize);
+    maxHistSizeSB->setValue(prefs.historysize);
     collapseDupsCB->setChecked(prefs.collapseDuplicates);
     maxHLTSB->setValue(prefs.maxhltextmbs);
 
@@ -126,6 +132,7 @@ void UIPrefsDialog::setFromPrefs()
 	filterBT_RB->setChecked(1);
 	break;
     }
+    noBeepsCB->setChecked(prefs.noBeeps);
     ssNoCompleteCB->setChecked(prefs.ssearchNoComplete);
     ssSearchOnCompleteCB->setChecked(prefs.ssearchStartOnComplete);
     ssSearchOnCompleteCB->setEnabled(!prefs.ssearchNoComplete);
@@ -136,13 +143,20 @@ void UIPrefsDialog::setFromPrefs()
     initStartAdvCB->setChecked(prefs.startWithAdvSearchOpen);
 
     keepSortCB->setChecked(prefs.keepSort);
+
     showTrayIconCB->setChecked(prefs.showTrayIcon);
     if (!prefs.showTrayIcon) {
         prefs.closeToTray = false;
+        prefs.trayMessages = false;
     }
     closeToTrayCB->setEnabled(showTrayIconCB->checkState());
+    trayMessagesCB->setEnabled(showTrayIconCB->checkState());
     closeToTrayCB->setChecked(prefs.closeToTray);
+    trayMessagesCB->setChecked(prefs.trayMessages);
+    
+    // See qxtconfirmationmessage. Needs to be -1 for the dialog to show.
     showTempFileWarningCB->setChecked(prefs.showTempFileWarning == -1);
+    anchorTamilHackCB->setChecked(settings.value("anchorSpcHack", 0).toBool());
     previewHtmlCB->setChecked(prefs.previewHtml);
     previewActiveLinksCB->setChecked(prefs.previewActiveLinks);
     switch (prefs.previewPlainPre) {
@@ -184,7 +198,8 @@ void UIPrefsDialog::setFromPrefs()
 	string nm = path_getsimple((const char *)snipCssFile.toLocal8Bit());
 	snipCssPB->setText(QString::fromLocal8Bit(nm.c_str()));
     }
-
+    snipwMaxLenSB->setValue(prefs.snipwMaxLength);
+    snipwByPageCB->setChecked(prefs.snipwSortByPage);
     paraFormat = prefs.reslistformat;
     headerText = prefs.reslistheadertext;
 
@@ -260,6 +275,10 @@ void UIPrefsDialog::setupReslistFontPB()
 
 void UIPrefsDialog::accept()
 {
+    // Most values are stored in the prefs struct. Some rarely used
+    // ones go directly through the settings
+    QSettings settings("Recoll.org", "recoll");
+    prefs.noBeeps = noBeepsCB->isChecked();
     prefs.ssearchNoComplete = ssNoCompleteCB->isChecked();
     prefs.ssearchStartOnComplete = ssSearchOnCompleteCB->isChecked();
 
@@ -282,6 +301,7 @@ void UIPrefsDialog::accept()
     m_mainWindow->setFilterCtlStyle(prefs.filterCtlStyle);
 
     prefs.respagesize = pageLenSB->value();
+    prefs.historysize = maxHistSizeSB->value();
     prefs.collapseDuplicates = collapseDupsCB->isChecked();
     prefs.maxhltextmbs = maxHLTSB->value();
 
@@ -301,6 +321,8 @@ void UIPrefsDialog::accept()
 	prefs.reslistformat = prefs.dfltResListFormat;
 	paraFormat = prefs.reslistformat;
     }
+    prefs.snipwMaxLength = snipwMaxLenSB->value();
+    prefs.snipwSortByPage = snipwByPageCB->isChecked();
 
     prefs.creslistformat = (const char*)prefs.reslistformat.toUtf8();
 
@@ -323,8 +345,11 @@ void UIPrefsDialog::accept()
     prefs.showTrayIcon = showTrayIconCB->isChecked();
     m_mainWindow->enableTrayIcon(prefs.showTrayIcon);
     prefs.closeToTray = closeToTrayCB->isChecked();
+    prefs.trayMessages = trayMessagesCB->isChecked();
+
     prefs.showTempFileWarning = showTempFileWarningCB->isChecked() ?
         -1 : 1024;
+    settings.setValue("anchorSpcHack", anchorTamilHackCB->isChecked());
     prefs.previewHtml = previewHtmlCB->isChecked();
     prefs.previewActiveLinks = previewActiveLinksCB->isChecked();
 
@@ -581,8 +606,10 @@ void UIPrefsDialog::on_showTrayIconCB_clicked()
 {
     if (!showTrayIconCB->checkState()) {
         closeToTrayCB->setChecked(false);
+        trayMessagesCB->setChecked(false);
     }
     closeToTrayCB->setEnabled(showTrayIconCB->checkState());
+    trayMessagesCB->setEnabled(showTrayIconCB->checkState());
 }
 
 /** 

@@ -91,6 +91,7 @@ public:
     /** Is char CJK ? (excluding Katakana) */
     static bool isCJK(int c);
     static bool isKATAKANA(int c);
+    static bool isHANGUL(int c);
 
     /** Statistics about word length (average and dispersion) can
      * detect bad data like undecoded base64 or other mis-identified

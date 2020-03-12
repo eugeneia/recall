@@ -58,7 +58,7 @@ public:
 private:
     bool read();
 
-    int m_current;
+    int m_current{-1};
     std::vector<std::shared_ptr<Rcl::SearchData> > m_entries;
 };
 

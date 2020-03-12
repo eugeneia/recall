@@ -167,9 +167,12 @@ signals:
     void docExpand(Rcl::Doc);
     void showSubDocs(Rcl::Doc);
     void showSnippets(Rcl::Doc);
-
+    void detailDocChanged(Rcl::Doc, std::shared_ptr<DocSequence>);
+    
     friend class ResTablePager;
     friend class ResTableDetailArea;
+protected:
+    bool eventFilter(QObject* obj, QEvent* event);
 private:
     void init();
     RecollModel   *m_model;

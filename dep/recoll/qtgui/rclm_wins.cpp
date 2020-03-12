@@ -1,4 +1,4 @@
-/* Copyright (C) 2005 J.F.Dockes
+/* Copyright (C) 2005-2019 J.F.Dockes
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
  *   the Free Software Foundation; either version 2 of the License, or
@@ -24,13 +24,18 @@
 #include "listdialog.h"
 #include "confgui/confguiindex.h"
 #include "idxsched.h"
+#ifdef _WIN32
+#include "winschedtool.h"
+#else
 #include "crontool.h"
 #include "rtitool.h"
+#endif
 #include "snippets_w.h"
 #include "fragbuts.h"
 #include "specialindex.h"
 #include "rclmain_w.h"
 #include "webcache.h"
+#include "restable.h"
 
 using namespace std;
 
@@ -174,20 +179,15 @@ void RclMain::execIndexConfig()
 void RclMain::showIndexConfig(bool modal)
 {
     LOGDEB("showIndexConfig()\n" );
+    bool created{false};
     if (indexConfig == 0) {
+        created = true;
 	indexConfig = new ConfIndexW(0, theconfig);
-	connect(new QShortcut(quitKeySeq, indexConfig), SIGNAL (activated()), 
-		this, SLOT (fileExit()));
-    } else {
-	// Close and reopen, in hope that makes us visible...
-	indexConfig->close();
-	indexConfig->reloadPanels();
     }
-    if (modal) {
-	indexConfig->exec();
-	indexConfig->setModal(false);
-    } else {
-	indexConfig->show();
+    indexConfig->showPrefs(modal);
+    if (created) {
+	connect(new QShortcut(quitKeySeq, indexConfig->getDialog()),
+                SIGNAL (activated()), this, SLOT (fileExit()));
     }
 }
 
@@ -201,17 +201,19 @@ void RclMain::execIndexSched()
 }
 void RclMain::showIndexSched(bool modal)
 {
-#ifdef _WIN32
-    QMessageBox::information(this, tr("Index scheduling"),
-                             tr("Sorry, not available under Windows for now, use the File menu entries "
-                                "to update the index"));
-    return;
-#endif    
     LOGDEB("showIndexSched()\n" );
     if (indexSched == 0) {
 	indexSched = new IdxSchedW(this);
 	connect(new QShortcut(quitKeySeq, indexSched), SIGNAL (activated()), 
 		this, SLOT (fileExit()));
+#ifdef _WIN32
+        indexSched->cronCLB->setText(tr("Batch scheduling"));
+        indexSched->cronCLB->setDescription(
+            tr("The tool will let you decide at what time indexing should run. "
+               " It uses the Windows task scheduler."));
+        indexSched->mainExplainLBL->hide();
+        indexSched->rtidxCLB->hide();
+#endif
 	connect(indexSched->cronCLB, SIGNAL(clicked()), 
 		this, SLOT(execCronTool()));
 	if (theconfig && theconfig->isDefaultConfig()) {
@@ -246,11 +248,16 @@ void RclMain::execCronTool()
 {
     showCronTool(true);
 }
+
 void RclMain::showCronTool(bool modal)
 {
     LOGDEB("showCronTool()\n" );
     if (cronTool == 0) {
+#ifdef _WIN32
+	cronTool = new WinSchedToolW(0);
+#else
 	cronTool = new CronToolW(0);
+#endif
 	connect(new QShortcut(quitKeySeq, cronTool), SIGNAL (activated()), 
 		this, SLOT (fileExit()));
     } else {
@@ -275,6 +282,7 @@ void RclMain::execRTITool()
 }
 void RclMain::showRTITool(bool modal)
 {
+#ifndef _WIN32
     LOGDEB("showRTITool()\n" );
     if (rtiTool == 0) {
 	rtiTool = new RTIToolW(0);
@@ -290,6 +298,7 @@ void RclMain::showRTITool(bool modal)
     } else {
 	rtiTool->show();
     }
+#endif
 }
 
 void RclMain::showUIPrefs()
@@ -319,8 +328,8 @@ void RclMain::showExtIdxDialog()
 void RclMain::showAboutDialog()
 {
     string vstring = Rcl::version_string() +
-        string("<br> http://www.recoll.org") +
-	string("<br> http://www.xapian.org");
+        string("<br><a href='http://www.recoll.org'>www.recoll.org</a>") +
+	string("<br><a href='http://www.xapian.org'>www.xapian.org</a>");
     QMessageBox::information(this, tr("About Recoll"), vstring.c_str());
 }
 
@@ -328,7 +337,8 @@ void RclMain::showMissingHelpers()
 {
     string miss;
     if (!theconfig->getMissingHelperDesc(miss)) {
-	QMessageBox::information(this, "", tr("Indexing did not run yet"));
+	QMessageBox::information(
+            this, "", tr("No information: initial indexing not yet performed."));
 	return;
     }
     QString msg = QString::fromUtf8("<p>") +
@@ -453,16 +463,23 @@ void RclMain::newDupsW(const Rcl::Doc, const vector<Rcl::Doc> dups)
 
 void RclMain::showSnippets(Rcl::Doc doc)
 {
-    if (m_snippets) {
-        deleteZ(m_snippets);
+    if (!m_snippets) {
+        m_snippets = new SnippetsW(doc, m_source);
+        connect(m_snippets, SIGNAL(startNativeViewer(Rcl::Doc, int, QString)),
+                this, SLOT(startNativeViewer(Rcl::Doc, int, QString)));
+        connect(new QShortcut(quitKeySeq, m_snippets), SIGNAL (activated()), 
+                this, SLOT (fileExit()));
+        connect(new QShortcut(closeKeySeq, m_snippets), SIGNAL (activated()), 
+                m_snippets, SLOT (close()));
+        if (restable) {
+            connect(
+                restable,
+                SIGNAL(detailDocChanged(Rcl::Doc, std::shared_ptr<DocSequence>)),
+                m_snippets,
+                SLOT(onSetDoc(Rcl::Doc, std::shared_ptr<DocSequence>)));
+        }
+    } else {
+        m_snippets->onSetDoc(doc, m_source);
     }
-    m_snippets = new SnippetsW(doc, m_source);
-    connect(m_snippets, SIGNAL(startNativeViewer(Rcl::Doc, int, QString)),
-	    this, SLOT(startNativeViewer(Rcl::Doc, int, QString)));
-    connect(new QShortcut(quitKeySeq, m_snippets), SIGNAL (activated()), 
-	    this, SLOT (fileExit()));
-    connect(new QShortcut(closeKeySeq, m_snippets), SIGNAL (activated()), 
-	    m_snippets, SLOT (close()));
     m_snippets->show();
 }
-

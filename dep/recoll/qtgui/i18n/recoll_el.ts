@@ -196,6 +196,229 @@
     </message>
 </context>
 <context>
+    <name>ConfIndexW</name>
+    <message>
+        <source>Can&apos;t write configuration file</source>
+        <translation type="unfinished">Αδύνατη η εγγραφή του αρχείου διαμόρφωσης</translation>
+    </message>
+    <message>
+        <source>Global parameters</source>
+        <translation type="unfinished">Καθολικές ρυθμίσεις</translation>
+    </message>
+    <message>
+        <source>Local parameters</source>
+        <translation type="unfinished">Τοπικές ρυθμίσεις</translation>
+    </message>
+    <message>
+        <source>Search parameters</source>
+        <translation type="unfinished">Ρυθμίσεις αναζήτησης</translation>
+    </message>
+    <message>
+        <source>Top directories</source>
+        <translation type="unfinished">Κατάλογοι εκκίνησης</translation>
+    </message>
+    <message>
+        <source>The list of directories where recursive indexing starts. Default: your home.</source>
+        <translation type="unfinished">Η λίστα των καταλόγων για την έναρξη της αναδρομικής ευρετηρίασης. Προεπιλογή: ο προσωπικός σας κατάλογος.</translation>
+    </message>
+    <message>
+        <source>Skipped paths</source>
+        <translation type="unfinished">Παραλειπόμενες διαδρομές</translation>
+    </message>
+    <message>
+        <source>These are pathnames of directories which indexing will not enter.&lt;br&gt;Path elements may contain wildcards. The entries must match the paths seen by the indexer (e.g.: if topdirs includes &apos;/home/me&apos; and &apos;/home&apos; is actually a link to &apos;/usr/home&apos;, a correct skippedPath entry would be &apos;/home/me/tmp*&apos;, not &apos;/usr/home/me/tmp*&apos;)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stemming languages</source>
+        <translation type="unfinished">Γλώσσα για την επέκταση των όρων</translation>
+    </message>
+    <message>
+        <source>The languages for which stemming expansion&lt;br&gt;dictionaries will be built.</source>
+        <translation type="unfinished">Οι γλώσσες για τις οποίες θα δημιουργηθούν τα λεξικά επεκτάσεων&lt;br&gt;των όρων.</translation>
+    </message>
+    <message>
+        <source>Log file name</source>
+        <translation type="unfinished">Όνομα του αρχείου καταγραφών</translation>
+    </message>
+    <message>
+        <source>The file where the messages will be written.&lt;br&gt;Use &apos;stderr&apos; for terminal output</source>
+        <translation type="unfinished">Το αρχείο που θα εγγραφούν τα μηνύματα.&lt;br&gt;Χρησιμοποιήστε &apos;stderr&apos; για την έξοδο τερματικού</translation>
+    </message>
+    <message>
+        <source>Log verbosity level</source>
+        <translation type="unfinished">Επίπεδο ανάλυσης των καταγραφών</translation>
+    </message>
+    <message>
+        <source>This value adjusts the amount of messages,&lt;br&gt;from only errors to a lot of debugging data.</source>
+        <translation type="unfinished">Αυτή η τιμή ρυθμίζει την ποσότητα των απεσταλμένων μηνυμάτων,&lt;br&gt;από μόνο τα σφάλματα μέχρι πολλά δεδομένα αποσφαλμάτωσης.</translation>
+    </message>
+    <message>
+        <source>Index flush megabytes interval</source>
+        <translation type="unfinished">Καθυστέρηση εγγραφής του ευρετηρίου σε megabyte</translation>
+    </message>
+    <message>
+        <source>This value adjust the amount of data which is indexed between flushes to disk.&lt;br&gt;This helps control the indexer memory usage. Default 10MB </source>
+        <translation type="unfinished">Αυτή η τιμή ρυθμίζει την ποσότητα των δεδομένων που δεικτοδοτούνται μεταξύ των εγγραφών στο δίσκο.&lt;br&gt;Βοηθά στον έλεγχο χρήσης της μνήμης. Προεπιλογή: 10MB </translation>
+    </message>
+    <message>
+        <source>Disk full threshold to stop indexing&lt;br&gt;(e.g. 90%, 0 means no limit)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the percentage of disk usage - total disk usage, not index size - at which indexing will fail and stop.&lt;br&gt;The default value of 0 removes any limit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No aspell usage</source>
+        <translation type="unfinished">Χωρίς χρήση του aspell</translation>
+    </message>
+    <message>
+        <source>Disables use of aspell to generate spelling approximation in the term explorer tool.&lt;br&gt; Useful if aspell is absent or does not work. </source>
+        <translation type="unfinished">Απενεργοποιεί τη χρήση του aspell για τη δημιουργία των ορθογραφικών προσεγγίσεων.&lt;br&gt;Χρήσιμο αν το aspell δεν είναι εγκατεστημένο ή δεν λειτουργεί. </translation>
+    </message>
+    <message>
+        <source>Aspell language</source>
+        <translation type="unfinished">Γλώσσα του aspell</translation>
+    </message>
+    <message>
+        <source>The language for the aspell dictionary. This should look like &apos;en&apos; or &apos;fr&apos; ...&lt;br&gt;If this value is not set, the NLS environment will be used to compute it, which usually works. To get an idea of what is installed on your system, type &apos;aspell config&apos; and look for .dat files inside the &apos;data-dir&apos; directory. </source>
+        <translation type="unfinished">Η γλώσσα για το λεξικό aspell. Αυτό θα πρέπει να είναι του τύπου «en» ή «el» ...&lt;br&gt; Αν αυτή η τιμή δεν οριστεί, χρησιμοποιείται το εθνικό περιβάλλον NLS για να την υπολογίσει, που συνήθως δουλεύει. Για να πάρετε μια ιδέα του τι είναι εγκατεστημένο στο σύστημά σας, πληκτρολογήστε «aspell config» και παρατηρήστε τα αρχεία .dat στον κατάλογο «data-dir». </translation>
+    </message>
+    <message>
+        <source>Database directory name</source>
+        <translation type="unfinished">Κατάλογος αποθήκευσης του ευρετηρίου</translation>
+    </message>
+    <message>
+        <source>The name for a directory where to store the index&lt;br&gt;A non-absolute path is taken relative to the configuration directory. The default is &apos;xapiandb&apos;.</source>
+        <translation type="unfinished">Το όνομα του καταλόγου αποθήκευσης του ευρετηρίου&lt;br&gt;Μια σχετική διαδρομή αναφερόμενη στη διαδρομή διαμόρφωσης. Η εξ&apos; ορισμού είναι «xapiandb». </translation>
+    </message>
+    <message>
+        <source>Unac exceptions</source>
+        <translation type="unfinished">Εξαιρέσεις unac</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;These are exceptions to the unac mechanism which, by default, removes all diacritics, and performs canonic decomposition. You can override unaccenting for some characters, depending on your language, and specify additional decompositions, e.g. for ligatures. In each space-separated entry, the first character is the source one, and the rest is the translation.</source>
+        <translation type="unfinished">&lt;p&gt;Αυτές είναι εξαιρέσεις για τον μηχανισμό unac, ο οποίος εξ&apos; ορισμού, αφαιρεί όλους τους τονισμούς, και πραγματοποιεί κανονική αποσύνθεση. Μπορείτε να αναιρέσετε την αφαίρεση των τονισμών  για ορισμένους χαρακτήρες, ανάλογα με τη γλώσσα σας, και διευκρινίστε άλλους αποσυνθέσεις, για παράδειγμα συμπλεγμένους χαρακτήρες. Στη λίστα διαχωρισμένη με κενά, ο πρώτος χαρακτήρας ενός αντικειμένου είναι η πηγή, το υπόλοιπο είναι η μετάφραση.</translation>
+    </message>
+    <message>
+        <source>Process the WEB history queue</source>
+        <translation type="unfinished">Επεξεργασία της ουράς ιστορικού του Ιστού</translation>
+    </message>
+    <message>
+        <source>Enables indexing Firefox visited pages.&lt;br&gt;(you need also install the Firefox Recoll plugin)</source>
+        <translation type="unfinished">Ενεργοποιεί τη δεικτοδότηση των επισκεπτόμενων σελίδων στον Firefox.&lt;br&gt;(θα πρέπει να εγκαταστήσετε και το πρόσθετο Firefox Recoll)</translation>
+    </message>
+    <message>
+        <source>Web page store directory name</source>
+        <translation type="unfinished">Όνομα καταλόγου αποθήκευσης ιστοσελίδων</translation>
+    </message>
+    <message>
+        <source>The name for a directory where to store the copies of visited web pages.&lt;br&gt;A non-absolute path is taken relative to the configuration directory.</source>
+        <translation type="unfinished">Το όνομα του καταλόγου αποθήκευσης αντιγράφων των επισκεφθέντων ιστοσελίδων.&lt;br&gt;Μια σχετική διαδρομή αναφερόμενη στη διαδρομή διαμόρφωσης.</translation>
+    </message>
+    <message>
+        <source>Max. size for the web store (MB)</source>
+        <translation type="unfinished">Μέγ. μέγεθος της λανθάνουσας μνήμης ιστού (MB)</translation>
+    </message>
+    <message>
+        <source>Entries will be recycled once the size is reached.&lt;br&gt;Only increasing the size really makes sense because reducing the value will not truncate an existing file (only waste space at the end).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic diacritics sensitivity</source>
+        <translation type="unfinished">Αυτόματη ευαισθησία στους τόνους</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Automatically trigger diacritics sensitivity if the search term has accented characters (not in unac_except_trans). Else you need to use the query language and the &lt;i&gt;D&lt;/i&gt; modifier to specify diacritics sensitivity.</source>
+        <translation type="unfinished">&lt;p&gt;Αυτόματη εναλλαγή ευαισθησίας τονισμού αν ο όρος αναζήτησης διαθέτει τονισμένους χαρακτήρες (εκτός αυτών του unac_except_trans). Διαφορετικά θα πρέπει να χρησιμοποιήσετε τη γλώσσα της αναζήτησης και τον τροποποιητή &lt;i&gt;D&lt;/i&gt; για τον καθορισμό της ευαισθησίας τονισμών.</translation>
+    </message>
+    <message>
+        <source>Automatic character case sensitivity</source>
+        <translation type="unfinished">Αυτόματη ευαισθησία πεζών/κεφαλαίων</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Automatically trigger character case sensitivity if the entry has upper-case characters in any but the first position. Else you need to use the query language and the &lt;i&gt;C&lt;/i&gt; modifier to specify character-case sensitivity.</source>
+        <translation type="unfinished">&lt;p&gt;Αυτόματη εναλλαγή ευαισθησίας διάκρισης πεζών/κεφαλαίων αν η ο όρος αναζήτησης διαθέτει κεφαλαία γράμματα (εκτός του πρώτου γράμματος). Διαφορετικά θα πρέπει να χρησιμοποιήσετε τη γλώσσα της αναζήτησης και τον τροποποιητή &lt;i&gt;C&lt;/i&gt; για τον καθορισμό της ευαισθησίας διάκρισης πεζών / κεφαλαίων.</translation>
+    </message>
+    <message>
+        <source>Maximum term expansion count</source>
+        <translation type="unfinished">Μέγιστο μέγεθος επέκτασης ενός όρου</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Maximum expansion count for a single term (e.g.: when using wildcards). The default of 10 000 is reasonable and will avoid queries that appear frozen while the engine is walking the term list.</source>
+        <translation type="unfinished">&lt;p&gt;Μέγιστος αριθμός επέκτασης για έναν όρο (π.χ.: κατά τη χρήση χαρακτήρων υποκατάστασης). Η προκαθορισμένη τιμή 10000 είναι λογική και θα αποφύγει ερωτήματα που εμφανίζονται σαν παγωμένα την ίδια στιγμή που η μηχανή διαπερνά τη λίστα όρων.</translation>
+    </message>
+    <message>
+        <source>Maximum Xapian clauses count</source>
+        <translation type="unfinished">Μέγιστος αριθμός ρητρών Xapian </translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Maximum number of elementary clauses we add to a single Xapian query. In some cases, the result of term expansion can be multiplicative, and we want to avoid using excessive memory. The default of 100 000 should be both high enough in most cases and compatible with current typical hardware configurations.</source>
+        <translation type="unfinished">&lt;p&gt;Μέγιστος αριθμός στοιχειωδών ρητρών που προσθέτουμε σε ένα απλό ερώτημα Xapian. Σε μερικές περιπτώσεις, το αποτέλεσμα της επέκτασης των όρων μπορεί να είναι πολλαπλασιαστικό, και θα χρησιμοποιούσε υπερβολική μνήμη. Η προκαθορισμένη τιμή 100000 θα πρέπει να είναι επαρκής και συμβατή με μια τυπική διαμόρφωση υλικού.</translation>
+    </message>
+</context>
+<context>
+    <name>ConfSubPanelW</name>
+    <message>
+        <source>Only mime types</source>
+        <translation type="unfinished">Μόνο οι τύποι MIME</translation>
+    </message>
+    <message>
+        <source>An exclusive list of indexed mime types.&lt;br&gt;Nothing else will be indexed. Normally empty and inactive</source>
+        <translation type="unfinished">Μια αποκλειστική λίστα δεικτοδοτημένων τύπων mime.&lt;br&gt;Δεν θα δεικτοδοτηθεί τίποτα άλλο. Φυσιολογικά κενό και αδρανές</translation>
+    </message>
+    <message>
+        <source>Exclude mime types</source>
+        <translation type="unfinished">Αποκλεισμός τύπων αρχείων</translation>
+    </message>
+    <message>
+        <source>Mime types not to be indexed</source>
+        <translation type="unfinished">Οι τύποι Mime που δεν θα δεικτοδοτηθούν</translation>
+    </message>
+    <message>
+        <source>Max. compressed file size (KB)</source>
+        <translation type="unfinished">Μεγ.μέγεθος για τα συμπιεσμένα αρχεία (KB)</translation>
+    </message>
+    <message>
+        <source>This value sets a threshold beyond which compressedfiles will not be processed. Set to -1 for no limit, to 0 for no decompression ever.</source>
+        <translation type="unfinished">Αυτή η τιμή καθορίζει ένα όριο πέραν του οποίου τα συμπιεσμένα αρχεία δεν θα επεξεργάζονται. Χρησιμοποιήστε -1 για κανένα όριο, 0 για να μην επεξεργάζονται τα συμπιεσμένα αρχεία.</translation>
+    </message>
+    <message>
+        <source>Max. text file size (MB)</source>
+        <translation type="unfinished">Μεγ. μέγεθος αρχείων κειμένου (MB)</translation>
+    </message>
+    <message>
+        <source>This value sets a threshold beyond which text files will not be processed. Set to -1 for no limit. 
+This is for excluding monster log files from the index.</source>
+        <translation type="unfinished">Αυτή η τιμή ορίζει ένα όριο πέραν του οποίου δεν θα γίνεται ευρετηρίαση για τα αρχεία κειμένου. Ορίστε -1 για κανένα όριο.
+Αυτό χρησιμεύει για τον αποκλεισμό από την ευρετηρίαση τεράστιων αρχείων καταγραφών.</translation>
+    </message>
+    <message>
+        <source>Text file page size (KB)</source>
+        <translation type="unfinished">Μέγεθος κοπής για τα αρχεία κειμένου (KB)</translation>
+    </message>
+    <message>
+        <source>If this value is set (not equal to -1), text files will be split in chunks of this size for indexing.
+This will help searching very big text  files (ie: log files).</source>
+        <translation type="unfinished">Αν αυτή η τιμή έχει οριστεί και είναι θετική, τα αρχεία κειμένου θα κοπούν σε κομμάτια αυτού του μεγέθους για την ευρετηρίαση.
+Αυτό βοηθά στη μείωση των καταναλωμένων πόρων από την ευρετηρίαση και βοηθά τη φόρτωση για την προεπισκόπηση.</translation>
+    </message>
+    <message>
+        <source>Max. filter exec. time (s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>External filters working longer than this will be aborted. This is for the rare case (ie: postscript) where a document could cause a filter to loop. Set to -1 for no limit.
+</source>
+        <translation type="unfinished">Τα εξωτερικά φίλτρα σε λειτουργία μεγαλύτερη από αυτό θα διακόπτονται. Χρήσιμο για τη σπάνια περίπτωση (π.χ. postscript) όπου ένα έγγραφο μπορεί να προκαλέσει ένα βρόγχο στο φίλτρο. Ορίστε το σε -1 για να αφαιρέσετε το όριο.</translation>
+    </message>
+    <message>
+        <source>Global</source>
+        <translation type="unfinished">Γενικά</translation>
+    </message>
+</context>
+<context>
     <name>CronToolW</name>
     <message>
         <source>Cron Dialog</source>
@@ -550,6 +773,14 @@ p, li { white-space: pre-wrap; }
         <source>Could not fetch stored text</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Previous result document</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next result document</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviewTextEdit</name>
@@ -602,11 +833,11 @@ p, li { white-space: pre-wrap; }
     <name>QObject</name>
     <message>
         <source>Global parameters</source>
-        <translation>Καθολικές ρυθμίσεις</translation>
+        <translation type="vanished">Καθολικές ρυθμίσεις</translation>
     </message>
     <message>
         <source>Local parameters</source>
-        <translation>Τοπικές ρυθμίσεις</translation>
+        <translation type="vanished">Τοπικές ρυθμίσεις</translation>
     </message>
     <message>
         <source>Beagle web history</source>
@@ -658,11 +889,11 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Search parameters</source>
-        <translation>Ρυθμίσεις αναζήτησης</translation>
+        <translation type="vanished">Ρυθμίσεις αναζήτησης</translation>
     </message>
     <message>
         <source>Web history</source>
-        <translation>Ιστορικό ιστού</translation>
+        <translation type="vanished">Ιστορικό ιστού</translation>
     </message>
     <message>
         <source>Default&lt;br&gt;character set</source>
@@ -1095,7 +1326,7 @@ Please check the mimeview file</source>
     </message>
     <message>
         <source>Indexing did not run yet</source>
-        <translation>Η δεικτοδότηση δεν έχει εκτελεστή εκόμα</translation>
+        <translation type="vanished">Η δεικτοδότηση δεν έχει εκτελεστή εκόμα</translation>
     </message>
     <message>
         <source>External applications/commands needed for your file types and not found, as stored by the last indexing pass in </source>
@@ -1244,14 +1475,6 @@ Please check the desktop file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Index scheduling</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sorry, not available under Windows for now, use the File menu entries to update the index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Disabled because the real time indexer was not compiled in.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1338,6 +1561,30 @@ Please check the desktop file</source>
     </message>
     <message>
         <source>total files)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No information: initial indexing not yet performed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Batch scheduling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The tool will let you decide at what time indexing should run.  It uses the Windows task scheduler.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Erasing simple and advanced search history lists, please click Ok to confirm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open/create file</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1645,6 +1892,10 @@ Please check the desktop file</source>
     </message>
     <message>
         <source>Trigger incremental pass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E&amp;xport simple search history</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2074,7 +2325,7 @@ Use &lt;b&gt;Show Query&lt;/b&gt; link when in doubt about result and see manual
 &lt;i&gt;&quot;term1 term2&quot;p&lt;/i&gt; : unordered proximity search with default distance.&lt;br&gt;
 Use &lt;b&gt;Show Query&lt;/b&gt; link when in doubt about result and see manual (&amp;lt;F1&gt;) for more detail.
 </source>
-        <translation>Εισαγωγή έκφρασης γλώσσας ερωτήματος. «Σκονάκι»:&lt;br&gt;
+        <translation type="vanished">Εισαγωγή έκφρασης γλώσσας ερωτήματος. «Σκονάκι»:&lt;br&gt;
 &lt;i&gt;όρος1 όρος2&lt;/i&gt; : &apos;όρος1&apos; και &apos;όρος2&apos; σε οποιοδήποτε πεδίο.&lt;br&gt;
 &lt;i&gt;πεδίο:όρος1&lt;/i&gt; : &apos;όρος1&apos; στο πεδίο &apos;πεδίο&apos;.&lt;br&gt;
  Τυπικό πεδίο ονόματα/συνώνυμα:&lt;br&gt;
@@ -2116,6 +2367,134 @@ Use &lt;b&gt;Show Query&lt;/b&gt; link when in doubt about result and see manual
         <source>Enter search terms here.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;style&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>table, th, td {</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>border: 1px solid black;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>border-collapse: collapse;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>}</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>th,td {</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>text-align: center;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;/style&gt;&lt;/head&gt;&lt;body&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Query language cheat-sheet. In doubt: click &lt;b&gt;Show Query&lt;/b&gt;.&amp;nbsp;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You should really look at the manual (F1)&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;table border=&apos;1&apos; cellspacing=&apos;0&apos;&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;th&gt;What&lt;/th&gt;&lt;th&gt;Examples&lt;/th&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;And&lt;/td&gt;&lt;td&gt;one two&amp;nbsp;&amp;nbsp;&amp;nbsp;one AND two&amp;nbsp;&amp;nbsp;&amp;nbsp;one &amp;&amp; two&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Or&lt;/td&gt;&lt;td&gt;one OR two&amp;nbsp;&amp;nbsp;&amp;nbsp;one || two&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Complex boolean. OR has priority, use parentheses&amp;nbsp;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>where needed&lt;/td&gt;&lt;td&gt;(one AND two) OR three&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Not&lt;/td&gt;&lt;td&gt;-term&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Phrase&lt;/td&gt;&lt;td&gt;&quot;pride and prejudice&quot;&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Ordered proximity (slack=1)&lt;/td&gt;&lt;td&gt;&quot;pride prejudice&quot;o1&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Unordered proximity (slack=1)&lt;/td&gt;&lt;td&gt;&quot;prejudice pride&quot;po1&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Unordered prox. (default slack=10)&lt;/td&gt;&lt;td&gt;&quot;prejudice&amp;nbsp;pride&quot;p&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;No stem expansion: capitalize&lt;/td&gt;&lt;td&gt;Floor&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Field-specific&lt;/td&gt;&lt;td&gt;author:austen&amp;nbsp;&amp;nbsp;title:prejudice&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;AND inside field (no order)&lt;/td&gt;&lt;td&gt;author:jane,austen&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;OR inside field&lt;/td&gt;&lt;td&gt;author:austen/bronte&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Field names&lt;/td&gt;&lt;td&gt;title/subject/caption&amp;nbsp;&amp;nbsp;author/from&lt;br&gt;recipient/to&amp;nbsp;&amp;nbsp;filename&amp;nbsp;&amp;nbsp;ext&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Directory path filter&lt;/td&gt;&lt;td&gt;dir:/home/me&amp;nbsp;&amp;nbsp;dir:doc&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;MIME type filter&lt;/td&gt;&lt;td&gt;mime:text/plain mime:video/*&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Date intervals&lt;/td&gt;&lt;td&gt;date:2018-01-01/2018-31-12&lt;br&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>date:2018&amp;nbsp;&amp;nbsp;date:2018-01-01/P12M&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Size&lt;/td&gt;&lt;td&gt;size&amp;gt;100k size&amp;lt;1M&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SSearchBase</name>
@@ -2153,10 +2532,6 @@ Use &lt;b&gt;Show Query&lt;/b&gt; link when in doubt about result and see manual
     </message>
     <message>
         <source>Show query history</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter search terms here.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2227,6 +2602,14 @@ Use &lt;b&gt;Show Query&lt;/b&gt; link when in doubt about result and see manual
     <message>
         <source>&lt;p&gt;Sorry, no exact match was found within limits. Probably the document is very big and the snippets generator got lost in a maze...&lt;/p&gt;</source>
         <translation>&lt;p&gt;Λυπάμαι, δεν βρέθηκε μια ακριβής αντιστοιχία εντός ορίων. Πιθανώς το έγγραφο να είναι ογκώδες και ο δημιουργός αποσπασμάτων χάθηκε σε έναν λαβύρινθο...&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>Sort By Relevance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort By Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2660,15 +3043,15 @@ Use &lt;b&gt;Show Query&lt;/b&gt; link when in doubt about result and see manual
     </message>
     <message>
         <source>Web page store directory name</source>
-        <translation>Όνομα καταλόγου αποθήκευσης ιστοσελίδων</translation>
+        <translation type="vanished">Όνομα καταλόγου αποθήκευσης ιστοσελίδων</translation>
     </message>
     <message>
         <source>The name for a directory where to store the copies of visited web pages.&lt;br&gt;A non-absolute path is taken relative to the configuration directory.</source>
-        <translation>Το όνομα του καταλόγου αποθήκευσης αντιγράφων των επισκεφθέντων ιστοσελίδων.&lt;br&gt;Μια σχετική διαδρομή αναφερόμενη στη διαδρομή διαμόρφωσης.</translation>
+        <translation type="vanished">Το όνομα του καταλόγου αποθήκευσης αντιγράφων των επισκεφθέντων ιστοσελίδων.&lt;br&gt;Μια σχετική διαδρομή αναφερόμενη στη διαδρομή διαμόρφωσης.</translation>
     </message>
     <message>
         <source>Max. size for the web store (MB)</source>
-        <translation>Μέγ. μέγεθος της λανθάνουσας μνήμης ιστού (MB)</translation>
+        <translation type="vanished">Μέγ. μέγεθος της λανθάνουσας μνήμης ιστού (MB)</translation>
     </message>
     <message>
         <source>Entries will be recycled once the size is reached</source>
@@ -2676,26 +3059,18 @@ Use &lt;b&gt;Show Query&lt;/b&gt; link when in doubt about result and see manual
     </message>
     <message>
         <source>Process the WEB history queue</source>
-        <translation>Επεξεργασία της ουράς ιστορικού του Ιστού</translation>
+        <translation type="vanished">Επεξεργασία της ουράς ιστορικού του Ιστού</translation>
     </message>
     <message>
         <source>Enables indexing Firefox visited pages.&lt;br&gt;(you need also install the Firefox Recoll plugin)</source>
-        <translation>Ενεργοποιεί τη δεικτοδότηση των επισκεπτόμενων σελίδων στον Firefox.&lt;br&gt;(θα πρέπει να εγκαταστήσετε και το πρόσθετο Firefox Recoll)</translation>
-    </message>
-    <message>
-        <source>Entries will be recycled once the size is reached.&lt;br&gt;Only increasing the size really makes sense because reducing the value will not truncate an existing file (only waste space at the end).</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">Ενεργοποιεί τη δεικτοδότηση των επισκεπτόμενων σελίδων στον Firefox.&lt;br&gt;(θα πρέπει να εγκαταστήσετε και το πρόσθετο Firefox Recoll)</translation>
     </message>
 </context>
 <context>
     <name>confgui::ConfIndexW</name>
     <message>
         <source>Can&apos;t write configuration file</source>
-        <translation>Αδύνατη η εγγραφή του αρχείου διαμόρφωσης</translation>
-    </message>
-    <message>
-        <source>Recoll - Index Settings: </source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">Αδύνατη η εγγραφή του αρχείου διαμόρφωσης</translation>
     </message>
 </context>
 <context>
@@ -2715,70 +3090,86 @@ Use &lt;b&gt;Show Query&lt;/b&gt; link when in doubt about result and see manual
         <source>-</source>
         <translation>-</translation>
     </message>
+    <message>
+        <source>Add entry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete selected entries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>~</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit selected entries</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>confgui::ConfSearchPanelW</name>
     <message>
         <source>Automatic diacritics sensitivity</source>
-        <translation>Αυτόματη ευαισθησία στους τόνους</translation>
+        <translation type="vanished">Αυτόματη ευαισθησία στους τόνους</translation>
     </message>
     <message>
         <source>&lt;p&gt;Automatically trigger diacritics sensitivity if the search term has accented characters (not in unac_except_trans). Else you need to use the query language and the &lt;i&gt;D&lt;/i&gt; modifier to specify diacritics sensitivity.</source>
-        <translation>&lt;p&gt;Αυτόματη εναλλαγή ευαισθησίας τονισμού αν ο όρος αναζήτησης διαθέτει τονισμένους χαρακτήρες (εκτός αυτών του unac_except_trans). Διαφορετικά θα πρέπει να χρησιμοποιήσετε τη γλώσσα της αναζήτησης και τον τροποποιητή &lt;i&gt;D&lt;/i&gt; για τον καθορισμό της ευαισθησίας τονισμών.</translation>
+        <translation type="vanished">&lt;p&gt;Αυτόματη εναλλαγή ευαισθησίας τονισμού αν ο όρος αναζήτησης διαθέτει τονισμένους χαρακτήρες (εκτός αυτών του unac_except_trans). Διαφορετικά θα πρέπει να χρησιμοποιήσετε τη γλώσσα της αναζήτησης και τον τροποποιητή &lt;i&gt;D&lt;/i&gt; για τον καθορισμό της ευαισθησίας τονισμών.</translation>
     </message>
     <message>
         <source>Automatic character case sensitivity</source>
-        <translation>Αυτόματη ευαισθησία πεζών/κεφαλαίων</translation>
+        <translation type="vanished">Αυτόματη ευαισθησία πεζών/κεφαλαίων</translation>
     </message>
     <message>
         <source>&lt;p&gt;Automatically trigger character case sensitivity if the entry has upper-case characters in any but the first position. Else you need to use the query language and the &lt;i&gt;C&lt;/i&gt; modifier to specify character-case sensitivity.</source>
-        <translation>&lt;p&gt;Αυτόματη εναλλαγή ευαισθησίας διάκρισης πεζών/κεφαλαίων αν η ο όρος αναζήτησης διαθέτει κεφαλαία γράμματα (εκτός του πρώτου γράμματος). Διαφορετικά θα πρέπει να χρησιμοποιήσετε τη γλώσσα της αναζήτησης και τον τροποποιητή &lt;i&gt;C&lt;/i&gt; για τον καθορισμό της ευαισθησίας διάκρισης πεζών / κεφαλαίων.</translation>
+        <translation type="vanished">&lt;p&gt;Αυτόματη εναλλαγή ευαισθησίας διάκρισης πεζών/κεφαλαίων αν η ο όρος αναζήτησης διαθέτει κεφαλαία γράμματα (εκτός του πρώτου γράμματος). Διαφορετικά θα πρέπει να χρησιμοποιήσετε τη γλώσσα της αναζήτησης και τον τροποποιητή &lt;i&gt;C&lt;/i&gt; για τον καθορισμό της ευαισθησίας διάκρισης πεζών / κεφαλαίων.</translation>
     </message>
     <message>
         <source>Maximum term expansion count</source>
-        <translation>Μέγιστο μέγεθος επέκτασης ενός όρου</translation>
+        <translation type="vanished">Μέγιστο μέγεθος επέκτασης ενός όρου</translation>
     </message>
     <message>
         <source>&lt;p&gt;Maximum expansion count for a single term (e.g.: when using wildcards). The default of 10 000 is reasonable and will avoid queries that appear frozen while the engine is walking the term list.</source>
-        <translation>&lt;p&gt;Μέγιστος αριθμός επέκτασης για έναν όρο (π.χ.: κατά τη χρήση χαρακτήρων υποκατάστασης). Η προκαθορισμένη τιμή 10000 είναι λογική και θα αποφύγει ερωτήματα που εμφανίζονται σαν παγωμένα την ίδια στιγμή που η μηχανή διαπερνά τη λίστα όρων.</translation>
+        <translation type="vanished">&lt;p&gt;Μέγιστος αριθμός επέκτασης για έναν όρο (π.χ.: κατά τη χρήση χαρακτήρων υποκατάστασης). Η προκαθορισμένη τιμή 10000 είναι λογική και θα αποφύγει ερωτήματα που εμφανίζονται σαν παγωμένα την ίδια στιγμή που η μηχανή διαπερνά τη λίστα όρων.</translation>
     </message>
     <message>
         <source>Maximum Xapian clauses count</source>
-        <translation>Μέγιστος αριθμός ρητρών Xapian </translation>
+        <translation type="vanished">Μέγιστος αριθμός ρητρών Xapian </translation>
     </message>
     <message>
         <source>&lt;p&gt;Maximum number of elementary clauses we add to a single Xapian query. In some cases, the result of term expansion can be multiplicative, and we want to avoid using excessive memory. The default of 100 000 should be both high enough in most cases and compatible with current typical hardware configurations.</source>
-        <translation>&lt;p&gt;Μέγιστος αριθμός στοιχειωδών ρητρών που προσθέτουμε σε ένα απλό ερώτημα Xapian. Σε μερικές περιπτώσεις, το αποτέλεσμα της επέκτασης των όρων μπορεί να είναι πολλαπλασιαστικό, και θα χρησιμοποιούσε υπερβολική μνήμη. Η προκαθορισμένη τιμή 100000 θα πρέπει να είναι επαρκής και συμβατή με μια τυπική διαμόρφωση υλικού.</translation>
+        <translation type="vanished">&lt;p&gt;Μέγιστος αριθμός στοιχειωδών ρητρών που προσθέτουμε σε ένα απλό ερώτημα Xapian. Σε μερικές περιπτώσεις, το αποτέλεσμα της επέκτασης των όρων μπορεί να είναι πολλαπλασιαστικό, και θα χρησιμοποιούσε υπερβολική μνήμη. Η προκαθορισμένη τιμή 100000 θα πρέπει να είναι επαρκής και συμβατή με μια τυπική διαμόρφωση υλικού.</translation>
     </message>
 </context>
 <context>
     <name>confgui::ConfSubPanelW</name>
     <message>
         <source>Max. compressed file size (KB)</source>
-        <translation>Μεγ.μέγεθος για τα συμπιεσμένα αρχεία (KB)</translation>
+        <translation type="vanished">Μεγ.μέγεθος για τα συμπιεσμένα αρχεία (KB)</translation>
     </message>
     <message>
         <source>This value sets a threshold beyond which compressedfiles will not be processed. Set to -1 for no limit, to 0 for no decompression ever.</source>
-        <translation>Αυτή η τιμή καθορίζει ένα όριο πέραν του οποίου τα συμπιεσμένα αρχεία δεν θα επεξεργάζονται. Χρησιμοποιήστε -1 για κανένα όριο, 0 για να μην επεξεργάζονται τα συμπιεσμένα αρχεία.</translation>
+        <translation type="vanished">Αυτή η τιμή καθορίζει ένα όριο πέραν του οποίου τα συμπιεσμένα αρχεία δεν θα επεξεργάζονται. Χρησιμοποιήστε -1 για κανένα όριο, 0 για να μην επεξεργάζονται τα συμπιεσμένα αρχεία.</translation>
     </message>
     <message>
         <source>Max. text file size (MB)</source>
-        <translation>Μεγ. μέγεθος αρχείων κειμένου (MB)</translation>
+        <translation type="vanished">Μεγ. μέγεθος αρχείων κειμένου (MB)</translation>
     </message>
     <message>
         <source>This value sets a threshold beyond which text files will not be processed. Set to -1 for no limit. 
 This is for excluding monster log files from the index.</source>
-        <translation>Αυτή η τιμή ορίζει ένα όριο πέραν του οποίου δεν θα γίνεται ευρετηρίαση για τα αρχεία κειμένου. Ορίστε -1 για κανένα όριο.
+        <translation type="vanished">Αυτή η τιμή ορίζει ένα όριο πέραν του οποίου δεν θα γίνεται ευρετηρίαση για τα αρχεία κειμένου. Ορίστε -1 για κανένα όριο.
 Αυτό χρησιμεύει για τον αποκλεισμό από την ευρετηρίαση τεράστιων αρχείων καταγραφών.</translation>
     </message>
     <message>
         <source>Text file page size (KB)</source>
-        <translation>Μέγεθος κοπής για τα αρχεία κειμένου (KB)</translation>
+        <translation type="vanished">Μέγεθος κοπής για τα αρχεία κειμένου (KB)</translation>
     </message>
     <message>
         <source>If this value is set (not equal to -1), text files will be split in chunks of this size for indexing.
 This will help searching very big text  files (ie: log files).</source>
-        <translation>Αν αυτή η τιμή έχει οριστεί και είναι θετική, τα αρχεία κειμένου θα κοπούν σε κομμάτια αυτού του μεγέθους για την ευρετηρίαση.
+        <translation type="vanished">Αν αυτή η τιμή έχει οριστεί και είναι θετική, τα αρχεία κειμένου θα κοπούν σε κομμάτια αυτού του μεγέθους για την ευρετηρίαση.
 Αυτό βοηθά στη μείωση των καταναλωμένων πόρων από την ευρετηρίαση και βοηθά τη φόρτωση για την προεπισκόπηση.</translation>
     </message>
     <message>
@@ -2792,47 +3183,43 @@ This will help searching very big text  files (ie: log files).</source>
     </message>
     <message>
         <source>Global</source>
-        <translation>Γενικά</translation>
+        <translation type="vanished">Γενικά</translation>
     </message>
     <message>
         <source>External filters working longer than this will be aborted. This is for the rare case (ie: postscript) where a document could cause a filter to loop. Set to -1 for no limit.
 </source>
-        <translation>Τα εξωτερικά φίλτρα σε λειτουργία μεγαλύτερη από αυτό θα διακόπτονται. Χρήσιμο για τη σπάνια περίπτωση (π.χ. postscript) όπου ένα έγγραφο μπορεί να προκαλέσει ένα βρόγχο στο φίλτρο. Ορίστε το σε -1 για να αφαιρέσετε το όριο.</translation>
+        <translation type="vanished">Τα εξωτερικά φίλτρα σε λειτουργία μεγαλύτερη από αυτό θα διακόπτονται. Χρήσιμο για τη σπάνια περίπτωση (π.χ. postscript) όπου ένα έγγραφο μπορεί να προκαλέσει ένα βρόγχο στο φίλτρο. Ορίστε το σε -1 για να αφαιρέσετε το όριο.</translation>
     </message>
     <message>
         <source>Only mime types</source>
-        <translation>Μόνο οι τύποι MIME</translation>
+        <translation type="vanished">Μόνο οι τύποι MIME</translation>
     </message>
     <message>
         <source>An exclusive list of indexed mime types.&lt;br&gt;Nothing else will be indexed. Normally empty and inactive</source>
-        <translation>Μια αποκλειστική λίστα δεικτοδοτημένων τύπων mime.&lt;br&gt;Δεν θα δεικτοδοτηθεί τίποτα άλλο. Φυσιολογικά κενό και αδρανές</translation>
+        <translation type="vanished">Μια αποκλειστική λίστα δεικτοδοτημένων τύπων mime.&lt;br&gt;Δεν θα δεικτοδοτηθεί τίποτα άλλο. Φυσιολογικά κενό και αδρανές</translation>
     </message>
     <message>
         <source>Exclude mime types</source>
-        <translation>Αποκλεισμός τύπων αρχείων</translation>
+        <translation type="vanished">Αποκλεισμός τύπων αρχείων</translation>
     </message>
     <message>
         <source>Mime types not to be indexed</source>
-        <translation>Οι τύποι Mime που δεν θα δεικτοδοτηθούν</translation>
-    </message>
-    <message>
-        <source>Max. filter exec. time (s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">Οι τύποι Mime που δεν θα δεικτοδοτηθούν</translation>
     </message>
 </context>
 <context>
     <name>confgui::ConfTopPanelW</name>
     <message>
         <source>Top directories</source>
-        <translation>Κατάλογοι εκκίνησης</translation>
+        <translation type="vanished">Κατάλογοι εκκίνησης</translation>
     </message>
     <message>
         <source>The list of directories where recursive indexing starts. Default: your home.</source>
-        <translation>Η λίστα των καταλόγων για την έναρξη της αναδρομικής ευρετηρίασης. Προεπιλογή: ο προσωπικός σας κατάλογος.</translation>
+        <translation type="vanished">Η λίστα των καταλόγων για την έναρξη της αναδρομικής ευρετηρίασης. Προεπιλογή: ο προσωπικός σας κατάλογος.</translation>
     </message>
     <message>
         <source>Skipped paths</source>
-        <translation>Παραλειπόμενες διαδρομές</translation>
+        <translation type="vanished">Παραλειπόμενες διαδρομές</translation>
     </message>
     <message>
         <source>These are names of directories which indexing will not enter.&lt;br&gt; May contain wildcards. Must match the paths seen by the indexer (ie: if topdirs includes &apos;/home/me&apos; and &apos;/home&apos; is actually a link to &apos;/usr/home&apos;, a correct skippedPath entry would be &apos;/home/me/tmp*&apos;, not &apos;/usr/home/me/tmp*&apos;)</source>
@@ -2840,35 +3227,35 @@ This will help searching very big text  files (ie: log files).</source>
     </message>
     <message>
         <source>Stemming languages</source>
-        <translation>Γλώσσα για την επέκταση των όρων</translation>
+        <translation type="vanished">Γλώσσα για την επέκταση των όρων</translation>
     </message>
     <message>
         <source>The languages for which stemming expansion&lt;br&gt;dictionaries will be built.</source>
-        <translation>Οι γλώσσες για τις οποίες θα δημιουργηθούν τα λεξικά επεκτάσεων&lt;br&gt;των όρων.</translation>
+        <translation type="vanished">Οι γλώσσες για τις οποίες θα δημιουργηθούν τα λεξικά επεκτάσεων&lt;br&gt;των όρων.</translation>
     </message>
     <message>
         <source>Log file name</source>
-        <translation>Όνομα του αρχείου καταγραφών</translation>
+        <translation type="vanished">Όνομα του αρχείου καταγραφών</translation>
     </message>
     <message>
         <source>The file where the messages will be written.&lt;br&gt;Use &apos;stderr&apos; for terminal output</source>
-        <translation>Το αρχείο που θα εγγραφούν τα μηνύματα.&lt;br&gt;Χρησιμοποιήστε &apos;stderr&apos; για την έξοδο τερματικού</translation>
+        <translation type="vanished">Το αρχείο που θα εγγραφούν τα μηνύματα.&lt;br&gt;Χρησιμοποιήστε &apos;stderr&apos; για την έξοδο τερματικού</translation>
     </message>
     <message>
         <source>Log verbosity level</source>
-        <translation>Επίπεδο ανάλυσης των καταγραφών</translation>
+        <translation type="vanished">Επίπεδο ανάλυσης των καταγραφών</translation>
     </message>
     <message>
         <source>This value adjusts the amount of messages,&lt;br&gt;from only errors to a lot of debugging data.</source>
-        <translation>Αυτή η τιμή ρυθμίζει την ποσότητα των απεσταλμένων μηνυμάτων,&lt;br&gt;από μόνο τα σφάλματα μέχρι πολλά δεδομένα αποσφαλμάτωσης.</translation>
+        <translation type="vanished">Αυτή η τιμή ρυθμίζει την ποσότητα των απεσταλμένων μηνυμάτων,&lt;br&gt;από μόνο τα σφάλματα μέχρι πολλά δεδομένα αποσφαλμάτωσης.</translation>
     </message>
     <message>
         <source>Index flush megabytes interval</source>
-        <translation>Καθυστέρηση εγγραφής του ευρετηρίου σε megabyte</translation>
+        <translation type="vanished">Καθυστέρηση εγγραφής του ευρετηρίου σε megabyte</translation>
     </message>
     <message>
         <source>This value adjust the amount of data which is indexed between flushes to disk.&lt;br&gt;This helps control the indexer memory usage. Default 10MB </source>
-        <translation>Αυτή η τιμή ρυθμίζει την ποσότητα των δεδομένων που δεικτοδοτούνται μεταξύ των εγγραφών στο δίσκο.&lt;br&gt;Βοηθά στον έλεγχο χρήσης της μνήμης. Προεπιλογή: 10MB </translation>
+        <translation type="vanished">Αυτή η τιμή ρυθμίζει την ποσότητα των δεδομένων που δεικτοδοτούνται μεταξύ των εγγραφών στο δίσκο.&lt;br&gt;Βοηθά στον έλεγχο χρήσης της μνήμης. Προεπιλογή: 10MB </translation>
     </message>
     <message>
         <source>Max disk occupation (%)</source>
@@ -2888,15 +3275,15 @@ This will help searching very big text  files (ie: log files).</source>
     </message>
     <message>
         <source>No aspell usage</source>
-        <translation>Χωρίς χρήση του aspell</translation>
+        <translation type="vanished">Χωρίς χρήση του aspell</translation>
     </message>
     <message>
         <source>Disables use of aspell to generate spelling approximation in the term explorer tool.&lt;br&gt; Useful if aspell is absent or does not work. </source>
-        <translation>Απενεργοποιεί τη χρήση του aspell για τη δημιουργία των ορθογραφικών προσεγγίσεων.&lt;br&gt;Χρήσιμο αν το aspell δεν είναι εγκατεστημένο ή δεν λειτουργεί. </translation>
+        <translation type="vanished">Απενεργοποιεί τη χρήση του aspell για τη δημιουργία των ορθογραφικών προσεγγίσεων.&lt;br&gt;Χρήσιμο αν το aspell δεν είναι εγκατεστημένο ή δεν λειτουργεί. </translation>
     </message>
     <message>
         <source>Aspell language</source>
-        <translation>Γλώσσα του aspell</translation>
+        <translation type="vanished">Γλώσσα του aspell</translation>
     </message>
     <message>
         <source>The language for the aspell dictionary. This should look like &apos;en&apos; or &apos;fr&apos; ...&lt;br&gt;If this value is not set, the NLS environment will be used to compute it, which usually works.To get an idea of what is installed on your system, type &apos;aspell config&apos; and look for .dat files inside the &apos;data-dir&apos; directory. </source>
@@ -2904,7 +3291,7 @@ This will help searching very big text  files (ie: log files).</source>
     </message>
     <message>
         <source>Database directory name</source>
-        <translation>Κατάλογος αποθήκευσης του ευρετηρίου</translation>
+        <translation type="vanished">Κατάλογος αποθήκευσης του ευρετηρίου</translation>
     </message>
     <message>
         <source>The name for a directory where to store the index&lt;br&gt;A non-absolute path is taken relative to the  configuration directory. The default is &apos;xapiandb&apos;.</source>
@@ -2912,31 +3299,19 @@ This will help searching very big text  files (ie: log files).</source>
     </message>
     <message>
         <source>The language for the aspell dictionary. This should look like &apos;en&apos; or &apos;fr&apos; ...&lt;br&gt;If this value is not set, the NLS environment will be used to compute it, which usually works. To get an idea of what is installed on your system, type &apos;aspell config&apos; and look for .dat files inside the &apos;data-dir&apos; directory. </source>
-        <translation>Η γλώσσα για το λεξικό aspell. Αυτό θα πρέπει να είναι του τύπου «en» ή «el» ...&lt;br&gt; Αν αυτή η τιμή δεν οριστεί, χρησιμοποιείται το εθνικό περιβάλλον NLS για να την υπολογίσει, που συνήθως δουλεύει. Για να πάρετε μια ιδέα του τι είναι εγκατεστημένο στο σύστημά σας, πληκτρολογήστε «aspell config» και παρατηρήστε τα αρχεία .dat στον κατάλογο «data-dir». </translation>
+        <translation type="vanished">Η γλώσσα για το λεξικό aspell. Αυτό θα πρέπει να είναι του τύπου «en» ή «el» ...&lt;br&gt; Αν αυτή η τιμή δεν οριστεί, χρησιμοποιείται το εθνικό περιβάλλον NLS για να την υπολογίσει, που συνήθως δουλεύει. Για να πάρετε μια ιδέα του τι είναι εγκατεστημένο στο σύστημά σας, πληκτρολογήστε «aspell config» και παρατηρήστε τα αρχεία .dat στον κατάλογο «data-dir». </translation>
     </message>
     <message>
         <source>The name for a directory where to store the index&lt;br&gt;A non-absolute path is taken relative to the configuration directory. The default is &apos;xapiandb&apos;.</source>
-        <translation>Το όνομα του καταλόγου αποθήκευσης του ευρετηρίου&lt;br&gt;Μια σχετική διαδρομή αναφερόμενη στη διαδρομή διαμόρφωσης. Η εξ&apos; ορισμού είναι «xapiandb». </translation>
+        <translation type="vanished">Το όνομα του καταλόγου αποθήκευσης του ευρετηρίου&lt;br&gt;Μια σχετική διαδρομή αναφερόμενη στη διαδρομή διαμόρφωσης. Η εξ&apos; ορισμού είναι «xapiandb». </translation>
     </message>
     <message>
         <source>Unac exceptions</source>
-        <translation>Εξαιρέσεις unac</translation>
+        <translation type="vanished">Εξαιρέσεις unac</translation>
     </message>
     <message>
         <source>&lt;p&gt;These are exceptions to the unac mechanism which, by default, removes all diacritics, and performs canonic decomposition. You can override unaccenting for some characters, depending on your language, and specify additional decompositions, e.g. for ligatures. In each space-separated entry, the first character is the source one, and the rest is the translation.</source>
-        <translation>&lt;p&gt;Αυτές είναι εξαιρέσεις για τον μηχανισμό unac, ο οποίος εξ&apos; ορισμού, αφαιρεί όλους τους τονισμούς, και πραγματοποιεί κανονική αποσύνθεση. Μπορείτε να αναιρέσετε την αφαίρεση των τονισμών  για ορισμένους χαρακτήρες, ανάλογα με τη γλώσσα σας, και διευκρινίστε άλλους αποσυνθέσεις, για παράδειγμα συμπλεγμένους χαρακτήρες. Στη λίστα διαχωρισμένη με κενά, ο πρώτος χαρακτήρας ενός αντικειμένου είναι η πηγή, το υπόλοιπο είναι η μετάφραση.</translation>
-    </message>
-    <message>
-        <source>These are pathnames of directories which indexing will not enter.&lt;br&gt;Path elements may contain wildcards. The entries must match the paths seen by the indexer (e.g.: if topdirs includes &apos;/home/me&apos; and &apos;/home&apos; is actually a link to &apos;/usr/home&apos;, a correct skippedPath entry would be &apos;/home/me/tmp*&apos;, not &apos;/usr/home/me/tmp*&apos;)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Max disk occupation (%, 0 means no limit)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is the percentage of disk usage - total disk usage, not index size - at which indexing will fail and stop.&lt;br&gt;The default value of 0 removes any limit.</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">&lt;p&gt;Αυτές είναι εξαιρέσεις για τον μηχανισμό unac, ο οποίος εξ&apos; ορισμού, αφαιρεί όλους τους τονισμούς, και πραγματοποιεί κανονική αποσύνθεση. Μπορείτε να αναιρέσετε την αφαίρεση των τονισμών  για ορισμένους χαρακτήρες, ανάλογα με τη γλώσσα σας, και διευκρινίστε άλλους αποσυνθέσεις, για παράδειγμα συμπλεγμένους χαρακτήρες. Στη λίστα διαχωρισμένη με κενά, ο πρώτος χαρακτήρας ενός αντικειμένου είναι η πηγή, το υπόλοιπο είναι η μετάφραση.</translation>
     </message>
 </context>
 <context>
@@ -2955,7 +3330,7 @@ This will help searching very big text  files (ie: log files).</source>
     </message>
     <message>
         <source>Style sheet</source>
-        <translation>Φύλλο στυλ</translation>
+        <translation type="vanished">Φύλλο στυλ</translation>
     </message>
     <message>
         <source>Opens a dialog to select the style sheet file</source>
@@ -3301,6 +3676,42 @@ May be slow for big documents.</source>
     </message>
     <message>
         <source>Start search on completer popup activation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of snippets displayed in the snippets window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Suppress all beeps.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Application Qt style sheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Limit the size of the search history. Use 0 to disable, -1 for unlimited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum size of search history (0: disable, -1: unlimited):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate desktop notifications.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort snippets by page number (default: by weight).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Misc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Work around QTBUG-78923 by inserting space before anchor text</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

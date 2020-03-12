@@ -163,7 +163,7 @@ double Query::Native::qualityTerms(Xapian::docid docid,
     // expanded from (by stemming)
     map<string, vector<string> > byRoot;
     for (const auto& term: terms) {
-        map<string, string>::const_iterator eit = hld.terms.find(term);
+        const auto eit = hld.terms.find(term);
         if (eit != hld.terms.end()) {
             byRoot[eit->second].push_back(term);
         } else {
@@ -174,9 +174,7 @@ double Query::Native::qualityTerms(Xapian::docid docid,
 
 #ifdef DEBUGABSTRACT
     {
-        string deb;
-        hld.toString(deb);
-        LOGABS("qualityTerms: hld: " << deb << "\n");
+        LOGABS("qualityTerms: hld: " << hld.toString() << "\n");
         string byRootstr;
         for (const auto& entry : byRoot) {
             byRootstr.append("[").append(entry.first).append("]->");
@@ -623,11 +621,12 @@ int Query::Native::abstractFromIndex(
 // @param[out] vabs the abstract is returned as a vector of snippets.
 int Query::Native::makeAbstract(Xapian::docid docid,
                                 vector<Snippet>& vabs, 
-                                int imaxoccs, int ictxwords)
+                                int imaxoccs, int ictxwords, bool sortbypage)
 {
     chron.restart();
-    LOGABS("makeAbstract: docid " << docid << " imaxoccs " <<
-           imaxoccs << " ictxwords " << ictxwords << "\n");
+    LOGDEB("makeAbstract: docid " << docid << " imaxoccs " <<
+           imaxoccs << " ictxwords " << ictxwords << " sort by page " <<
+           sortbypage << "\n");
 
     // The (unprefixed) terms matched by this document
     vector<string> matchedTerms;
@@ -675,7 +674,7 @@ int Query::Native::makeAbstract(Xapian::docid docid,
     if (ndb->m_storetext) {
         return abstractFromText(ndb, docid, matchedTerms, byQ,
                                 totalweight, ctxwords, maxtotaloccs, vabs,
-                                chron);
+                                chron, sortbypage);
     } else {
         return abstractFromIndex(ndb, docid, matchedTerms, byQ,
                                  totalweight, ctxwords, maxtotaloccs, vabs,

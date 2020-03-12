@@ -32,6 +32,8 @@
 #include "mimehandler.h"
 #include "pathut.h"
 #include "idxstatus.h"
+#include "execmd.h"
+#include "safesysstat.h"
 
 #ifdef RCL_USE_ASPELL
 #include "rclaspell.h"
@@ -56,6 +58,56 @@ void addIdxReason(string who, string reason)
     }
 }
 
+#ifndef DISABLE_WEB_INDEXER
+bool runWebFilesMoverScript(RclConfig *config)
+{
+    static string downloadsdir;
+    if (downloadsdir.empty()) {
+        if (!config->getConfParam("webdownloadsdir", downloadsdir)) {
+            downloadsdir = path_tildexpand("~/Downloads");
+        }
+    }
+    static string cmdpath;
+    vector<string> args;
+#ifdef _WIN32
+    const static string cmdnm{"python"};
+    args.push_back(config->findFilter("recoll-we-move-files.py"));
+#else
+    const static string cmdnm{"recoll-we-move-files.py"};
+#endif
+    if (cmdpath.empty()) {
+        cmdpath = config->findFilter(cmdnm);
+        if (cmdpath.empty()) {
+            LOGERR("runWFMoverScript: recoll-we-move-files.py not found\n");
+            return false;
+        }
+    }
+
+    /* Arrange to not actually run the script if the directory did not change */
+    static time_t dirmtime;
+    time_t ndirmtime = 0;
+    struct stat st;
+    if (path_fileprops(downloadsdir.c_str(), &st) == 0) {
+        ndirmtime = st.st_mtime;
+    }
+    /* If stat fails, presumably Downloads does not exist or is not
+       accessible, dirmtime and mdirmtime stay at 0, and we never
+       execute the script, which is the right thing. */
+    if (dirmtime != ndirmtime) {
+        /* The script is going to change the directory, so updating
+           dirmtime before it runs means that we are going to execute
+           it one time too many (it will run without doing anything),
+           but we can't set the mtime to after the run in case files
+           are created during the run. */
+        dirmtime = ndirmtime;
+        ExecCmd cmd;
+        int status = cmd.doexec(cmdpath, args);
+        return status == 0;
+    }
+    return true;
+}
+#endif
+
 ConfIndexer::ConfIndexer(RclConfig *cnf, DbIxStatusUpdater *updfunc)
     : m_config(cnf), m_db(cnf), m_fsindexer(0), 
       m_doweb(false), m_webindexer(0),
@@ -74,7 +126,7 @@ ConfIndexer::~ConfIndexer()
 
 // Determine if this is likely the first time that the user runs
 // indexing.  We don't look at the xapiandb as this may have been
-// explicitely removed for valid reasons, but at the indexing status
+// explicitly removed for valid reasons, but at the indexing status
 // file, which should be unexistant-or-empty only before any indexing
 // has ever run
 bool ConfIndexer::runFirstIndexing()

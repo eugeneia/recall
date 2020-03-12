@@ -41,20 +41,16 @@ class ExecCmd;
 class Preview;
 class ResTable;
 class CronToolW;
+class WinSchedToolW;
 class RTIToolW;
 class FragButs;
 class SpecIdxW;
 class WebcacheEdit;
+class ConfIndexW;
+class RclTrayIcon;
 
 #include "ui_rclmain.h"
 
-namespace confgui {
-class ConfIndexW;
-}
-
-using confgui::ConfIndexW;
-
-class RclTrayIcon;
 
 class RclMain : public QMainWindow, public Ui::RclMainBase {
     Q_OBJECT;
@@ -143,6 +139,7 @@ public slots:
     virtual void resetSearch();
     virtual void eraseDocHistory();
     virtual void eraseSearchHistory();
+    virtual void exportSimpleSearchHistory();
     virtual void saveLastQuery();
     virtual void loadSavedQuery();
     virtual void setStemLang(QAction *id);
@@ -184,7 +181,11 @@ private:
     UIPrefsDialog  *uiprefs{0};
     ConfIndexW     *indexConfig{0};
     IdxSchedW      *indexSched{0};
+#ifdef _WIN32
+    WinSchedToolW  *cronTool{0};
+#else
     CronToolW      *cronTool{0};
+#endif
     RTIToolW       *rtiTool{0};
     SpellW         *spellform{0};
     FragButs       *fragbuts{0};

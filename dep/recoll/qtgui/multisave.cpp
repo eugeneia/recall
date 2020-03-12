@@ -77,7 +77,7 @@ void multiSave(QWidget *p, vector<Rcl::Doc>& docs)
     */
     set<string> existingNames;
     string reason;
-    if (!readdir(dir, reason, existingNames)) {
+    if (!listdir(dir, reason, existingNames)) {
 	QMessageBox::warning(0, "Recoll",
 			     QWidget::tr("Could not read directory: ") +
 			     QString::fromLocal8Bit(reason.c_str()));

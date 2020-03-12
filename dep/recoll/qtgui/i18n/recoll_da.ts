@@ -188,6 +188,229 @@
     </message>
 </context>
 <context>
+    <name>ConfIndexW</name>
+    <message>
+        <source>Can&apos;t write configuration file</source>
+        <translation type="unfinished">Kan ikke skrive konfigurationsfil</translation>
+    </message>
+    <message>
+        <source>Global parameters</source>
+        <translation type="unfinished">Globale parametre</translation>
+    </message>
+    <message>
+        <source>Local parameters</source>
+        <translation type="unfinished">Lokale parametre</translation>
+    </message>
+    <message>
+        <source>Search parameters</source>
+        <translation type="unfinished">Søgeparametre</translation>
+    </message>
+    <message>
+        <source>Top directories</source>
+        <translation type="unfinished">Øverste mapper</translation>
+    </message>
+    <message>
+        <source>The list of directories where recursive indexing starts. Default: your home.</source>
+        <translation type="unfinished">Listen over mapper hvor rekursiv indeksering starter. Standard: din hjemme-mappe (home).</translation>
+    </message>
+    <message>
+        <source>Skipped paths</source>
+        <translation type="unfinished">Udeladte stier</translation>
+    </message>
+    <message>
+        <source>These are pathnames of directories which indexing will not enter.&lt;br&gt;Path elements may contain wildcards. The entries must match the paths seen by the indexer (e.g.: if topdirs includes &apos;/home/me&apos; and &apos;/home&apos; is actually a link to &apos;/usr/home&apos;, a correct skippedPath entry would be &apos;/home/me/tmp*&apos;, not &apos;/usr/home/me/tmp*&apos;)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stemming languages</source>
+        <translation type="unfinished">Ordstammer for sprogene</translation>
+    </message>
+    <message>
+        <source>The languages for which stemming expansion&lt;br&gt;dictionaries will be built.</source>
+        <translation type="unfinished">De sprog, hvor ordstamme-udvidelses&lt;br&gt;ordbøger vil blive bygget.</translation>
+    </message>
+    <message>
+        <source>Log file name</source>
+        <translation type="unfinished">Navn på logfil</translation>
+    </message>
+    <message>
+        <source>The file where the messages will be written.&lt;br&gt;Use &apos;stderr&apos; for terminal output</source>
+        <translation type="unfinished">Filen hvor meddelelser vil blive skrevet.&lt;br&gt;Brug &apos;stderr&apos; for terminal output</translation>
+    </message>
+    <message>
+        <source>Log verbosity level</source>
+        <translation type="unfinished">Log informationsniveau</translation>
+    </message>
+    <message>
+        <source>This value adjusts the amount of messages,&lt;br&gt;from only errors to a lot of debugging data.</source>
+        <translation type="unfinished">Denne værdi justerer mængden af meddelelser,&lt;br&gt;fra kun fejl til en masse fejlretningsdata.</translation>
+    </message>
+    <message>
+        <source>Index flush megabytes interval</source>
+        <translation type="unfinished">Megabyte interval for skrivning af Index</translation>
+    </message>
+    <message>
+        <source>This value adjust the amount of data which is indexed between flushes to disk.&lt;br&gt;This helps control the indexer memory usage. Default 10MB </source>
+        <translation type="unfinished">Denne værdi justere mængden af data, der er indekseret mellem skrivning til disken.&lt;br&gt;Dette hjælper med at kontrollere indekseringsprogrammets brug af hukommelse. Standard 10MB</translation>
+    </message>
+    <message>
+        <source>Disk full threshold to stop indexing&lt;br&gt;(e.g. 90%, 0 means no limit)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the percentage of disk usage - total disk usage, not index size - at which indexing will fail and stop.&lt;br&gt;The default value of 0 removes any limit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No aspell usage</source>
+        <translation type="unfinished">Brug ikke aspell</translation>
+    </message>
+    <message>
+        <source>Disables use of aspell to generate spelling approximation in the term explorer tool.&lt;br&gt; Useful if aspell is absent or does not work. </source>
+        <translation type="unfinished">Deaktiver brug af aspell til at generere stavnings-tilnærmelse i værktøj for søgning efter ord. &lt;br&gt; Nyttigt hvis aspell er fraværende eller ikke virker.</translation>
+    </message>
+    <message>
+        <source>Aspell language</source>
+        <translation type="unfinished">Aspell sprog</translation>
+    </message>
+    <message>
+        <source>The language for the aspell dictionary. This should look like &apos;en&apos; or &apos;fr&apos; ...&lt;br&gt;If this value is not set, the NLS environment will be used to compute it, which usually works. To get an idea of what is installed on your system, type &apos;aspell config&apos; and look for .dat files inside the &apos;data-dir&apos; directory. </source>
+        <translation type="unfinished">Sproget for aspell ordbog. Det skal se ud som &quot;en&quot; eller &quot;fr&quot; ...&lt;br&gt;Hvis denne værdi ikke er angivet, så vil NLS omgivelser blive brugt til at finde det, det fungerer normalt. For at få en idé om, hvad der er installeret på dit system, kan du skrive &apos;aspell konfig &quot;og se efter .dat filer inde i &apos;data-dir&apos; mappen.</translation>
+    </message>
+    <message>
+        <source>Database directory name</source>
+        <translation type="unfinished">Databasens mappenavn</translation>
+    </message>
+    <message>
+        <source>The name for a directory where to store the index&lt;br&gt;A non-absolute path is taken relative to the configuration directory. The default is &apos;xapiandb&apos;.</source>
+        <translation type="unfinished">Navnet på en mappe hvor du vil gemme indekset&lt;br&gt;En relativ sti er taget i forhold til konfigurationsmappen. Standard er &quot;xapiandb.</translation>
+    </message>
+    <message>
+        <source>Unac exceptions</source>
+        <translation type="unfinished">Unac-undtagelser</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;These are exceptions to the unac mechanism which, by default, removes all diacritics, and performs canonic decomposition. You can override unaccenting for some characters, depending on your language, and specify additional decompositions, e.g. for ligatures. In each space-separated entry, the first character is the source one, and the rest is the translation.</source>
+        <translation type="unfinished">&lt;p&gt;Disse er undtagelser fra unac mekanismen, der, som standard, fjerner alle diakritiske tegn, og udfører kanonisk nedbrydning. Du kan tilsidesætte fjernelse af accent for nogle tegn, afhængigt af dit sprog, og angive yderligere nedbrydninger, f.eks. for ligaturer. I hver indgang adskilt af mellemrum, er det første tegn kildedelen, og resten er oversættelsen.</translation>
+    </message>
+    <message>
+        <source>Process the WEB history queue</source>
+        <translation type="unfinished">Behandl køen for WEB-historik</translation>
+    </message>
+    <message>
+        <source>Enables indexing Firefox visited pages.&lt;br&gt;(you need also install the Firefox Recoll plugin)</source>
+        <translation type="unfinished">Aktiverer indeksering af sider besøgt af Firefox.&lt;br&gt;(Du skal også installere Firefox Recoll plugin)</translation>
+    </message>
+    <message>
+        <source>Web page store directory name</source>
+        <translation type="unfinished">Mappenavn for lageret til Websider</translation>
+    </message>
+    <message>
+        <source>The name for a directory where to store the copies of visited web pages.&lt;br&gt;A non-absolute path is taken relative to the configuration directory.</source>
+        <translation type="unfinished">Navnet på en mappe hvor du vil gemme kopier af besøgte websider.&lt;br&gt;En relativ sti er taget i forhold til konfigurationsmappen.</translation>
+    </message>
+    <message>
+        <source>Max. size for the web store (MB)</source>
+        <translation type="unfinished">Max. størrelse til web-lager (MB)</translation>
+    </message>
+    <message>
+        <source>Entries will be recycled once the size is reached.&lt;br&gt;Only increasing the size really makes sense because reducing the value will not truncate an existing file (only waste space at the end).</source>
+        <translation type="unfinished">Indgangene vil blive genbrugt, når størrelsen er nået.&lt;br&gt;Kun en øgning af størrelsen giver god mening, da en reducering af værdien ikke vil afkorte en eksisterende fil (kun spildplads i slutningen).</translation>
+    </message>
+    <message>
+        <source>Automatic diacritics sensitivity</source>
+        <translation type="unfinished">Automatisk følsomhed over for diakritiske tegn</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Automatically trigger diacritics sensitivity if the search term has accented characters (not in unac_except_trans). Else you need to use the query language and the &lt;i&gt;D&lt;/i&gt; modifier to specify diacritics sensitivity.</source>
+        <translation type="unfinished">&lt;p&gt;Udløser automatisk følsomhed over for diakritiske tegn, hvis søgeordet har accent tegn (ikke i unac_except_trans). Ellers er du nød til bruge forespørgselssproget og &lt;i&gt;D&lt;/i&gt; modifikatoren, for at angive følsomhed over for diakritiske tegn.</translation>
+    </message>
+    <message>
+        <source>Automatic character case sensitivity</source>
+        <translation type="unfinished">Automatisk følsomhed over for store/små bogstaver </translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Automatically trigger character case sensitivity if the entry has upper-case characters in any but the first position. Else you need to use the query language and the &lt;i&gt;C&lt;/i&gt; modifier to specify character-case sensitivity.</source>
+        <translation type="unfinished">&lt;p&gt;Udløser automatisk følsomhed over for store/små bogstaver, hvis indgangen har store bogstaver i andet end den første position. Ellers er du nød til bruge forespørgselssproget og &lt;i&gt;C&lt;/i&gt; modifikatoren, for at angive følsomhed over for store/små bogstaver.</translation>
+    </message>
+    <message>
+        <source>Maximum term expansion count</source>
+        <translation type="unfinished">Maksimale antal ordudvidelser</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Maximum expansion count for a single term (e.g.: when using wildcards). The default of 10 000 is reasonable and will avoid queries that appear frozen while the engine is walking the term list.</source>
+        <translation type="unfinished">&lt;p&gt;Maksimal antal udvidelser-for et enkelt ord (fx: når der bruges jokertegn). Standarden på 10 000 er rimeligt og vil undgå forespørgsler, der synes at fryse mens motoren arbejder sig igennem ordlisten.</translation>
+    </message>
+    <message>
+        <source>Maximum Xapian clauses count</source>
+        <translation type="unfinished">Maksimale antal Xapiansætninger</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Maximum number of elementary clauses we add to a single Xapian query. In some cases, the result of term expansion can be multiplicative, and we want to avoid using excessive memory. The default of 100 000 should be both high enough in most cases and compatible with current typical hardware configurations.</source>
+        <translation type="unfinished">&lt;p&gt;Maksimalt antal grundlæggende sætninger vi føjer til en enkel Xapian forespørgsel. I nogle tilfælde kan resultatet af ordudvidelse være multiplikativ, og vi ønsker at undgå at bruge overdreven hukommelse. Standarden på 100 000 bør være både høj nok i de fleste tilfælde og kompatibel med de nuværende typiske hardware konfigurationer.</translation>
+    </message>
+</context>
+<context>
+    <name>ConfSubPanelW</name>
+    <message>
+        <source>Only mime types</source>
+        <translation type="unfinished">Kun mime-typer</translation>
+    </message>
+    <message>
+        <source>An exclusive list of indexed mime types.&lt;br&gt;Nothing else will be indexed. Normally empty and inactive</source>
+        <translation type="unfinished">En eksklusiv liste over indekserede MIME-typer.&lt;br&gt;Intet andet vil blive indekseret. Normalt tom og inaktiv</translation>
+    </message>
+    <message>
+        <source>Exclude mime types</source>
+        <translation type="unfinished">Udeluk mime-typer</translation>
+    </message>
+    <message>
+        <source>Mime types not to be indexed</source>
+        <translation type="unfinished">Mime-typer der ikke skal indekseres</translation>
+    </message>
+    <message>
+        <source>Max. compressed file size (KB)</source>
+        <translation type="unfinished">Maks. komprimeret filstørrelse (KB)</translation>
+    </message>
+    <message>
+        <source>This value sets a threshold beyond which compressedfiles will not be processed. Set to -1 for no limit, to 0 for no decompression ever.</source>
+        <translation type="unfinished">Denne værdi angiver en grænse for, hvornår komprimerede filer ikke vil blive behandlet. Indstil til -1 for ingen grænse, til 0 for ingen dekomprimering nogensinde.</translation>
+    </message>
+    <message>
+        <source>Max. text file size (MB)</source>
+        <translation type="unfinished">Maks. størrelse på tekstfil (MB)</translation>
+    </message>
+    <message>
+        <source>This value sets a threshold beyond which text files will not be processed. Set to -1 for no limit. 
+This is for excluding monster log files from the index.</source>
+        <translation type="unfinished">Denne værdi angiver en grænse for, hvornår tekstfiler ikke vil blive behandlet. Indstil til -1 for ingen grænse. 
+Dette er for at udelukke monster logfiler fra indekset.</translation>
+    </message>
+    <message>
+        <source>Text file page size (KB)</source>
+        <translation type="unfinished">Sidestørrelse på tekstfil (KB)</translation>
+    </message>
+    <message>
+        <source>If this value is set (not equal to -1), text files will be split in chunks of this size for indexing.
+This will help searching very big text  files (ie: log files).</source>
+        <translation type="unfinished">Hvis denne værdi er angivet (ikke lig med -1), vil tekstfiler opdeles i bidder af denne størrelse for indeksering.
+Dette vil hjælpe søgning i meget store tekstfiler (dvs.: log-filer).</translation>
+    </message>
+    <message>
+        <source>Max. filter exec. time (s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>External filters working longer than this will be aborted. This is for the rare case (ie: postscript) where a document could cause a filter to loop. Set to -1 for no limit.
+</source>
+        <translation type="unfinished">Eksterne filtre der arbejder længere end dette vil blive afbrudt. Dette er for det sjældne tilfælde (dvs.: postscript) hvor et dokument kan forårsage, at et filter laver et loop. Indstil til -1 for ingen grænse.</translation>
+    </message>
+    <message>
+        <source>Global</source>
+        <translation type="unfinished">Global</translation>
+    </message>
+</context>
+<context>
     <name>CronToolW</name>
     <message>
         <source>Cron Dialog</source>
@@ -542,6 +765,14 @@ p, li { white-space: pre-wrap; }
         <source>Could not fetch stored text</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Previous result document</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next result document</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviewTextEdit</name>
@@ -594,11 +825,11 @@ p, li { white-space: pre-wrap; }
     <name>QObject</name>
     <message>
         <source>Global parameters</source>
-        <translation>Globale parametre</translation>
+        <translation type="vanished">Globale parametre</translation>
     </message>
     <message>
         <source>Local parameters</source>
-        <translation>Lokale parametre</translation>
+        <translation type="vanished">Lokale parametre</translation>
     </message>
     <message>
         <source>&lt;b&gt;Customised subtrees</source>
@@ -638,11 +869,11 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Search parameters</source>
-        <translation>Søgeparametre</translation>
+        <translation type="vanished">Søgeparametre</translation>
     </message>
     <message>
         <source>Web history</source>
-        <translation>Webhistorik</translation>
+        <translation type="vanished">Webhistorik</translation>
     </message>
     <message>
         <source>Default&lt;br&gt;character set</source>
@@ -1050,7 +1281,7 @@ Kontroller venligst mimeview-filen</translation>
     </message>
     <message>
         <source>Indexing did not run yet</source>
-        <translation>Indeksering har ikke kørt endnu</translation>
+        <translation type="vanished">Indeksering har ikke kørt endnu</translation>
     </message>
     <message>
         <source>External applications/commands needed for your file types and not found, as stored by the last indexing pass in </source>
@@ -1173,11 +1404,11 @@ Tjek venligst desktopfilen</translation>
     </message>
     <message>
         <source>Index scheduling</source>
-        <translation>Indeks skedulering</translation>
+        <translation type="vanished">Indeks skedulering</translation>
     </message>
     <message>
         <source>Sorry, not available under Windows for now, use the File menu entries to update the index</source>
-        <translation>Beklager, er endnu ikke tilgængelig for Windows, bruge Fil menuindgange for at opdatere indekset</translation>
+        <translation type="vanished">Beklager, er endnu ikke tilgængelig for Windows, bruge Fil menuindgange for at opdatere indekset</translation>
     </message>
     <message>
         <source>Can&apos;t set synonyms file (parse error?)</source>
@@ -1294,6 +1525,30 @@ Tjek venligst desktopfilen</translation>
     </message>
     <message>
         <source>total files)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No information: initial indexing not yet performed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Batch scheduling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The tool will let you decide at what time indexing should run.  It uses the Windows task scheduler.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Erasing simple and advanced search history lists, please click Ok to confirm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open/create file</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1569,6 +1824,10 @@ Tjek venligst desktopfilen</translation>
     </message>
     <message>
         <source>Trigger incremental pass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E&amp;xport simple search history</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1886,7 +2145,7 @@ Brug &lt;b&gt;Vis Forespørgsel&lt;/b&gt; link når i tvivl om resultatet og se 
 &lt;i&gt;&quot;term1 term2&quot;p&lt;/i&gt; : unordered proximity search with default distance.&lt;br&gt;
 Use &lt;b&gt;Show Query&lt;/b&gt; link when in doubt about result and see manual (&amp;lt;F1&gt;) for more detail.
 </source>
-        <translation>Indtast forespørgselssprogets udtryk. Snydeark:&lt;br&gt;
+        <translation type="vanished">Indtast forespørgselssprogets udtryk. Snydeark:&lt;br&gt;
 &lt;i&gt;ord1 ord2&lt;/i&gt; : &apos;ord1&apos; og &apos;ord2&apos; i et hvilken som helst felt.&lt;br&gt;
 &lt;i&gt;felt:ord1&lt;/i&gt; : &apos;ord1&apos; i feltet &apos;felt&apos;.&lt;br&gt;
  Standard feltnavne/synonymer:&lt;br&gt;
@@ -1927,6 +2186,134 @@ Brug &lt;b&gt;Vis Forespørgsel&lt;/b&gt; link når i tvivl om resultatet og se 
         <source>Enter search terms here.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&lt;html&gt;&lt;head&gt;&lt;style&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>table, th, td {</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>border: 1px solid black;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>border-collapse: collapse;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>}</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>th,td {</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>text-align: center;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;/style&gt;&lt;/head&gt;&lt;body&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Query language cheat-sheet. In doubt: click &lt;b&gt;Show Query&lt;/b&gt;.&amp;nbsp;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You should really look at the manual (F1)&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;table border=&apos;1&apos; cellspacing=&apos;0&apos;&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;th&gt;What&lt;/th&gt;&lt;th&gt;Examples&lt;/th&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;And&lt;/td&gt;&lt;td&gt;one two&amp;nbsp;&amp;nbsp;&amp;nbsp;one AND two&amp;nbsp;&amp;nbsp;&amp;nbsp;one &amp;&amp; two&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Or&lt;/td&gt;&lt;td&gt;one OR two&amp;nbsp;&amp;nbsp;&amp;nbsp;one || two&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Complex boolean. OR has priority, use parentheses&amp;nbsp;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>where needed&lt;/td&gt;&lt;td&gt;(one AND two) OR three&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Not&lt;/td&gt;&lt;td&gt;-term&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Phrase&lt;/td&gt;&lt;td&gt;&quot;pride and prejudice&quot;&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Ordered proximity (slack=1)&lt;/td&gt;&lt;td&gt;&quot;pride prejudice&quot;o1&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Unordered proximity (slack=1)&lt;/td&gt;&lt;td&gt;&quot;prejudice pride&quot;po1&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Unordered prox. (default slack=10)&lt;/td&gt;&lt;td&gt;&quot;prejudice&amp;nbsp;pride&quot;p&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;No stem expansion: capitalize&lt;/td&gt;&lt;td&gt;Floor&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Field-specific&lt;/td&gt;&lt;td&gt;author:austen&amp;nbsp;&amp;nbsp;title:prejudice&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;AND inside field (no order)&lt;/td&gt;&lt;td&gt;author:jane,austen&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;OR inside field&lt;/td&gt;&lt;td&gt;author:austen/bronte&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Field names&lt;/td&gt;&lt;td&gt;title/subject/caption&amp;nbsp;&amp;nbsp;author/from&lt;br&gt;recipient/to&amp;nbsp;&amp;nbsp;filename&amp;nbsp;&amp;nbsp;ext&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Directory path filter&lt;/td&gt;&lt;td&gt;dir:/home/me&amp;nbsp;&amp;nbsp;dir:doc&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;MIME type filter&lt;/td&gt;&lt;td&gt;mime:text/plain mime:video/*&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Date intervals&lt;/td&gt;&lt;td&gt;date:2018-01-01/2018-31-12&lt;br&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>date:2018&amp;nbsp;&amp;nbsp;date:2018-01-01/P12M&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;tr&gt;&lt;td&gt;Size&lt;/td&gt;&lt;td&gt;size&amp;gt;100k size&amp;lt;1M&lt;/td&gt;&lt;/tr&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SSearchBase</name>
@@ -1964,10 +2351,6 @@ Brug &lt;b&gt;Vis Forespørgsel&lt;/b&gt; link når i tvivl om resultatet og se 
     </message>
     <message>
         <source>Show query history</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter search terms here.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2038,6 +2421,14 @@ Brug &lt;b&gt;Vis Forespørgsel&lt;/b&gt; link når i tvivl om resultatet og se 
     <message>
         <source>&lt;p&gt;Sorry, no exact match was found within limits. Probably the document is very big and the snippets generator got lost in a maze...&lt;/p&gt;</source>
         <translation>&lt;p&gt;Desværre blev der ikke, inden for rimelige grænser, fundet en nøjagtig match. Sandsynligvis fordi dokumentet er meget stort, så tekststump-generatoren for vild i mængden...&lt;/ p&gt;</translation>
+    </message>
+    <message>
+        <source>Sort By Relevance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort By Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2451,38 +2842,34 @@ Brug &lt;b&gt;Vis Forespørgsel&lt;/b&gt; link når i tvivl om resultatet og se 
     </message>
     <message>
         <source>Web page store directory name</source>
-        <translation>Mappenavn for lageret til Websider</translation>
+        <translation type="vanished">Mappenavn for lageret til Websider</translation>
     </message>
     <message>
         <source>The name for a directory where to store the copies of visited web pages.&lt;br&gt;A non-absolute path is taken relative to the configuration directory.</source>
-        <translation>Navnet på en mappe hvor du vil gemme kopier af besøgte websider.&lt;br&gt;En relativ sti er taget i forhold til konfigurationsmappen.</translation>
+        <translation type="vanished">Navnet på en mappe hvor du vil gemme kopier af besøgte websider.&lt;br&gt;En relativ sti er taget i forhold til konfigurationsmappen.</translation>
     </message>
     <message>
         <source>Max. size for the web store (MB)</source>
-        <translation>Max. størrelse til web-lager (MB)</translation>
+        <translation type="vanished">Max. størrelse til web-lager (MB)</translation>
     </message>
     <message>
         <source>Process the WEB history queue</source>
-        <translation>Behandl køen for WEB-historik</translation>
+        <translation type="vanished">Behandl køen for WEB-historik</translation>
     </message>
     <message>
         <source>Enables indexing Firefox visited pages.&lt;br&gt;(you need also install the Firefox Recoll plugin)</source>
-        <translation>Aktiverer indeksering af sider besøgt af Firefox.&lt;br&gt;(Du skal også installere Firefox Recoll plugin)</translation>
+        <translation type="vanished">Aktiverer indeksering af sider besøgt af Firefox.&lt;br&gt;(Du skal også installere Firefox Recoll plugin)</translation>
     </message>
     <message>
         <source>Entries will be recycled once the size is reached.&lt;br&gt;Only increasing the size really makes sense because reducing the value will not truncate an existing file (only waste space at the end).</source>
-        <translation>Indgangene vil blive genbrugt, når størrelsen er nået.&lt;br&gt;Kun en øgning af størrelsen giver god mening, da en reducering af værdien ikke vil afkorte en eksisterende fil (kun spildplads i slutningen).</translation>
+        <translation type="vanished">Indgangene vil blive genbrugt, når størrelsen er nået.&lt;br&gt;Kun en øgning af størrelsen giver god mening, da en reducering af værdien ikke vil afkorte en eksisterende fil (kun spildplads i slutningen).</translation>
     </message>
 </context>
 <context>
     <name>confgui::ConfIndexW</name>
     <message>
         <source>Can&apos;t write configuration file</source>
-        <translation>Kan ikke skrive konfigurationsfil</translation>
-    </message>
-    <message>
-        <source>Recoll - Index Settings: </source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">Kan ikke skrive konfigurationsfil</translation>
     </message>
 </context>
 <context>
@@ -2502,74 +2889,90 @@ Brug &lt;b&gt;Vis Forespørgsel&lt;/b&gt; link når i tvivl om resultatet og se 
         <source>-</source>
         <translation>-</translation>
     </message>
+    <message>
+        <source>Add entry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete selected entries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>~</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit selected entries</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>confgui::ConfSearchPanelW</name>
     <message>
         <source>Automatic diacritics sensitivity</source>
-        <translation>Automatisk følsomhed over for diakritiske tegn</translation>
+        <translation type="vanished">Automatisk følsomhed over for diakritiske tegn</translation>
     </message>
     <message>
         <source>&lt;p&gt;Automatically trigger diacritics sensitivity if the search term has accented characters (not in unac_except_trans). Else you need to use the query language and the &lt;i&gt;D&lt;/i&gt; modifier to specify diacritics sensitivity.</source>
-        <translation>&lt;p&gt;Udløser automatisk følsomhed over for diakritiske tegn, hvis søgeordet har accent tegn (ikke i unac_except_trans). Ellers er du nød til bruge forespørgselssproget og &lt;i&gt;D&lt;/i&gt; modifikatoren, for at angive følsomhed over for diakritiske tegn.</translation>
+        <translation type="vanished">&lt;p&gt;Udløser automatisk følsomhed over for diakritiske tegn, hvis søgeordet har accent tegn (ikke i unac_except_trans). Ellers er du nød til bruge forespørgselssproget og &lt;i&gt;D&lt;/i&gt; modifikatoren, for at angive følsomhed over for diakritiske tegn.</translation>
     </message>
     <message>
         <source>Automatic character case sensitivity</source>
-        <translation>Automatisk følsomhed over for store/små bogstaver </translation>
+        <translation type="vanished">Automatisk følsomhed over for store/små bogstaver </translation>
     </message>
     <message>
         <source>&lt;p&gt;Automatically trigger character case sensitivity if the entry has upper-case characters in any but the first position. Else you need to use the query language and the &lt;i&gt;C&lt;/i&gt; modifier to specify character-case sensitivity.</source>
-        <translation>&lt;p&gt;Udløser automatisk følsomhed over for store/små bogstaver, hvis indgangen har store bogstaver i andet end den første position. Ellers er du nød til bruge forespørgselssproget og &lt;i&gt;C&lt;/i&gt; modifikatoren, for at angive følsomhed over for store/små bogstaver.</translation>
+        <translation type="vanished">&lt;p&gt;Udløser automatisk følsomhed over for store/små bogstaver, hvis indgangen har store bogstaver i andet end den første position. Ellers er du nød til bruge forespørgselssproget og &lt;i&gt;C&lt;/i&gt; modifikatoren, for at angive følsomhed over for store/små bogstaver.</translation>
     </message>
     <message>
         <source>Maximum term expansion count</source>
-        <translation>Maksimale antal ordudvidelser</translation>
+        <translation type="vanished">Maksimale antal ordudvidelser</translation>
     </message>
     <message>
         <source>&lt;p&gt;Maximum expansion count for a single term (e.g.: when using wildcards). The default of 10 000 is reasonable and will avoid queries that appear frozen while the engine is walking the term list.</source>
-        <translation>&lt;p&gt;Maksimal antal udvidelser-for et enkelt ord (fx: når der bruges jokertegn). Standarden på 10 000 er rimeligt og vil undgå forespørgsler, der synes at fryse mens motoren arbejder sig igennem ordlisten.</translation>
+        <translation type="vanished">&lt;p&gt;Maksimal antal udvidelser-for et enkelt ord (fx: når der bruges jokertegn). Standarden på 10 000 er rimeligt og vil undgå forespørgsler, der synes at fryse mens motoren arbejder sig igennem ordlisten.</translation>
     </message>
     <message>
         <source>Maximum Xapian clauses count</source>
-        <translation>Maksimale antal Xapiansætninger</translation>
+        <translation type="vanished">Maksimale antal Xapiansætninger</translation>
     </message>
     <message>
         <source>&lt;p&gt;Maximum number of elementary clauses we add to a single Xapian query. In some cases, the result of term expansion can be multiplicative, and we want to avoid using excessive memory. The default of 100 000 should be both high enough in most cases and compatible with current typical hardware configurations.</source>
-        <translation>&lt;p&gt;Maksimalt antal grundlæggende sætninger vi føjer til en enkel Xapian forespørgsel. I nogle tilfælde kan resultatet af ordudvidelse være multiplikativ, og vi ønsker at undgå at bruge overdreven hukommelse. Standarden på 100 000 bør være både høj nok i de fleste tilfælde og kompatibel med de nuværende typiske hardware konfigurationer.</translation>
+        <translation type="vanished">&lt;p&gt;Maksimalt antal grundlæggende sætninger vi føjer til en enkel Xapian forespørgsel. I nogle tilfælde kan resultatet af ordudvidelse være multiplikativ, og vi ønsker at undgå at bruge overdreven hukommelse. Standarden på 100 000 bør være både høj nok i de fleste tilfælde og kompatibel med de nuværende typiske hardware konfigurationer.</translation>
     </message>
 </context>
 <context>
     <name>confgui::ConfSubPanelW</name>
     <message>
         <source>Global</source>
-        <translation>Global</translation>
+        <translation type="vanished">Global</translation>
     </message>
     <message>
         <source>Max. compressed file size (KB)</source>
-        <translation>Maks. komprimeret filstørrelse (KB)</translation>
+        <translation type="vanished">Maks. komprimeret filstørrelse (KB)</translation>
     </message>
     <message>
         <source>This value sets a threshold beyond which compressedfiles will not be processed. Set to -1 for no limit, to 0 for no decompression ever.</source>
-        <translation>Denne værdi angiver en grænse for, hvornår komprimerede filer ikke vil blive behandlet. Indstil til -1 for ingen grænse, til 0 for ingen dekomprimering nogensinde.</translation>
+        <translation type="vanished">Denne værdi angiver en grænse for, hvornår komprimerede filer ikke vil blive behandlet. Indstil til -1 for ingen grænse, til 0 for ingen dekomprimering nogensinde.</translation>
     </message>
     <message>
         <source>Max. text file size (MB)</source>
-        <translation>Maks. størrelse på tekstfil (MB)</translation>
+        <translation type="vanished">Maks. størrelse på tekstfil (MB)</translation>
     </message>
     <message>
         <source>This value sets a threshold beyond which text files will not be processed. Set to -1 for no limit. 
 This is for excluding monster log files from the index.</source>
-        <translation>Denne værdi angiver en grænse for, hvornår tekstfiler ikke vil blive behandlet. Indstil til -1 for ingen grænse. 
+        <translation type="vanished">Denne værdi angiver en grænse for, hvornår tekstfiler ikke vil blive behandlet. Indstil til -1 for ingen grænse. 
 Dette er for at udelukke monster logfiler fra indekset.</translation>
     </message>
     <message>
         <source>Text file page size (KB)</source>
-        <translation>Sidestørrelse på tekstfil (KB)</translation>
+        <translation type="vanished">Sidestørrelse på tekstfil (KB)</translation>
     </message>
     <message>
         <source>If this value is set (not equal to -1), text files will be split in chunks of this size for indexing.
 This will help searching very big text  files (ie: log files).</source>
-        <translation>Hvis denne værdi er angivet (ikke lig med -1), vil tekstfiler opdeles i bidder af denne størrelse for indeksering.
+        <translation type="vanished">Hvis denne værdi er angivet (ikke lig med -1), vil tekstfiler opdeles i bidder af denne størrelse for indeksering.
 Dette vil hjælpe søgning i meget store tekstfiler (dvs.: log-filer).</translation>
     </message>
     <message>
@@ -2579,42 +2982,38 @@ Dette vil hjælpe søgning i meget store tekstfiler (dvs.: log-filer).</translat
     <message>
         <source>External filters working longer than this will be aborted. This is for the rare case (ie: postscript) where a document could cause a filter to loop. Set to -1 for no limit.
 </source>
-        <translation>Eksterne filtre der arbejder længere end dette vil blive afbrudt. Dette er for det sjældne tilfælde (dvs.: postscript) hvor et dokument kan forårsage, at et filter laver et loop. Indstil til -1 for ingen grænse.</translation>
+        <translation type="vanished">Eksterne filtre der arbejder længere end dette vil blive afbrudt. Dette er for det sjældne tilfælde (dvs.: postscript) hvor et dokument kan forårsage, at et filter laver et loop. Indstil til -1 for ingen grænse.</translation>
     </message>
     <message>
         <source>Only mime types</source>
-        <translation>Kun mime-typer</translation>
+        <translation type="vanished">Kun mime-typer</translation>
     </message>
     <message>
         <source>An exclusive list of indexed mime types.&lt;br&gt;Nothing else will be indexed. Normally empty and inactive</source>
-        <translation>En eksklusiv liste over indekserede MIME-typer.&lt;br&gt;Intet andet vil blive indekseret. Normalt tom og inaktiv</translation>
+        <translation type="vanished">En eksklusiv liste over indekserede MIME-typer.&lt;br&gt;Intet andet vil blive indekseret. Normalt tom og inaktiv</translation>
     </message>
     <message>
         <source>Exclude mime types</source>
-        <translation>Udeluk mime-typer</translation>
+        <translation type="vanished">Udeluk mime-typer</translation>
     </message>
     <message>
         <source>Mime types not to be indexed</source>
-        <translation>Mime-typer der ikke skal indekseres</translation>
-    </message>
-    <message>
-        <source>Max. filter exec. time (s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">Mime-typer der ikke skal indekseres</translation>
     </message>
 </context>
 <context>
     <name>confgui::ConfTopPanelW</name>
     <message>
         <source>Top directories</source>
-        <translation>Øverste mapper</translation>
+        <translation type="vanished">Øverste mapper</translation>
     </message>
     <message>
         <source>The list of directories where recursive indexing starts. Default: your home.</source>
-        <translation>Listen over mapper hvor rekursiv indeksering starter. Standard: din hjemme-mappe (home).</translation>
+        <translation type="vanished">Listen over mapper hvor rekursiv indeksering starter. Standard: din hjemme-mappe (home).</translation>
     </message>
     <message>
         <source>Skipped paths</source>
-        <translation>Udeladte stier</translation>
+        <translation type="vanished">Udeladte stier</translation>
     </message>
     <message>
         <source>These are names of directories which indexing will not enter.&lt;br&gt; May contain wildcards. Must match the paths seen by the indexer (ie: if topdirs includes &apos;/home/me&apos; and &apos;/home&apos; is actually a link to &apos;/usr/home&apos;, a correct skippedPath entry would be &apos;/home/me/tmp*&apos;, not &apos;/usr/home/me/tmp*&apos;)</source>
@@ -2622,35 +3021,35 @@ Dette vil hjælpe søgning i meget store tekstfiler (dvs.: log-filer).</translat
     </message>
     <message>
         <source>Stemming languages</source>
-        <translation>Ordstammer for sprogene</translation>
+        <translation type="vanished">Ordstammer for sprogene</translation>
     </message>
     <message>
         <source>The languages for which stemming expansion&lt;br&gt;dictionaries will be built.</source>
-        <translation>De sprog, hvor ordstamme-udvidelses&lt;br&gt;ordbøger vil blive bygget.</translation>
+        <translation type="vanished">De sprog, hvor ordstamme-udvidelses&lt;br&gt;ordbøger vil blive bygget.</translation>
     </message>
     <message>
         <source>Log file name</source>
-        <translation>Navn på logfil</translation>
+        <translation type="vanished">Navn på logfil</translation>
     </message>
     <message>
         <source>The file where the messages will be written.&lt;br&gt;Use &apos;stderr&apos; for terminal output</source>
-        <translation>Filen hvor meddelelser vil blive skrevet.&lt;br&gt;Brug &apos;stderr&apos; for terminal output</translation>
+        <translation type="vanished">Filen hvor meddelelser vil blive skrevet.&lt;br&gt;Brug &apos;stderr&apos; for terminal output</translation>
     </message>
     <message>
         <source>Log verbosity level</source>
-        <translation>Log informationsniveau</translation>
+        <translation type="vanished">Log informationsniveau</translation>
     </message>
     <message>
         <source>This value adjusts the amount of messages,&lt;br&gt;from only errors to a lot of debugging data.</source>
-        <translation>Denne værdi justerer mængden af meddelelser,&lt;br&gt;fra kun fejl til en masse fejlretningsdata.</translation>
+        <translation type="vanished">Denne værdi justerer mængden af meddelelser,&lt;br&gt;fra kun fejl til en masse fejlretningsdata.</translation>
     </message>
     <message>
         <source>Index flush megabytes interval</source>
-        <translation>Megabyte interval for skrivning af Index</translation>
+        <translation type="vanished">Megabyte interval for skrivning af Index</translation>
     </message>
     <message>
         <source>This value adjust the amount of data which is indexed between flushes to disk.&lt;br&gt;This helps control the indexer memory usage. Default 10MB </source>
-        <translation>Denne værdi justere mængden af data, der er indekseret mellem skrivning til disken.&lt;br&gt;Dette hjælper med at kontrollere indekseringsprogrammets brug af hukommelse. Standard 10MB</translation>
+        <translation type="vanished">Denne værdi justere mængden af data, der er indekseret mellem skrivning til disken.&lt;br&gt;Dette hjælper med at kontrollere indekseringsprogrammets brug af hukommelse. Standard 10MB</translation>
     </message>
     <message>
         <source>Max disk occupation (%)</source>
@@ -2662,47 +3061,35 @@ Dette vil hjælpe søgning i meget store tekstfiler (dvs.: log-filer).</translat
     </message>
     <message>
         <source>No aspell usage</source>
-        <translation>Brug ikke aspell</translation>
+        <translation type="vanished">Brug ikke aspell</translation>
     </message>
     <message>
         <source>Aspell language</source>
-        <translation>Aspell sprog</translation>
+        <translation type="vanished">Aspell sprog</translation>
     </message>
     <message>
         <source>Database directory name</source>
-        <translation>Databasens mappenavn</translation>
+        <translation type="vanished">Databasens mappenavn</translation>
     </message>
     <message>
         <source>Disables use of aspell to generate spelling approximation in the term explorer tool.&lt;br&gt; Useful if aspell is absent or does not work. </source>
-        <translation>Deaktiver brug af aspell til at generere stavnings-tilnærmelse i værktøj for søgning efter ord. &lt;br&gt; Nyttigt hvis aspell er fraværende eller ikke virker.</translation>
+        <translation type="vanished">Deaktiver brug af aspell til at generere stavnings-tilnærmelse i værktøj for søgning efter ord. &lt;br&gt; Nyttigt hvis aspell er fraværende eller ikke virker.</translation>
     </message>
     <message>
         <source>The language for the aspell dictionary. This should look like &apos;en&apos; or &apos;fr&apos; ...&lt;br&gt;If this value is not set, the NLS environment will be used to compute it, which usually works. To get an idea of what is installed on your system, type &apos;aspell config&apos; and look for .dat files inside the &apos;data-dir&apos; directory. </source>
-        <translation>Sproget for aspell ordbog. Det skal se ud som &quot;en&quot; eller &quot;fr&quot; ...&lt;br&gt;Hvis denne værdi ikke er angivet, så vil NLS omgivelser blive brugt til at finde det, det fungerer normalt. For at få en idé om, hvad der er installeret på dit system, kan du skrive &apos;aspell konfig &quot;og se efter .dat filer inde i &apos;data-dir&apos; mappen.</translation>
+        <translation type="vanished">Sproget for aspell ordbog. Det skal se ud som &quot;en&quot; eller &quot;fr&quot; ...&lt;br&gt;Hvis denne værdi ikke er angivet, så vil NLS omgivelser blive brugt til at finde det, det fungerer normalt. For at få en idé om, hvad der er installeret på dit system, kan du skrive &apos;aspell konfig &quot;og se efter .dat filer inde i &apos;data-dir&apos; mappen.</translation>
     </message>
     <message>
         <source>The name for a directory where to store the index&lt;br&gt;A non-absolute path is taken relative to the configuration directory. The default is &apos;xapiandb&apos;.</source>
-        <translation>Navnet på en mappe hvor du vil gemme indekset&lt;br&gt;En relativ sti er taget i forhold til konfigurationsmappen. Standard er &quot;xapiandb.</translation>
+        <translation type="vanished">Navnet på en mappe hvor du vil gemme indekset&lt;br&gt;En relativ sti er taget i forhold til konfigurationsmappen. Standard er &quot;xapiandb.</translation>
     </message>
     <message>
         <source>Unac exceptions</source>
-        <translation>Unac-undtagelser</translation>
+        <translation type="vanished">Unac-undtagelser</translation>
     </message>
     <message>
         <source>&lt;p&gt;These are exceptions to the unac mechanism which, by default, removes all diacritics, and performs canonic decomposition. You can override unaccenting for some characters, depending on your language, and specify additional decompositions, e.g. for ligatures. In each space-separated entry, the first character is the source one, and the rest is the translation.</source>
-        <translation>&lt;p&gt;Disse er undtagelser fra unac mekanismen, der, som standard, fjerner alle diakritiske tegn, og udfører kanonisk nedbrydning. Du kan tilsidesætte fjernelse af accent for nogle tegn, afhængigt af dit sprog, og angive yderligere nedbrydninger, f.eks. for ligaturer. I hver indgang adskilt af mellemrum, er det første tegn kildedelen, og resten er oversættelsen.</translation>
-    </message>
-    <message>
-        <source>These are pathnames of directories which indexing will not enter.&lt;br&gt;Path elements may contain wildcards. The entries must match the paths seen by the indexer (e.g.: if topdirs includes &apos;/home/me&apos; and &apos;/home&apos; is actually a link to &apos;/usr/home&apos;, a correct skippedPath entry would be &apos;/home/me/tmp*&apos;, not &apos;/usr/home/me/tmp*&apos;)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Max disk occupation (%, 0 means no limit)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is the percentage of disk usage - total disk usage, not index size - at which indexing will fail and stop.&lt;br&gt;The default value of 0 removes any limit.</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">&lt;p&gt;Disse er undtagelser fra unac mekanismen, der, som standard, fjerner alle diakritiske tegn, og udfører kanonisk nedbrydning. Du kan tilsidesætte fjernelse af accent for nogle tegn, afhængigt af dit sprog, og angive yderligere nedbrydninger, f.eks. for ligaturer. I hver indgang adskilt af mellemrum, er det første tegn kildedelen, og resten er oversættelsen.</translation>
     </message>
 </context>
 <context>
@@ -2885,7 +3272,7 @@ Kan være langsomt for store dokumenter.</translation>
     </message>
     <message>
         <source>Style sheet</source>
-        <translation>Stilark</translation>
+        <translation type="vanished">Stilark</translation>
     </message>
     <message>
         <source>Opens a dialog to select the style sheet file</source>
@@ -3047,6 +3434,42 @@ Standardværdien er 2 (procent).</translation>
     </message>
     <message>
         <source>Start search on completer popup activation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of snippets displayed in the snippets window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Suppress all beeps.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Application Qt style sheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Limit the size of the search history. Use 0 to disable, -1 for unlimited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum size of search history (0: disable, -1: unlimited):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate desktop notifications.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort snippets by page number (default: by weight).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Misc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Work around QTBUG-78923 by inserting space before anchor text</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -137,7 +137,6 @@ public:
 public slots:
     // Search stuff
     virtual void searchTextChanged(const QString& text);
-    virtual void searchTextFromIndex(int);
     virtual void doSearch(const QString& str, bool next, bool reverse,
                           bool wo = false);
     virtual void nextPressed();
@@ -173,7 +172,7 @@ private:
 
     bool          m_dynSearchActive{false};
     // Index value the search text comes from. -1 if text was edited
-    int           m_searchTextFromIndex{-1};
+    int           m_searchTextFromIndex{0};
 
     bool          m_canBeep{true};
     bool          m_loading{false};

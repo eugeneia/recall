@@ -958,15 +958,16 @@ Query_execute(recoll_QueryObject* self, PyObject *args, PyObject *kwargs)
 {
     LOGDEB0("Query_execute\n");
     static const char *kwlist[] = {"query_string", "stemming", "stemlang",
-                                   "fetchtext", NULL};
+                                   "fetchtext", "collapseduplicates", NULL};
     char *sutf8 = 0; // needs freeing
     char *sstemlang = 0;
     PyObject *dostemobj = 0;
     PyObject *fetchtextobj = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "es|OesO:Query_execute", 
+    PyObject *collapseobj = 0;
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "es|OesOO:Query_execute", 
 				     (char**)kwlist, "utf-8", &sutf8,
-				     &dostemobj, 
-				     "utf-8", &sstemlang, &fetchtextobj)) {
+				     &dostemobj, "utf-8", &sstemlang,
+                                     &fetchtextobj, &collapseobj)) {
 	return 0;
     }
 
@@ -995,6 +996,12 @@ Query_execute(recoll_QueryObject* self, PyObject *args, PyObject *kwargs)
 	return 0;
     }
 
+    if (collapseobj != 0 && PyObject_IsTrue(collapseobj)) {
+        self->query->setCollapseDuplicates(true);
+    } else {
+        self->query->setCollapseDuplicates(false);
+    }
+        
     // SearchData defaults to stemming in english
     // Use default for now but need to add way to specify language
     string reason;
@@ -1025,12 +1032,14 @@ static PyObject *
 Query_executesd(recoll_QueryObject* self, PyObject *args, PyObject *kwargs)
 {
     LOGDEB0("Query_executeSD\n");
-    static const char *kwlist[] = {"searchdata", "fetchtext", NULL};
+    static const char *kwlist[] = {"searchdata", "fetchtext",
+                                   "collapseduplicates", NULL};
     recoll_SearchDataObject *pysd = 0;
     PyObject *fetchtextobj = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!|O:Query_execute", 
+    PyObject *collapseobj = 0;
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O!|OO:Query_execute", 
 				     (char **)kwlist, &recoll_SearchDataType,
-                                     &pysd, &fetchtextobj)) {
+                                     &pysd, &fetchtextobj, &collapseobj)) {
 	return 0;
     }
     if (pysd == 0 || self->query == 0) {
@@ -1042,6 +1051,12 @@ Query_executesd(recoll_QueryObject* self, PyObject *args, PyObject *kwargs)
     } else {
         self->fetchtext = false;
     }
+    if (collapseobj != 0 && PyObject_IsTrue(collapseobj)) {
+        self->query->setCollapseDuplicates(true);
+    } else {
+        self->query->setCollapseDuplicates(false);
+    }
+        
     self->query->setSortBy(*self->sortfield, self->ascending);
     self->query->setQuery(pysd->sd);
     int cnt = self->query->getResCnt();
@@ -1425,8 +1440,9 @@ Query_getgroups(recoll_QueryObject* self, PyObject *, PyObject *)
     // We walk the groups vector. For each we retrieve the user group,
     // make a python list of each, then group those in a pair, and
     // append this to the main list.
-    for (unsigned int i = 0; i < hld.groups.size(); i++) {
-	unsigned int ugidx = hld.grpsugidx[i];
+    for (unsigned int i = 0; i < hld.index_term_groups.size(); i++) {
+        HighlightData::TermGroup& tg{hld.index_term_groups[i]};
+	unsigned int ugidx = tg.grpsugidx;
 	ulist = PyList_New(hld.ugroups[ugidx].size());
 	for (unsigned int j = 0; j < hld.ugroups[ugidx].size(); j++) {
 	    PyList_SetItem(ulist, j, 
@@ -1435,12 +1451,21 @@ Query_getgroups(recoll_QueryObject* self, PyObject *, PyObject *)
 					    "UTF-8", "replace"));
 	}
 
-	xlist = PyList_New(hld.groups[i].size());
-	for (unsigned int j = 0; j < hld.groups[i].size(); j++) {
-	    PyList_SetItem(xlist, j, 
-			   PyUnicode_Decode(hld.groups[i][j].c_str(), 
-					    hld.groups[i][j].size(), 
+        // Not sure that this makes any sense after we changed from
+        // multiply_groups to using or-plists. TBD: check
+        if (tg.kind == HighlightData::TermGroup::TGK_TERM) {
+            xlist = PyList_New(1);
+            PyList_SetItem(xlist, 0, 
+                           PyUnicode_Decode(tg.term.c_str(), tg.term.size(), 
 					    "UTF-8", "replace"));
+        } else {
+            xlist = PyList_New(tg.orgroups.size());
+            for (unsigned int j = 0; j < tg.orgroups.size(); j++) {
+                PyList_SetItem(xlist, j, 
+                               PyUnicode_Decode(tg.orgroups[j][0].c_str(),
+                                                tg.orgroups[j][0].size(), 
+                                                "UTF-8", "replace"));
+            }
 	}
 	PyList_Append(mainlist,  Py_BuildValue("(OO)", ulist, xlist));
     }

@@ -50,6 +50,7 @@ private:
     // in the query (the map key is and index into HighlightData.groups).
     std::map<unsigned int, std::vector<int> > m_groupanchors;
     std::map<unsigned int, unsigned int> m_groupcuranchors;
+    bool m_spacehack{false};
 };
 
 /* A thread to convert to rich text (mark search terms) */

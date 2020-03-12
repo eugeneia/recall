@@ -117,7 +117,7 @@ class FsTreeWalker {
     /** Set the ignored paths list */
     bool setSkippedPaths(const vector<string> &patterns);
 
-    /** Test if path/name should be skipped. This can be used independantly of
+    /** Test if path/name should be skipped. This can be used independently of
       * an actual tree walk */
     bool inSkippedPaths(const string& path, bool ckparents = false);
     bool inSkippedNames(const string& name);

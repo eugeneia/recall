@@ -36,12 +36,15 @@ class QTimer;
 
 struct SSearchDef;
 
+class SSearch;
+class QCompleter;
+
 class RclCompleterModel : public QAbstractListModel {
     Q_OBJECT
 
 public:
-    RclCompleterModel(QWidget *parent = 0)
-        : QAbstractListModel(parent) {
+    RclCompleterModel(SSearch *parent = 0)
+        : QAbstractListModel((QWidget*)parent), m_parent(parent) {
         init();
     }
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -55,6 +58,7 @@ private:
     int firstfromindex;
     QPixmap clockPixmap;
     QPixmap interroPixmap;
+    SSearch *m_parent{nullptr};
 };
 
 class SSearch : public QWidget, public Ui::SSearchBase {
@@ -80,6 +84,7 @@ public:
     // Restore ssearch UI from saved search
     virtual bool fromXML(const SSearchDef& fxml);
     virtual QString currentText();
+    virtual bool eventFilter(QObject *target, QEvent *event);
                                   
 public slots:
     virtual void searchTypeChanged(int);
@@ -97,6 +102,7 @@ private slots:
     virtual void onCompletionActivated(const QString&);
     virtual void restoreText();
     virtual void onHistoryClicked();
+    virtual void onCompleterShown();
     
 signals:
     void startSearch(std::shared_ptr<Rcl::SearchData>, bool);
@@ -108,12 +114,13 @@ private:
     int getPartialWord(QString& word);
     bool startSimpleSearch(const string& q, int maxexp = -1);
 
+    RclCompleterModel *m_completermodel{nullptr};
+    QCompleter *m_completer{nullptr};
     /* We save multiword entries because the completer replaces them with
        the completion */
     QString m_savedEditText;
      /* Saved xml version of the search, as we start it */
     std::string m_xml;
-    RclCompleterModel *m_completermodel{nullptr};
 };
 
 

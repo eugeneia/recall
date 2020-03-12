@@ -35,26 +35,33 @@ class SnippetsW : public QWidget, public Ui::Snippets
 public:
     SnippetsW(Rcl::Doc doc, std::shared_ptr<DocSequence> source,
               QWidget* parent = 0) 
-        : QWidget(parent), m_doc(doc), m_source(source) {
+        : QWidget(parent) {
         setupUi((QDialog*)this);
         init();
+        onSetDoc(doc, source);
     }
 
 public slots:
     virtual void onLinkClicked(const QUrl &);
+    virtual void onSetDoc(Rcl::Doc doc, std::shared_ptr<DocSequence> source);
+    virtual void createPopupMenu(const QPoint& pos);
 
 protected slots:
     virtual void slotEditFind();
     virtual void slotEditFindNext();
     virtual void slotEditFindPrevious();
     virtual void slotSearchTextChanged(const QString&);
+    virtual void reloadByRelevance();
+    virtual void reloadByPage();
+    
 signals:
     void startNativeViewer(Rcl::Doc, int pagenum, QString term);
         
 private:
     void init();
-    Rcl::Doc m_doc;
     std::shared_ptr<DocSequence> m_source;
+    Rcl::Doc m_doc;
+    bool m_sortingByPage;
 };
 
 #ifdef USING_WEBENGINE

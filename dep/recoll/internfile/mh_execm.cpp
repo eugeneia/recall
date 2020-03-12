@@ -1,4 +1,4 @@
-	/* Copyright (C) 2005 J.F.Dockes 
+/* Copyright (C) 2005 J.F.Dockes 
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
  *   the Free Software Foundation; either version 2 of the License, or
@@ -38,10 +38,10 @@ bool MimeHandlerExecMultiple::startCmd()
 {
     LOGDEB("MimeHandlerExecMultiple::startCmd\n");
     if (params.empty()) {
-	// Hu ho
-	LOGERR("MHExecMultiple::startCmd: empty params\n");
-	m_reason = "RECFILTERROR BADCONFIG";
-	return false;
+        // Hu ho
+        LOGERR("MHExecMultiple::startCmd: empty params\n");
+        m_reason = "RECFILTERROR BADCONFIG";
+        return false;
     }
 
     // Command name
@@ -55,7 +55,7 @@ bool MimeHandlerExecMultiple::startCmd()
 
     m_cmd.putenv("RECOLL_CONFDIR", m_config->getConfDir());
     m_cmd.putenv(m_forPreview ? "RECOLL_FILTER_FORPREVIEW=yes" :
-		"RECOLL_FILTER_FORPREVIEW=no");
+                 "RECOLL_FILTER_FORPREVIEW=no");
 
     m_cmd.setrlimit_as(m_filtermaxmbytes);
     m_adv.setmaxsecs(m_filtermaxseconds);
@@ -156,11 +156,11 @@ bool MimeHandlerExecMultiple::next_document()
 {
     LOGDEB("MimeHandlerExecMultiple::next_document(): [" << m_fn << "]\n");
     if (m_havedoc == false)
-	return false;
+        return false;
 
     if (missingHelper) {
-	LOGDEB("MHExecMultiple::next_document(): helper known missing\n");
-	return false;
+        LOGDEB("MHExecMultiple::next_document(): helper known missing\n");
+        return false;
     }
 
     if (m_cmd.getChildPid() <= 0 && !startCmd()) {
@@ -178,15 +178,15 @@ bool MimeHandlerExecMultiple::next_document()
     ostringstream obuf;
     string file_md5;
     if (m_filefirst) {
-	if (!m_forPreview && !m_nomd5) {
-	    string md5, xmd5, reason;
-	    if (MD5File(m_fn, md5, &reason)) {
-		file_md5 = MD5HexPrint(md5, xmd5);
-	    } else {
-		LOGERR("MimeHandlerExecM: cant compute md5 for [" << m_fn <<
+        if (!m_forPreview && !m_nomd5) {
+            string md5, xmd5, reason;
+            if (MD5File(m_fn, md5, &reason)) {
+                file_md5 = MD5HexPrint(md5, xmd5);
+            } else {
+                LOGERR("MimeHandlerExecM: cant compute md5 for [" << m_fn <<
                        "]: " << reason << "\n");
-	    }
-	}
+            }
+        }
         obuf << "FileName: " << m_fn.length() << "\n" << m_fn;
         // m_filefirst is set to true by set_document_file()
         m_filefirst = false;
@@ -194,13 +194,13 @@ bool MimeHandlerExecMultiple::next_document()
         obuf << "Filename: " << 0 << "\n";
     }
     if (!m_ipath.empty()) {
-	LOGDEB("next_doc: sending ipath " << m_ipath.length() << " val [" <<
+        LOGDEB("next_doc: sending ipath " << m_ipath.length() << " val [" <<
                m_ipath << "]\n");
         obuf << "Ipath: " << m_ipath.length() << "\n" << m_ipath;
     }
     if (!m_dfltInputCharset.empty()) {
         obuf << "DflInCS: " << m_dfltInputCharset.length() << "\n" 
-	     << m_dfltInputCharset;
+             << m_dfltInputCharset;
     }
     obuf << "Mimetype: " << m_mimeType.length() << "\n" << m_mimeType;
     obuf << "\n";
@@ -247,10 +247,10 @@ bool MimeHandlerExecMultiple::next_document()
             eofnow_received = true;
         } else if (!stringlowercmp("fileerror:", name)) {
             LOGDEB("MHExecMultiple: got FILEERROR\n");
-	    fileerror_received = true;
+            fileerror_received = true;
         } else if (!stringlowercmp("subdocerror:", name)) {
             LOGDEB("MHExecMultiple: got SUBDOCERROR\n");
-	    subdocerror_received = true;
+            subdocerror_received = true;
         } else if (!stringlowercmp("ipath:", name)) {
             ipath = data;
             LOGDEB("MHExecMultiple: got ipath [" << data << "]\n");
@@ -264,7 +264,11 @@ bool MimeHandlerExecMultiple::next_document()
             string nm = stringtolower((const string&)name);
             trimstring(nm, ":");
             LOGDEB("MHExecMultiple: got [" << nm << "] -> [" << data << "]\n");
-            m_metaData[nm] += data;
+            auto it = m_metaData.find(nm);
+            if (it == m_metaData.end() ||
+                it->second.find(data) == std::string::npos) {
+                m_metaData[nm] += data;
+            }
         }
         if (loop == 200) {
             // ?? 
@@ -279,7 +283,7 @@ bool MimeHandlerExecMultiple::next_document()
         return false;
     }
     if (subdocerror_received) {
-	return false;
+        return false;
     }
 
     // It used to be that eof could be signalled just by an empty document, but
@@ -291,13 +295,13 @@ bool MimeHandlerExecMultiple::next_document()
     }
 
     if (!ipath.empty()) {
-	// If this has an ipath, it is an internal doc from a
-	// multi-document file. In this case, either the filter
-	// supplies the mimetype, or the ipath MUST be a filename-like
-	// string which we can use to compute a mime type
+        // If this has an ipath, it is an internal doc from a
+        // multi-document file. In this case, either the filter
+        // supplies the mimetype, or the ipath MUST be a filename-like
+        // string which we can use to compute a mime type
         m_metaData[cstr_dj_keyipath] = ipath;
         if (mtype.empty()) {
-	    LOGDEB0("MHExecMultiple: no mime type from filter, using ipath "
+            LOGDEB0("MHExecMultiple: no mime type from filter, using ipath "
                     "for a guess\n");
             mtype = mimetype(ipath, 0, m_config, false);
             if (mtype.empty()) {
@@ -313,16 +317,16 @@ bool MimeHandlerExecMultiple::next_document()
             }
         }
         m_metaData[cstr_dj_keymt] = mtype;
-	if (!m_forPreview) {
-	    string md5, xmd5;
-	    MD5String(m_metaData[cstr_dj_keycontent], md5);
-	    m_metaData[cstr_dj_keymd5] = MD5HexPrint(md5, xmd5);
-	}
+        if (!m_forPreview) {
+            string md5, xmd5;
+            MD5String(m_metaData[cstr_dj_keycontent], md5);
+            m_metaData[cstr_dj_keymd5] = MD5HexPrint(md5, xmd5);
+        }
     } else {
-	// "Self" document.
+        // "Self" document.
         m_metaData[cstr_dj_keymt] = mtype.empty() ? cstr_texthtml : mtype;
         m_metaData.erase(cstr_dj_keyipath);
-	if (!m_forPreview) {
+        if (!m_forPreview) {
             m_metaData[cstr_dj_keymd5] = file_md5;
         }
     }
@@ -339,4 +343,3 @@ bool MimeHandlerExecMultiple::next_document()
     LOGDEB2("MHExecMultiple: metadata: \n" << metadataAsString());
     return true;
 }
-

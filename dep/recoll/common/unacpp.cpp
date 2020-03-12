@@ -92,7 +92,7 @@ bool unaciscapital(const string& in)
 // sharp s folds to ss but lowercases to itself, and greek final sigma
 // folds to sigma. So an input containing one of these characters
 // would wrongly detected as containing upper case. We now handle a
-// few special cases explicitely, by folding them before performing
+// few special cases explicitly, by folding them before performing
 // the lowercasing. There are actually quite a few other cases of
 // lowercase being transformed by casefolding, check Unicode
 // CaseFolding.txt for occurrences of SMALL. One more step towards

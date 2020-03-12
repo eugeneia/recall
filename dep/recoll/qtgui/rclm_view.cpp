@@ -375,6 +375,11 @@ void RclMain::startNativeViewer(Rcl::Doc doc, int pagenum, QString term)
         confirm.setSettingsPath("Recoll/prefs");
         confirm.setOverrideSettingsKey("showTempFileWarning");
         confirm.exec();
+        // Pita: need to keep the prefs struct in sync, else the value
+        // will be clobbered on program exit.
+        QSettings settings("Recoll.org", "recoll");
+        prefs.showTempFileWarning =
+            settings.value("Recoll/prefs/showTempFileWarning").toInt();
     }
 
     // If we are not called with a page number (which would happen for a call
@@ -506,6 +511,6 @@ void RclMain::startManual(const string& index)
         doc.url = path_pathtofileurl(usermanual);
     }
     doc.mimetype = "text/html";
+    doc.addmeta(Rcl::Doc::keyapptg, "rclman");
     startNativeViewer(doc);
 }
-

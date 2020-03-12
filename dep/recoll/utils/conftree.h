@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 J.F.Dockes
+/* Copyright (C) 2006-2019 J.F.Dockes
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU Lesser General Public License as published by
  *   the Free Software Foundation; either version 2.1 of the License, or
@@ -24,21 +24,21 @@
  *
  * Lines like '[subkey]' in the file define subsections, with independant
  * configuration namespaces. Only subsections holding at least one variable are
- * significant (empty subsections may be deleted during an update, or not)
+ * significant (empty subsections may be deleted during an update, or not).
  *
- * Whitespace around name and value is insignificant.
+ * Whitespace around name and value is ignored.
  *
- * The names are case-sensitive but don't depend on it, this might change
+ * The names are case-sensitive but don't depend on it, this might change.
  *
  * Values can be queried for, or set.
  *
- * Any line without a '=' is a comment (a line like #var = value
- * actually assigns a variable named '#var', which is not a big issue)
+ * Any line without a '=', or beginning with '[ \t]*#' is a comment.
  *
  * A configuration object can be created empty or by reading from a file or
  * a string.
- * All 'set' calls cause an immediate rewrite of the backing object if any
- * (file or string)
+ *
+ * All 'set' calls normally cause an immediate rewrite of the backing
+ * object if any (file or string). This can be prevented with holdWrites().
  *
  * The ConfTree derived class interprets the subkeys as file paths and
  * lets subdir keys hierarchically inherit the properties from
@@ -46,7 +46,7 @@
  *
  * The ConfStack class stacks several Con(Simple/Tree) objects so that
  * parameters from the top of the stack override the values from lower
- * (useful to have central/personal config files)
+ * (useful to have central/personal config files).
  */
 
 #include <time.h>
@@ -82,7 +82,7 @@ public:
 };
 
 /**
- * Virtual base class used to define an interface mostly useful for testing
+ * Virtual base class used to define the interface, and a few helper methods.
  */
 class ConfNull {
 public:
@@ -92,9 +92,15 @@ public:
                     const std::string& sk = std::string()) const = 0;
     virtual int set(const std::string& nm, const std::string& val,
                     const std::string& sk = std::string()) = 0;
+    virtual long long getInt(const std::string& name, long long dflt,
+                             const std::string& sk = std::string());
+    virtual double getFloat(const std::string& name, double dflt,
+                            const std::string& sk = std::string());
+    virtual bool getBool(const std::string& name, bool dflt,
+                         const std::string& sk = std::string());
     virtual bool ok() const = 0;
     virtual std::vector<std::string> getNames(const std::string& sk,
-                                              const char* = 0)const = 0;
+                                              const char* = 0) const = 0;
     virtual bool hasNameAnywhere(const std::string& nm) const = 0;
     virtual int erase(const std::string&, const std::string&) = 0;
     virtual int eraseKey(const std::string&) = 0;
@@ -165,15 +171,6 @@ public:
      */
     virtual int get(const std::string& name, std::string& value,
                     const std::string& sk = std::string()) const override;
-
-    /**
-     * Get integer value for named parameter, from specified subsection (looks 
-     * in global space if sk is empty).
-     * @return 0 if name not found, 1 else
-     */
-    virtual int get(const std::string& name, int* value,
-                    const std::string& sk = std::string()) const;
-
 
     /**
      * Set value for named string parameter in specified subsection (or global)
@@ -301,8 +298,8 @@ protected:
     StatusCode status;
 private:
     // Set if we're working with a file
-    std::string                            m_filename;
-    time_t                            m_fmtime;
+    std::string m_filename;
+    time_t      m_fmtime;
     // Configuration data submaps (one per subkey, the main data has a
     // null subkey)
     std::map<std::string, std::map<std::string, std::string> > m_submaps;
@@ -310,9 +307,9 @@ private:
     // Presentation data. We keep the comments, empty lines and
     // variable and subkey ordering information in there (for
     // rewriting the file while keeping hand-edited information)
-    std::vector<ConfLine>                    m_order;
+    std::vector<ConfLine>    m_order;
     // Control if we're writing to the backing store
-    bool                              m_holdWrites;
+    bool                     m_holdWrites;
 
     void parseinput(std::istream& input);
     bool write();
@@ -368,15 +365,16 @@ public:
 };
 
 /**
- * Use several config files, trying to get values from each in order. Used to
- * have a central config, with possible overrides from more specific
- * (ie personal) ones.
+ * Use several config files, trying to get values from each in order. 
+ *
+ * Enables having a central/default config, with possible overrides
+ * from more specific (e.g. personal) ones.
  *
  * Notes: it's ok for some of the files not to exist, but the last
- * one must or we generate an error. We open all trees readonly, except the
- * topmost one if requested. All writes go to the topmost file. Note that
- * erase() won't work except for parameters only defined in the topmost
- * file (it erases only from there).
+ * (bottom) one must or we generate an error. We open all trees
+ * readonly, except the topmost one if requested. All writes go to the
+ * topmost file. Note that erase() won't work except for parameters
+ * only defined in the topmost file (it erases only from there).
  */
 template <class T> class ConfStack : public ConfNull {
 public:
@@ -390,9 +388,8 @@ public:
     ConfStack(const std::string& nm, const std::vector<std::string>& dirs,
               bool ro = true) {
         std::vector<std::string> fns;
-        for (std::vector<std::string>::const_iterator it = dirs.begin();
-                it != dirs.end(); it++) {
-            fns.push_back(path_cat(*it, nm));
+        for (const auto& dir : dirs) {
+            fns.push_back(path_cat(dir, nm));
         }
         ConfStack::construct(fns, ro);
     }
@@ -418,10 +415,9 @@ public:
         return *this;
     }
 
-     virtual bool sourceChanged() const override {
-        typename std::vector<T*>::const_iterator it;
-        for (it = m_confs.begin(); it != m_confs.end(); it++) {
-            if ((*it)->sourceChanged()) {
+    virtual bool sourceChanged() const override {
+        for (const auto& conf : m_confs) {
+            if (conf->sourceChanged()) {
                 return true;
             }
         }
@@ -447,9 +443,8 @@ public:
     }
 
     virtual bool hasNameAnywhere(const std::string& nm) const override {
-        typename std::vector<T*>::const_iterator it;
-        for (it = m_confs.begin(); it != m_confs.end(); it++) {
-            if ((*it)->hasNameAnywhere(nm)) {
+        for (const auto& conf : m_confs) {
+            if (conf->hasNameAnywhere(nm)) {
                 return true;
             }
         }
@@ -466,7 +461,7 @@ public:
         // Avoid adding unneeded entries: if the new value matches the
         // one out from the deeper configs, erase or dont add it
         // from/to the topmost file
-        typename std::vector<T*>::iterator it = m_confs.begin();
+        auto it = m_confs.begin();
         it++;
         while (it != m_confs.end()) {
             std::string value;
@@ -502,19 +497,18 @@ public:
         return getNames1(sk, pattern, false);
     }
     virtual std::vector<std::string> getNamesShallow(const std::string& sk,
-                                           const char *patt = 0) const {
+                                                     const char *patt = 0) const {
         return getNames1(sk, patt, true);
     }
 
     virtual std::vector<std::string> getNames1(
         const std::string& sk, const char *pattern, bool shallow) const {
         std::vector<std::string> nms;
-        typename std::vector<T*>::const_iterator it;
         bool skfound = false;
-        for (it = m_confs.begin(); it != m_confs.end(); it++) {
-            if ((*it)->hasSubKey(sk)) {
+        for (const auto& conf : m_confs) {
+            if (conf->hasSubKey(sk)) {
                 skfound = true;
-                std::vector<std::string> lst = (*it)->getNames(sk, pattern);
+                std::vector<std::string> lst = conf->getNames(sk, pattern);
                 nms.insert(nms.end(), lst.begin(), lst.end());
             }
             if (shallow && skfound) {
@@ -532,10 +526,9 @@ public:
     }
     virtual std::vector<std::string> getSubKeys(bool shallow) const override {
         std::vector<std::string> sks;
-        typename std::vector<T*>::const_iterator it;
-        for (it = m_confs.begin(); it != m_confs.end(); it++) {
+        for (const auto& conf : m_confs) {
             std::vector<std::string> lst;
-            lst = (*it)->getSubKeys();
+            lst = conf->getSubKeys();
             sks.insert(sks.end(), lst.begin(), lst.end());
             if (shallow) {
                 break;
@@ -557,9 +550,8 @@ private:
 
     /// Reset to pristine
     void clear() {
-        typename std::vector<T*>::iterator it;
-        for (it = m_confs.begin(); it != m_confs.end(); it++) {
-            delete(*it);
+        for (auto& conf : m_confs) {
+            delete(conf);
         }
         m_confs.clear();
     }
@@ -567,34 +559,35 @@ private:
     /// Common code to initialize from existing object
     void init_from(const ConfStack& rhs) {
         if ((m_ok = rhs.m_ok)) {
-            typename std::vector<T*>::const_iterator it;
-            for (it = rhs.m_confs.begin(); it != rhs.m_confs.end(); it++) {
-                m_confs.push_back(new T(**it));
+            for (const auto& conf : rhs.m_confs) {
+                m_confs.push_back(new T(*conf));
             }
         }
     }
 
-    /// Common construct from file names code
+    /// Common construct from file names code. We used to be ok even
+    /// if some files were not readable/parsable. Now fail if any
+    /// fails.
     void construct(const std::vector<std::string>& fns, bool ro) {
-        std::vector<std::string>::const_iterator it;
-        bool lastok = false;
-        for (it = fns.begin(); it != fns.end(); it++) {
-            T* p = new T(it->c_str(), ro);
+        bool ok{true};
+        bool first{true};
+        for (const auto& fn : fns) {
+            T* p = new T(fn.c_str(), ro);
             if (p && p->ok()) {
                 m_confs.push_back(p);
-                lastok = true;
             } else {
                 delete p;
-                lastok = false;
-                if (!ro) {
-                    // For rw acccess, the topmost file needs to be ok
-                    // (ro is set to true after the first file)
-                    break;
+                // In ro mode, we accept a non-existing topmost file
+                // and treat it as an empty one.
+                if (!(ro && first && !path_exists(fn))) {
+                    ok = false;
                 }
             }
+            // Only the first file is opened rw
             ro = true;
+            first = false;
         }
-        m_ok = lastok;
+        m_ok = ok;
     }
 };
 

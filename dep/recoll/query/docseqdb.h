@@ -16,9 +16,10 @@
  */
 #ifndef _DOCSEQDB_H_INCLUDED_
 #define _DOCSEQDB_H_INCLUDED_
-#include "docseq.h"
+
 #include <memory>
 
+#include "docseq.h"
 #include "searchdata.h"
 #include "rclquery.h"
 
@@ -26,40 +27,40 @@
 class DocSequenceDb : public DocSequence {
  public:
     DocSequenceDb(std::shared_ptr<Rcl::Db> db,
-                  std::shared_ptr<Rcl::Query> q, const string &t, 
+                  std::shared_ptr<Rcl::Query> q, const std::string &t, 
 		  std::shared_ptr<Rcl::SearchData> sdata);
     virtual ~DocSequenceDb() {}
-    virtual bool getDoc(int num, Rcl::Doc &doc, string * = 0);
-    virtual int getResCnt();
-    virtual void getTerms(HighlightData& hld);
+    virtual bool getDoc(int num, Rcl::Doc &doc, std::string * = 0) override;
+    virtual int getResCnt() override;
+    virtual void getTerms(HighlightData& hld) override;
 
     // Called to fill-up the snippets window. Ignoers
     // buildabstract/replaceabstract and syntabslen
-    virtual bool getAbstract(Rcl::Doc &doc, vector<Rcl::Snippet>&);
+    virtual bool getAbstract(Rcl::Doc &doc, std::vector<Rcl::Snippet>&,
+                             int maxlen, bool sortbypage) override;
 
-    virtual bool getAbstract(Rcl::Doc &doc, vector<string>&);
-    virtual int getFirstMatchPage(Rcl::Doc&, std::string& term);
-    virtual bool docDups(const Rcl::Doc& doc, std::vector<Rcl::Doc>& dups);
-    virtual string getDescription();
-    virtual std::list<std::string> expand(Rcl::Doc &doc);
-    virtual bool canFilter() {return true;}
-    virtual bool setFiltSpec(const DocSeqFiltSpec &filtspec);
-    virtual bool canSort() {return true;} 
-    virtual bool setSortSpec(const DocSeqSortSpec &sortspec);
-    virtual void setAbstractParams(bool qba, bool qra)
-    {
+    virtual bool getAbstract(Rcl::Doc &doc, std::vector<std::string>&) override;
+    virtual int getFirstMatchPage(Rcl::Doc&, std::string& term) override;
+    virtual bool docDups(const Rcl::Doc& doc, std::vector<Rcl::Doc>& dups)
+        override;
+    virtual std::string getDescription() override;
+    virtual std::list<std::string> expand(Rcl::Doc &doc) override;
+    virtual bool canFilter()  override {return true;}
+    virtual bool setFiltSpec(const DocSeqFiltSpec &filtspec) override;
+    virtual bool canSort()  override {return true;} 
+    virtual bool setSortSpec(const DocSeqSortSpec &sortspec) override;
+    virtual void setAbstractParams(bool qba, bool qra) {
         m_queryBuildAbstract = qba;
         m_queryReplaceAbstract = qra;
     }
 
-    virtual bool snippetsCapable()
-    {
+    virtual bool snippetsCapable() override {
 	return true;
     }
-    virtual string title();
+    virtual std::string title() override;
 
 protected:
-    virtual std::shared_ptr<Rcl::Db> getDb() {
+    virtual std::shared_ptr<Rcl::Db> getDb() override {
         return m_db;
     }
 private:

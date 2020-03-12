@@ -21,7 +21,7 @@
 #include <list>
 #include <set>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <algorithm>
 #include <regex>
 
@@ -29,6 +29,7 @@ using std::vector;
 using std::list;
 using std::pair;
 using std::set;
+using std::unordered_map;
 
 #include "rcldb.h"
 #include "rclconfig.h"
@@ -53,15 +54,17 @@ public:
         :  m_wcount(0), m_hdata(hdata) {
         // We separate single terms and groups and extract the group
         // terms for computing positions list before looking for group
-        // matches
-        for (vector<vector<string> >::const_iterator vit = hdata.groups.begin();
-             vit != hdata.groups.end(); vit++) {
-            if (vit->size() == 1) {
-                m_terms[vit->front()] = vit - hdata.groups.begin();
-            } else if (vit->size() > 1) {
-                for (vector<string>::const_iterator it = vit->begin(); 
-                     it != vit->end(); it++) {
-                    m_gterms.insert(*it);
+        // matches. Single terms are stored with a reference to the
+        // entry they come with.
+        for (unsigned int i = 0; i < hdata.index_term_groups.size(); i++) {
+            const HighlightData::TermGroup& tg(hdata.index_term_groups[i]);
+            if (tg.kind == HighlightData::TermGroup::TGK_TERM) {
+                m_terms[tg.term] = i;
+            } else {
+                for (const auto& group : tg.orgroups) {
+                    for (const auto& term : group) {
+                        m_gterms.insert(term);
+                    }
                 }
             }
         }
@@ -121,21 +124,21 @@ private:
     const HighlightData& m_hdata;
 
     // group/near terms word positions.
-    map<string, vector<int> > m_plists;
-    map<int, pair<int, int> > m_gpostobytes;
+    unordered_map<string, vector<int> > m_plists;
+    unordered_map<int, pair<int, int> > m_gpostobytes;
 };
 
 
 // Look for matches to PHRASE and NEAR term groups and finalize the
 // matched regions list (sort it by increasing start then decreasing
 // length)
-// Actually, we handle all groups as NEAR (ignore order).
 bool TextSplitPTR::matchGroups()
 {
-    for (unsigned int i = 0; i < m_hdata.groups.size(); i++) {
-        if (m_hdata.groups[i].size() <= 1)
-            continue;
-        matchGroup(m_hdata, i, m_plists, m_gpostobytes, m_tboffs);
+    for (unsigned int i = 0; i < m_hdata.index_term_groups.size(); i++) {
+        if (m_hdata.index_term_groups[i].kind !=
+            HighlightData::TermGroup::TGK_TERM) {
+            matchGroup(m_hdata, i, m_plists, m_gpostobytes, m_tboffs);
+        }
     }
 
     // Sort regions by increasing start and decreasing width.  

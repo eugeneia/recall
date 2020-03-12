@@ -70,7 +70,7 @@ class Aspell {
     std::string dicPath();
     const RclConfig  *m_config;
     std::string      m_lang;
-    AspellData *m_data;
+    AspellData *m_data{nullptr};
 
     bool make_speller(std::string& reason);
 };

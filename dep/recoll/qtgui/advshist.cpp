@@ -28,14 +28,12 @@ using namespace Rcl;
 AdvSearchHist::AdvSearchHist()
 {
     read();
-    m_current = -1;
 }
 
 AdvSearchHist::~AdvSearchHist()
 {
-    for (vector<std::shared_ptr<SearchData> >::iterator it = m_entries.begin();
-	 it != m_entries.end(); it++) {
-	it->reset();
+    for (auto& entry : m_entries) {
+	entry.reset();
     }
 }
 
@@ -71,7 +69,11 @@ bool AdvSearchHist::push(std::shared_ptr<SearchData> sd)
 	m_current++;
 
     string xml = sd->asXML();
-    g_dynconf->enterString(advSearchHistSk, xml, 100);
+    // dynconf interprets <= 0 as unlimited size, but we want 0 to
+    // disable saving history
+    if (prefs.historysize != 0) {
+        g_dynconf->enterString(advSearchHistSk, xml, prefs.historysize);
+    }
     return true;
 }
 

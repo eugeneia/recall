@@ -104,11 +104,11 @@ static void cleanup()
 // Also check for an interrupt request and return the info to caller which
 // should subsequently orderly terminate what it is doing.
 class MyUpdater : public DbIxStatusUpdater {
- public:
+public:
     MyUpdater(const RclConfig *config) 
-	: m_file(config->getIdxStatusFile().c_str()),
+        : m_file(config->getIdxStatusFile().c_str()),
           m_stopfilename(config->getIdxStopFile()),
-	  m_prevphase(DbIxStatus::DBIXS_NONE) {
+          m_prevphase(DbIxStatus::DBIXS_NONE) {
         // The total number of files included in the index is actually
         // difficult to compute from the index itself. For display
         // purposes, we save it in the status file from indexing to
@@ -121,49 +121,49 @@ class MyUpdater : public DbIxStatusUpdater {
 
     virtual bool update() 
     {
-	// Update the status file. Avoid doing it too often. Always do
-	// it at the end (status DONE)
-	if (status.phase == DbIxStatus::DBIXS_DONE || 
+        // Update the status file. Avoid doing it too often. Always do
+        // it at the end (status DONE)
+        if (status.phase == DbIxStatus::DBIXS_DONE || 
             status.phase != m_prevphase || m_chron.millis() > 300) {
             if (status.totfiles < status.filesdone ||
                 status.phase == DbIxStatus::DBIXS_DONE) {
                 status.totfiles = status.filesdone;
             }
-	    m_prevphase = status.phase;
-	    m_chron.restart();
+            m_prevphase = status.phase;
+            m_chron.restart();
             m_file.holdWrites(true);
             m_file.set("phase", int(status.phase));
-	    m_file.set("docsdone", status.docsdone);
-	    m_file.set("filesdone", status.filesdone);
-	    m_file.set("fileerrors", status.fileerrors);
-	    m_file.set("dbtotdocs", status.dbtotdocs);
-	    m_file.set("totfiles", status.totfiles);
-	    m_file.set("fn", status.fn);
+            m_file.set("docsdone", status.docsdone);
+            m_file.set("filesdone", status.filesdone);
+            m_file.set("fileerrors", status.fileerrors);
+            m_file.set("dbtotdocs", status.dbtotdocs);
+            m_file.set("totfiles", status.totfiles);
+            m_file.set("fn", status.fn);
             m_file.set("hasmonitor", status.hasmonitor);
             m_file.holdWrites(false);
-	}
+        }
         if (path_exists(m_stopfilename)) {
             LOGINF("recollindex: asking indexer to stop because " <<
                    m_stopfilename << " exists\n");
             unlink(m_stopfilename.c_str());
             stopindexing = true;
         }
-	if (stopindexing) {
-	    return false;
-	}
+        if (stopindexing) {
+            return false;
+        }
 
 #ifndef DISABLE_X11MON
-	// If we are in the monitor, we also need to check X11 status
-	// during the initial indexing pass (else the user could log
-	// out and the indexing would go on, not good (ie: if the user
-	// logs in again, the new recollindex will fail).
-	if ((op_flags & OPT_m) && !(op_flags & OPT_x) && !x11IsAlive()) {
-	    LOGDEB("X11 session went away during initial indexing pass\n");
-	    stopindexing = true;
-	    return false;
-	}
+        // If we are in the monitor, we also need to check X11 status
+        // during the initial indexing pass (else the user could log
+        // out and the indexing would go on, not good (ie: if the user
+        // logs in again, the new recollindex will fail).
+        if ((op_flags & OPT_m) && !(op_flags & OPT_x) && !x11IsAlive()) {
+            LOGDEB("X11 session went away during initial indexing pass\n");
+            stopindexing = true;
+            return false;
+        }
 #endif
-	return true;
+        return true;
     }
 
 private:
@@ -217,9 +217,9 @@ static void sigcleanup(int sig)
 static void makeIndexerOrExit(RclConfig *config, bool inPlaceReset)
 {
     if (!confindexer) {
-	confindexer = new ConfIndexer(config, updater);
-	if (inPlaceReset)
-	    confindexer->setInPlaceReset();
+        confindexer = new ConfIndexer(config, updater);
+        if (inPlaceReset)
+            confindexer->setInPlaceReset();
     }
     if (!confindexer) {
         cerr << "Cannot create indexer" << endl;
@@ -232,7 +232,8 @@ void rclIxIonice(const RclConfig *config)
 #ifndef _WIN32
     string clss, classdata;
     if (!config->getConfParam("monioniceclass", clss) || clss.empty())
-	clss = "3";
+        clss = "3";
+    // Classdata may be empty (must be for idle class)
     config->getConfParam("monioniceclassdata", classdata);
     rclionice(clss, classdata);
 #endif
@@ -241,7 +242,13 @@ void rclIxIonice(const RclConfig *config)
 static void setMyPriority(const RclConfig *config)
 {
 #ifndef _WIN32
-    if (setpriority(PRIO_PROCESS, 0, 20) != 0) {
+    int prio{19};
+    std::string sprio;
+    config->getConfParam("idxniceprio", sprio);
+    if (!sprio.empty()) {
+        prio = atoi(sprio.c_str());
+    }
+    if (setpriority(PRIO_PROCESS, 0, prio) != 0) {
         LOGINFO("recollindex: can't setpriority(), errno " << errno << "\n");
     }
     // Try to ionice. This does not work on all platforms
@@ -253,13 +260,13 @@ static void setMyPriority(const RclConfig *config)
 class MakeListWalkerCB : public FsTreeWalkerCB {
 public:
     MakeListWalkerCB(list<string>& files, const vector<string>& selpats)
-	: m_files(files), m_pats(selpats)
+        : m_files(files), m_pats(selpats)
     {
     }
     virtual FsTreeWalker::Status 
     processone(const string& fn, const struct stat *, FsTreeWalker::CbFlag flg) 
     {
-	if (flg== FsTreeWalker::FtwDirEnter || flg == FsTreeWalker::FtwRegular){
+        if (flg== FsTreeWalker::FtwDirEnter || flg == FsTreeWalker::FtwRegular){
             if (m_pats.empty()) {
                 cerr << "Selecting " << fn << endl;
                 m_files.push_back(fn);
@@ -273,7 +280,7 @@ public:
                 }
             }
         }
-	return FsTreeWalker::FtwOk;
+        return FsTreeWalker::FtwOk;
     }
     list<string>& m_files;
     const vector<string>& m_pats;
@@ -312,7 +319,7 @@ bool recursive_index(RclConfig *config, const string& top,
 bool indexfiles(RclConfig *config, list<string> &filenames)
 {
     if (filenames.empty())
-	return true;
+        return true;
     makeIndexerOrExit(config, (op_flags & OPT_Z) != 0);
     // The default is to retry failed files
     int indexerFlags = ConfIndexer::IxFNone; 
@@ -330,7 +337,7 @@ bool indexfiles(RclConfig *config, list<string> &filenames)
 bool purgefiles(RclConfig *config, list<string> &filenames)
 {
     if (filenames.empty())
-	return true;
+        return true;
     makeIndexerOrExit(config, (op_flags & OPT_Z) != 0);
     return confindexer->purgeFiles(filenames, ConfIndexer::IxFNone);
 }
@@ -341,10 +348,10 @@ bool createAuxDbs(RclConfig *config)
     makeIndexerOrExit(config, false);
 
     if (!confindexer->createStemmingDatabases())
-	return false;
+        return false;
 
     if (!confindexer->createAspellDict())
-	return false;
+        return false;
 
     return true;
 }
@@ -391,7 +398,7 @@ static bool checktopdirs(RclConfig *config, vector<string>& nonexist)
     }
     
     for (auto& dir : o_topdirs) {
-	dir = path_tildexpand(dir);
+        dir = path_tildexpand(dir);
         if (!dir.size() || !path_isabsolute(dir)) {
             if (dir[0] == '~') {
                 cerr << "Tilde expansion failed: " << dir << endl;
@@ -414,99 +421,58 @@ static bool checktopdirs(RclConfig *config, vector<string>& nonexist)
     return true;
 }
 
-bool runWebFilesMoverScript(RclConfig *config)
-{
-    static string downloadsdir;
-    if (downloadsdir.empty()) {
-        if (!config->getConfParam("webdownloadsdir", downloadsdir)) {
-            downloadsdir = path_tildexpand("~/Downloads");
-        }
-    }
-    static string cmdpath;
-    if (cmdpath.empty()) {
-        cmdpath = config->findFilter("recoll-we-move-files.py");
-        if (cmdpath.empty()) {
-            LOGERR("runWFMoverScript: recoll-we-move-files.py not found\n");
-            return false;
-        }
-    }
-
-    /* Arrange to not actually run the script if the directory did not change */
-    static time_t dirmtime;
-    time_t ndirmtime = 0;
-    struct stat st;
-    if (::stat(downloadsdir.c_str(), &st) == 0) {
-        ndirmtime = st.st_mtime;
-    }
-    /* If stat fails, presumably Downloads does not exist or is not
-       accessible, dirmtime and mdirmtime stay at 0, and we never
-       execute the script, which is the right thing. */
-    if (dirmtime != ndirmtime) {
-        /* The script is going to change the directory, so updating
-           dirmtime before it runs means that we are going to execute
-           it one time too many (it will run without doing anything),
-           but we can't set the mtime to after the run in case files
-           are created during the run. */
-        dirmtime = ndirmtime;
-        ExecCmd cmd;
-        int status = cmd.doexec(cmdpath, {});
-        return status == 0;
-    }
-    return true;
-}
-
 
 string thisprog;
 
 static const char usage [] =
-"\n"
-"recollindex [-h] \n"
-"    Print help\n"
-"recollindex [-z|-Z] [-k]\n"
-"    Index everything according to configuration file\n"
-"    -z : reset database before starting indexing\n"
-"    -Z : in place reset: consider all documents as changed. Can also\n"
-"         be combined with -i or -r but not -m\n"
-"    -k : retry files on which we previously failed\n"
+                                                           "\n"
+                                                           "recollindex [-h] \n"
+                                                           "    Print help\n"
+                                                           "recollindex [-z|-Z] [-k]\n"
+                                                           "    Index everything according to configuration file\n"
+                                                           "    -z : reset database before starting indexing\n"
+                                                           "    -Z : in place reset: consider all documents as changed. Can also\n"
+                                                           "         be combined with -i or -r but not -m\n"
+                                                           "    -k : retry files on which we previously failed\n"
 #ifdef RCL_MONITOR
-"recollindex -m [-w <secs>] -x [-D] [-C]\n"
-"    Perform real time indexing. Don't become a daemon if -D is set.\n"
-"    -w sets number of seconds to wait before starting.\n"
-"    -C disables monitoring config for changes/reexecuting.\n"
-"    -n disables initial incremental indexing (!and purge!).\n"
+                                                           "recollindex -m [-w <secs>] -x [-D] [-C]\n"
+                                                           "    Perform real time indexing. Don't become a daemon if -D is set.\n"
+                                                           "    -w sets number of seconds to wait before starting.\n"
+                                                           "    -C disables monitoring config for changes/reexecuting.\n"
+                                                           "    -n disables initial incremental indexing (!and purge!).\n"
 #ifndef DISABLE_X11MON
-"    -x disables exit on end of x11 session\n"
+                                                           "    -x disables exit on end of x11 session\n"
 #endif /* DISABLE_X11MON */
 #endif /* RCL_MONITOR */
-"recollindex -e [<filepath [path ...]>]\n"
-"    Purge data for individual files. No stem database updates.\n"
-"    Reads paths on stdin if none is given as argument.\n"
-"recollindex -i [-f] [-Z] [<filepath [path ...]>]\n"
-"    Index individual files. No database purge or stem database updates\n"
-"    Will read paths on stdin if none is given as argument\n"
-"    -f : ignore skippedPaths and skippedNames while doing this\n"
-"recollindex -r [-K] [-f] [-Z] [-p pattern] <top> \n"
-"   Recursive partial reindex. \n"
-"     -p : filter file names, multiple instances are allowed, e.g.: \n"
-"        -p *.odt -p *.pdf\n"
-"     -K : skip previously failed files (they are retried by default)\n"
-"recollindex -l\n"
-"    List available stemming languages\n"
-"recollindex -s <lang>\n"
-"    Build stem database for additional language <lang>\n"
-"recollindex -E\n"
-"    Check configuration file for topdirs and other paths existence\n"
+                                                           "recollindex -e [<filepath [path ...]>]\n"
+                                                           "    Purge data for individual files. No stem database updates.\n"
+                                                           "    Reads paths on stdin if none is given as argument.\n"
+                                                           "recollindex -i [-f] [-Z] [<filepath [path ...]>]\n"
+                                                           "    Index individual files. No database purge or stem database updates\n"
+                                                           "    Will read paths on stdin if none is given as argument\n"
+                                                           "    -f : ignore skippedPaths and skippedNames while doing this\n"
+                                                           "recollindex -r [-K] [-f] [-Z] [-p pattern] <top> \n"
+                                                           "   Recursive partial reindex. \n"
+                                                           "     -p : filter file names, multiple instances are allowed, e.g.: \n"
+                                                           "        -p *.odt -p *.pdf\n"
+                                                           "     -K : skip previously failed files (they are retried by default)\n"
+                                                           "recollindex -l\n"
+                                                           "    List available stemming languages\n"
+                                                           "recollindex -s <lang>\n"
+                                                           "    Build stem database for additional language <lang>\n"
+                                                           "recollindex -E\n"
+                                                           "    Check configuration file for topdirs and other paths existence\n"
 #ifdef FUTURE_IMPROVEMENT
-"recollindex -W\n"
-"    Process the Web queue\n"
+                                                           "recollindex -W\n"
+                                                           "    Process the Web queue\n"
 #endif
 #ifdef RCL_USE_ASPELL
-"recollindex -S\n"
-"    Build aspell spelling dictionary.>\n"
+                                                           "recollindex -S\n"
+                                                           "    Build aspell spelling dictionary.>\n"
 #endif
-"Common options:\n"
-"    -c <configdir> : specify config directory, overriding $RECOLL_CONFDIR\n"
-;
+                                                           "Common options:\n"
+                                                           "    -c <configdir> : specify config directory, overriding $RECOLL_CONFDIR\n"
+                                                           ;
 
 static void
 Usage(FILE *where = stderr)
@@ -549,12 +515,12 @@ static void lockorexit(Pidfile *pidfile, RclConfig *config)
             cerr << "Can't become exclusive indexer: " << pidfile->getreason()
                  << endl;
         }            
-	exit(1);
+        exit(1);
     }
     if (pidfile->write_pid() != 0) {
-	cerr << "Can't become exclusive indexer: " << pidfile->getreason() <<
-	    endl;
-	exit(1);
+        cerr << "Can't become exclusive indexer: " << pidfile->getreason() <<
+            endl;
+        exit(1);
     }
 }
 
@@ -598,65 +564,65 @@ int main(int argc, char **argv)
     argc--; argv++;
 
     while (argc > 0 && **argv == '-') {
-	(*argv)++;
-	if (!(**argv))
-	    Usage();
-	while (**argv)
-	    switch (*(*argv)++) {
-	    case 'b': op_flags |= OPT_b; break;
-	    case 'c':	op_flags |= OPT_c; if (argc < 2)  Usage();
-		a_config = *(++argv);
-		argc--; goto b1;
+        (*argv)++;
+        if (!(**argv))
+            Usage();
+        while (**argv)
+            switch (*(*argv)++) {
+            case 'b': op_flags |= OPT_b; break;
+            case 'c':   op_flags |= OPT_c; if (argc < 2)  Usage();
+                a_config = *(++argv);
+                argc--; goto b1;
 #ifdef RCL_MONITOR
-	    case 'C': op_flags |= OPT_C; break;
-	    case 'D': op_flags |= OPT_D; break;
+            case 'C': op_flags |= OPT_C; break;
+            case 'D': op_flags |= OPT_D; break;
 #endif
-	    case 'E': op_flags |= OPT_E; break;
-	    case 'e': op_flags |= OPT_e; break;
-	    case 'f': op_flags |= OPT_f; break;
-	    case 'h': op_flags |= OPT_h; break;
-	    case 'i': op_flags |= OPT_i; break;
-	    case 'k': op_flags |= OPT_k; break;
-	    case 'K': op_flags |= OPT_K; break;
-	    case 'l': op_flags |= OPT_l; break;
-	    case 'm': op_flags |= OPT_m; break;
-	    case 'n': op_flags |= OPT_n; break;
-	    case 'P': op_flags |= OPT_P; break;
-	    case 'p': op_flags |= OPT_p; if (argc < 2)  Usage();
-		selpatterns.push_back(*(++argv));
-		argc--; goto b1;
-	    case 'r': op_flags |= OPT_r; break;
-	    case 'R':	op_flags |= OPT_R; if (argc < 2)  Usage();
+            case 'E': op_flags |= OPT_E; break;
+            case 'e': op_flags |= OPT_e; break;
+            case 'f': op_flags |= OPT_f; break;
+            case 'h': op_flags |= OPT_h; break;
+            case 'i': op_flags |= OPT_i; break;
+            case 'k': op_flags |= OPT_k; break;
+            case 'K': op_flags |= OPT_K; break;
+            case 'l': op_flags |= OPT_l; break;
+            case 'm': op_flags |= OPT_m; break;
+            case 'n': op_flags |= OPT_n; break;
+            case 'P': op_flags |= OPT_P; break;
+            case 'p': op_flags |= OPT_p; if (argc < 2)  Usage();
+                selpatterns.push_back(*(++argv));
+                argc--; goto b1;
+            case 'r': op_flags |= OPT_r; break;
+            case 'R':   op_flags |= OPT_R; if (argc < 2)  Usage();
                 reasonsfile = *(++argv); argc--; goto b1;
-	    case 's': op_flags |= OPT_s; break;
+            case 's': op_flags |= OPT_s; break;
 #ifdef RCL_USE_ASPELL
-	    case 'S': op_flags |= OPT_S; break;
+            case 'S': op_flags |= OPT_S; break;
 #endif
-	    case 'w':	op_flags |= OPT_w; if (argc < 2)  Usage();
-		if ((sscanf(*(++argv), "%d", &sleepsecs)) != 1) 
-		    Usage(); 
-		argc--; goto b1;
-	    case 'x': op_flags |= OPT_x; break;
-	    case 'Z': op_flags |= OPT_Z; break;
-	    case 'z': op_flags |= OPT_z; break;
-	    default: Usage(); break;
-	    }
+            case 'w':   op_flags |= OPT_w; if (argc < 2)  Usage();
+                if ((sscanf(*(++argv), "%d", &sleepsecs)) != 1) 
+                    Usage(); 
+                argc--; goto b1;
+            case 'x': op_flags |= OPT_x; break;
+            case 'Z': op_flags |= OPT_Z; break;
+            case 'z': op_flags |= OPT_z; break;
+            default: Usage(); break;
+            }
     b1: argc--; argv++;
     }
     if (op_flags & OPT_h)
-	Usage(stdout);
+        Usage(stdout);
 #ifndef RCL_MONITOR
     if (op_flags & (OPT_m | OPT_w|OPT_x)) {
-	cerr << "Sorry, -m not available: real-time monitoring was not "
-	    "configured in this build\n";
-	exit(1);
+        cerr << "Sorry, -m not available: real-time monitoring was not "
+            "configured in this build\n";
+        exit(1);
     }
 #endif
 
     if ((op_flags & OPT_z) && (op_flags & (OPT_i|OPT_e|OPT_r)))
-	Usage();
+        Usage();
     if ((op_flags & OPT_Z) && (op_flags & (OPT_m)))
-	Usage();
+        Usage();
     if ((op_flags & OPT_E) && (op_flags & ~(OPT_E|OPT_c))) {
         Usage();
     }
@@ -664,14 +630,14 @@ int main(int argc, char **argv)
     string reason;
     int flags = RCLINIT_IDX;
     if ((op_flags & OPT_m) && !(op_flags&OPT_D)) {
-	flags |= RCLINIT_DAEMON;
+        flags |= RCLINIT_DAEMON;
     }
     config = recollinit(flags, cleanup, sigcleanup, reason, &a_config);
     if (config == 0 || !config->ok()) {
         addIdxReason("init", reason);
         flushIdxReasons();
-	cerr << "Configuration problem: " << reason << endl;
-	exit(1);
+        cerr << "Configuration problem: " << reason << endl;
+        exit(1);
     }
 #ifndef _WIN32
     o_reexec->atexit(cleanup);
@@ -702,18 +668,18 @@ int main(int argc, char **argv)
     string rundir;
     config->getConfParam("idxrundir", rundir);
     if (!rundir.compare("tmp")) {
-	LOGINFO("recollindex: changing current directory to [" <<
+        LOGINFO("recollindex: changing current directory to [" <<
                 tmplocation() << "]\n");
-	if (chdir(tmplocation().c_str()) < 0) {
-	    LOGERR("chdir(" << tmplocation() << ") failed, errno " << errno <<
+        if (chdir(tmplocation().c_str()) < 0) {
+            LOGERR("chdir(" << tmplocation() << ") failed, errno " << errno <<
                    "\n");
-	}
+        }
     } else if (!rundir.empty()) {
-	LOGINFO("recollindex: changing current directory to [" << rundir <<
+        LOGINFO("recollindex: changing current directory to [" << rundir <<
                 "]\n");
-	if (chdir(rundir.c_str()) < 0) {
-	    LOGERR("chdir(" << rundir << ") failed, errno " << errno << "\n");
-	}
+        if (chdir(rundir.c_str()) < 0) {
+            LOGERR("chdir(" << rundir << ") failed, errno " << errno << "\n");
+        }
     }
 
     bool rezero((op_flags & OPT_z) != 0);
@@ -751,10 +717,10 @@ int main(int argc, char **argv)
     setMyPriority(config);
     
     if (op_flags & OPT_r) {
-	if (argc != 1) 
-	    Usage();
-	string top = *argv++; argc--;
-	bool status = recursive_index(config, top, selpatterns);
+        if (argc != 1) 
+            Usage();
+        string top = *argv++; argc--;
+        bool status = recursive_index(config, top, selpatterns);
         if (confindexer && !confindexer->getReason().empty()) {
             addIdxReason("indexer", confindexer->getReason());
             cerr << confindexer->getReason() << endl;
@@ -762,33 +728,33 @@ int main(int argc, char **argv)
         flushIdxReasons();
         exit(status ? 0 : 1);
     } else if (op_flags & (OPT_i|OPT_e)) {
-	lockorexit(&pidfile, config);
+        lockorexit(&pidfile, config);
 
-	list<string> filenames;
+        list<string> filenames;
 
-	if (argc == 0) {
-	    // Read from stdin
-	    char line[1024];
-	    while (fgets(line, 1023, stdin)) {
-		string sl(line);
-		trimstring(sl, "\n\r");
-		filenames.push_back(sl);
-	    }
-	} else {
-	    while (argc--) {
-		filenames.push_back(*argv++);
-	    }
-	}
+        if (argc == 0) {
+            // Read from stdin
+            char line[1024];
+            while (fgets(line, 1023, stdin)) {
+                string sl(line);
+                trimstring(sl, "\n\r");
+                filenames.push_back(sl);
+            }
+        } else {
+            while (argc--) {
+                filenames.push_back(*argv++);
+            }
+        }
 
         // Note that -e and -i may be both set. In this case we first erase,
         // then index. This is a slightly different from -Z -i because we 
         // warranty that all subdocs are purged.
         bool status = true;
-	if (op_flags & OPT_e) {
-	    status = purgefiles(config, filenames);
+        if (op_flags & OPT_e) {
+            status = purgefiles(config, filenames);
         }
         if (status && (op_flags & OPT_i)) {
-	    status = indexfiles(config, filenames);
+            status = indexfiles(config, filenames);
         }
         if (confindexer && !confindexer->getReason().empty()) {
             addIdxReason("indexer", confindexer->getReason());
@@ -797,132 +763,132 @@ int main(int argc, char **argv)
         flushIdxReasons();
         exit(status ? 0 : 1);
     } else if (op_flags & OPT_l) {
-	if (argc != 0) 
-	    Usage();
-	vector<string> stemmers = ConfIndexer::getStemmerNames();
-	for (vector<string>::const_iterator it = stemmers.begin(); 
-	     it != stemmers.end(); it++) {
-	    cout << *it << endl;
-	}
-	exit(0);
+        if (argc != 0) 
+            Usage();
+        vector<string> stemmers = ConfIndexer::getStemmerNames();
+        for (vector<string>::const_iterator it = stemmers.begin(); 
+             it != stemmers.end(); it++) {
+            cout << *it << endl;
+        }
+        exit(0);
     } else if (op_flags & OPT_s) {
-	if (argc != 1) 
-	    Usage();
-	string lang = *argv++; argc--;
-	exit(!createstemdb(config, lang));
+        if (argc != 1) 
+            Usage();
+        string lang = *argv++; argc--;
+        exit(!createstemdb(config, lang));
 #ifdef RCL_USE_ASPELL
     } else if (op_flags & OPT_S) {
-	makeIndexerOrExit(config, false);
+        makeIndexerOrExit(config, false);
         exit(!confindexer->createAspellDict());
 #endif // ASPELL
 
 #ifdef RCL_MONITOR
     } else if (op_flags & OPT_m) {
-	if (argc != 0) 
-	    Usage();
-	lockorexit(&pidfile, config);
+        if (argc != 0) 
+            Usage();
+        lockorexit(&pidfile, config);
         if (updater) {
-	    updater->status.hasmonitor = true;
+            updater->status.hasmonitor = true;
         }
-	if (!(op_flags&OPT_D)) {
-	    LOGDEB("recollindex: daemonizing\n");
+        if (!(op_flags&OPT_D)) {
+            LOGDEB("recollindex: daemonizing\n");
 #ifndef _WIN32
-	    if (daemon(0,0) != 0) {
+            if (daemon(0,0) != 0) {
                 addIdxReason("monitor", "daemon() failed");
                 cerr << "daemon() failed, errno " << errno << endl;
                 LOGERR("daemon() failed, errno " << errno << "\n");
                 flushIdxReasons();
                 exit(1);
-	    }
+            }
 #endif
-	}
-	// Need to rewrite pid, it changed
-	pidfile.write_pid();
+        }
+        // Need to rewrite pid, it changed
+        pidfile.write_pid();
         // Not too sure if I have to redo the nice thing after daemon(),
         // can't hurt anyway (easier than testing on all platforms...)
         setMyPriority(config);
 
-	if (sleepsecs > 0) {
-	    LOGDEB("recollindex: sleeping " << sleepsecs << "\n");
-	    for (int i = 0; i < sleepsecs; i++) {
-	      sleep(1);
-	      // Check that x11 did not go away while we were sleeping.
-	      if (!(op_flags & OPT_x) && !x11IsAlive()) {
-		LOGDEB("X11 session went away during initial sleep period\n");
-		exit(0);
-	      }
-	    }
-	}
+        if (sleepsecs > 0) {
+            LOGDEB("recollindex: sleeping " << sleepsecs << "\n");
+            for (int i = 0; i < sleepsecs; i++) {
+                sleep(1);
+                // Check that x11 did not go away while we were sleeping.
+                if (!(op_flags & OPT_x) && !x11IsAlive()) {
+                    LOGDEB("X11 session went away during initial sleep period\n");
+                    exit(0);
+                }
+            }
+        }
 
-	if (!(op_flags & OPT_n)) {
-	    makeIndexerOrExit(config, inPlaceReset);
-	    LOGDEB("Recollindex: initial indexing pass before monitoring\n");
-	    if (!confindexer->index(rezero, ConfIndexer::IxTAll, indexerFlags)
+        if (!(op_flags & OPT_n)) {
+            makeIndexerOrExit(config, inPlaceReset);
+            LOGDEB("Recollindex: initial indexing pass before monitoring\n");
+            if (!confindexer->index(rezero, ConfIndexer::IxTAll, indexerFlags)
                 || stopindexing) {
-		LOGERR("recollindex, initial indexing pass failed, "
+                LOGERR("recollindex, initial indexing pass failed, "
                        "not going into monitor mode\n");
                 flushIdxReasons();
-		exit(1);
-	    } else {
+                exit(1);
+            } else {
                 // Record success of indexing pass with failed files retries.
                 if (!(indexerFlags & ConfIndexer::IxFNoRetryFailed)) {
                     checkRetryFailed(config, true);
                 }
             }
-	    deleteZ(confindexer);
+            deleteZ(confindexer);
 #ifndef _WIN32
-	    o_reexec->insertArgs(vector<string>(1, "-n"));
-	    LOGINFO("recollindex: reexecuting with -n after initial full "
+            o_reexec->insertArgs(vector<string>(1, "-n"));
+            LOGINFO("recollindex: reexecuting with -n after initial full "
                     "pass\n");
-	    // Note that -n will be inside the reexec when we come
-	    // back, but the monitor will explicitely strip it before
-	    // starting a config change exec to ensure that we do a
-	    // purging pass in this latter case (full restart).
-	    o_reexec->reexec();
+            // Note that -n will be inside the reexec when we come
+            // back, but the monitor will explicitly strip it before
+            // starting a config change exec to ensure that we do a
+            // purging pass in this latter case (full restart).
+            o_reexec->reexec();
 #endif
-	}
+        }
 
         if (updater) {
-	    updater->status.phase = DbIxStatus::DBIXS_MONITOR;
-	    updater->status.fn.clear();
-	    updater->update();
-	}
-	int opts = RCLMON_NONE;
-	if (op_flags & OPT_D)
-	    opts |= RCLMON_NOFORK;
-	if (op_flags & OPT_C)
-	    opts |= RCLMON_NOCONFCHECK;
-	if (op_flags & OPT_x)
-	    opts |= RCLMON_NOX11;
-	bool monret = startMonitor(config, opts);
-	MONDEB(("Monitor returned %d, exiting\n", monret));
-	exit(monret == false);
+            updater->status.phase = DbIxStatus::DBIXS_MONITOR;
+            updater->status.fn.clear();
+            updater->update();
+        }
+        int opts = RCLMON_NONE;
+        if (op_flags & OPT_D)
+            opts |= RCLMON_NOFORK;
+        if (op_flags & OPT_C)
+            opts |= RCLMON_NOCONFCHECK;
+        if (op_flags & OPT_x)
+            opts |= RCLMON_NOX11;
+        bool monret = startMonitor(config, opts);
+        MONDEB(("Monitor returned %d, exiting\n", monret));
+        exit(monret == false);
 #endif // MONITOR
 
     } else if (op_flags & OPT_b) {
         cerr << "Not yet" << endl;
         return 1;
     } else {
-	lockorexit(&pidfile, config);
-	makeIndexerOrExit(config, inPlaceReset);
-	bool status = confindexer->index(rezero, ConfIndexer::IxTAll, 
+        lockorexit(&pidfile, config);
+        makeIndexerOrExit(config, inPlaceReset);
+        bool status = confindexer->index(rezero, ConfIndexer::IxTAll, 
                                          indexerFlags);
         // Record success of indexing pass with failed files retries.
         if (status && !(indexerFlags & ConfIndexer::IxFNoRetryFailed)) {
             checkRetryFailed(config, true);
         }
-	if (!status) 
-	    cerr << "Indexing failed" << endl;
+        if (!status) 
+            cerr << "Indexing failed" << endl;
         if (!confindexer->getReason().empty()) {
             addIdxReason("indexer", confindexer->getReason());
             cerr << confindexer->getReason() << endl;
         }
         if (updater) {
-	    updater->status.phase = DbIxStatus::DBIXS_DONE;
-	    updater->status.fn.clear();
-	    updater->update();
-	}
+            updater->status.phase = DbIxStatus::DBIXS_DONE;
+            updater->status.fn.clear();
+            updater->update();
+        }
         flushIdxReasons();
-	return !status;
+        return !status;
     }
 }

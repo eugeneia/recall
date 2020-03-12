@@ -6,7 +6,7 @@
 #
 from builtins import range
 import sys, os.path, optparse
-sys.path.append(sys.path[0]+"/msodump.zip")
+sys.path.insert(0, sys.path[0]+"/msodump.zip")
 import traceback
 
 from msodumper import ole, xlsstream, globals, node, xlsmodel, olestream

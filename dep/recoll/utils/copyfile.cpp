@@ -129,6 +129,13 @@ out:
 
 bool renameormove(const char *src, const char *dst, string &reason)
 {
+#ifdef _WIN32
+    // Windows refuses to rename to an existing file. It appears that
+    // there are workarounds (See MoveFile, MoveFileTransacted), but
+    // anyway we are not expecting atomicity here.
+    unlink(dst);
+#endif
+    
     // First try rename(2). If this succeeds we're done. If this fails
     // with EXDEV, try to copy. Unix really should have a library function
     // for this.

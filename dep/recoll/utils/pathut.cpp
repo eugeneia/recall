@@ -61,6 +61,11 @@
 #define LSTAT _wstati64
 #define STATBUF _stati64
 #define ACCESS _waccess
+#define OPENDIR _wopendir
+#define CLOSEDIR _wclosedir
+#define READDIR _wreaddir
+#define DIRENT _wdirent
+#define DIRHDL _WDIR
 
 #else // Not windows ->
 #include <fcntl.h>
@@ -76,6 +81,11 @@
 #define LSTAT lstat
 #define STATBUF stat
 #define ACCESS access
+#define OPENDIR opendir
+#define CLOSEDIR closedir
+#define READDIR readdir
+#define DIRENT dirent
+#define DIRHDL DIR
 #endif
 
 #include <cstdlib>
@@ -275,7 +285,7 @@ bool fsocc(const string& path, int *pc, long long *avmbs)
     ULARGE_INTEGER freebytesavail;
     ULARGE_INTEGER totalbytes;
     if (!GetDiskFreeSpaceExA(path.c_str(), &freebytesavail,
-							 &totalbytes, NULL)) {
+                             &totalbytes, NULL)) {
         return false;
     }
     if (pc) {
@@ -305,11 +315,11 @@ bool fsocc(const string& path, int *pc, long long *avmbs)
         *avmbs = 0;
         if (buf.f_bsize > 0) {
             int ratio = buf.f_frsize > FSOCC_MB ? buf.f_frsize / FSOCC_MB :
-                        FSOCC_MB / buf.f_frsize;
+                FSOCC_MB / buf.f_frsize;
 
             *avmbs = buf.f_frsize > FSOCC_MB ?
-                     ((long long)buf.f_bavail) * ratio :
-                     ((long long)buf.f_bavail) / ratio;
+                ((long long)buf.f_bavail) * ratio :
+                ((long long)buf.f_bavail) / ratio;
         }
     }
     return true;
@@ -517,7 +527,7 @@ bool path_isroot(const string& path)
     }
 #ifdef _WIN32
     if (path.size() == 3 && isalpha(path[0]) && path[1] == ':' &&
-            (path[2] == '/' || path[2] == '\\')) {
+        (path[2] == '/' || path[2] == '\\')) {
         return true;
     }
 #endif
@@ -553,7 +563,7 @@ bool path_isabsolute(const string& path)
 #ifdef _WIN32
                           || path_isdriveabs(path)
 #endif
-                         )) {
+            )) {
         return true;
     }
     return false;
@@ -566,7 +576,7 @@ string path_absolute(const string& is)
     }
     string s = is;
 #ifdef _WIN32
-        path_slashize(s);
+    path_slashize(s);
 #endif
     if (!path_isabsolute(s)) {
         char buf[MAXPATHLEN];
@@ -611,7 +621,7 @@ string path_canon(const string& is, const string* cwd)
     stringToTokens(s, elems, "/");
     vector<string> cleaned;
     for (vector<string>::const_iterator it = elems.begin();
-            it != elems.end(); it++) {
+         it != elems.end(); it++) {
         if (*it == "..") {
             if (!cleaned.empty()) {
                 cleaned.pop_back();
@@ -624,7 +634,7 @@ string path_canon(const string& is, const string* cwd)
     string ret;
     if (!cleaned.empty()) {
         for (vector<string>::const_iterator it = cleaned.begin();
-                it != cleaned.end(); it++) {
+             it != cleaned.end(); it++) {
             ret += "/";
 #ifdef _WIN32
             if (it == cleaned.begin() && path_strlookslikedrive(*it)) {
@@ -735,52 +745,15 @@ bool path_readable(const string& path)
     return ACCESS(syspath, R_OK) == 0;
 }
 
-// Allowed punctuation in the path part of an URI according to RFC2396
-// -_.!~*'():@&=+$,
-/*
-21 !
-    22 "
-    23 #
-24 $
-    25 %
-26 &
-27 '
-28 (
-29 )
-2A *
-2B +
-2C ,
-2D -
-2E .
-2F /
-30 0
-...
-39 9
-3A :
-    3B ;
-    3C <
-3D =
-    3E >
-    3F ?
-40 @
-41 A
-...
-5A Z
-    5B [
-    5C \
-    5D ]
-    5E ^
-5F _
-    60 `
-61 a
-...
-7A z
-    7B {
-    7C |
-    7D }
-7E ~
-    7F DEL
-*/
+/* There is a lot of vagueness about what should be percent-encoded or
+ * not in a file:// url. The constraint that we have is that we may use
+ * the encoded URL to compute (MD5) a thumbnail path according to the
+ * freedesktop.org thumbnail spec, which itself does not define what
+ * should be escaped. We choose to exactly escape what gio does, as
+ * implemented in glib/gconvert.c:g_escape_uri_string(uri, UNSAFE_PATH). 
+ * Hopefully, the other desktops have the same set of escaped chars. 
+ * Note that $ is not encoded, so the value is not shell-safe.
+ */
 string url_encode(const string& url, string::size_type offs)
 {
     string out = url.substr(0, offs);
@@ -790,22 +763,22 @@ string url_encode(const string& url, string::size_type offs)
         const char *h = "0123456789ABCDEF";
         c = cp[i];
         if (c <= 0x20 ||
-                c >= 0x7f ||
-                c == '"' ||
-                c == '#' ||
-                c == '%' ||
-                c == ';' ||
-                c == '<' ||
-                c == '>' ||
-                c == '?' ||
-                c == '[' ||
-                c == '\\' ||
-                c == ']' ||
-                c == '^' ||
-                c == '`' ||
-                c == '{' ||
-                c == '|' ||
-                c == '}') {
+            c >= 0x7f ||
+            c == '"' ||
+            c == '#' ||
+            c == '%' ||
+            c == ';' ||
+            c == '<' ||
+            c == '>' ||
+            c == '?' ||
+            c == '[' ||
+            c == '\\' ||
+            c == ']' ||
+            c == '^' ||
+            c == '`' ||
+            c == '{' ||
+            c == '|' ||
+            c == '}') {
             out += '%';
             out += h[(c >> 4) & 0xf];
             out += h[c & 0xf];
@@ -821,6 +794,8 @@ static inline int h2d(int c) {
         return c - '0';
     else if ('A' <= c && c <= 'F')
         return 10 + c - 'A';
+    else if ('a' <= c && c <= 'f')
+        return 10 + c - 'a';
     else 
         return -1;
 }
@@ -834,7 +809,7 @@ string url_decode(const string &in)
     const char *cp = in.c_str();
     string::size_type i = 0;
     for (; i < in.size() - 2; i++) {
-	if (cp[i] == '%') {
+        if (cp[i] == '%') {
             int d1 = h2d(cp[i+1]);
             int d2 = h2d(cp[i+2]);
             if (d1 != -1 && d2 != -1) {
@@ -845,7 +820,7 @@ string url_decode(const string &in)
                 out += cp[i+2];
             }
             i += 2;
-	} else {
+        } else {
             out += cp[i];
         }
     }
@@ -888,7 +863,7 @@ string url_parentfolder(const string& url)
         parenturl = url_gpath(url);
     }
     return isfileurl ? string("file://") + parenturl :
-           string("http://") + parenturl;
+        string("http://") + parenturl;
 }
 
 
@@ -1033,43 +1008,55 @@ ParsedUri::ParsedUri(std::string uri)
     }
 }
 
-bool readdir(const string& dir, string& reason, set<string>& entries)
+bool listdir(const string& dir, string& reason, set<string>& entries)
 {
-    struct stat st;
+    struct STATBUF st;
     int statret;
     ostringstream msg;
-    DIR *d = 0;
-    statret = lstat(dir.c_str(), &st);
+    DIRHDL *d = 0;
+
+    SYSPATH(dir, sysdir);
+
+    statret = LSTAT(sysdir, &st);
     if (statret == -1) {
-        msg << "readdir: cant stat " << dir << " errno " <<  errno;
+        msg << "listdir: cant stat " << dir << " errno " <<  errno;
         goto out;
     }
     if (!S_ISDIR(st.st_mode)) {
-        msg << "readdir: " << dir <<  " not a directory";
+        msg << "listdir: " << dir <<  " not a directory";
         goto out;
     }
-    if (access(dir.c_str(), R_OK) < 0) {
-        msg << "readdir: no read access to " << dir;
+    if (ACCESS(sysdir, R_OK) < 0) {
+        msg << "listdir: no read access to " << dir;
         goto out;
     }
 
-    d = opendir(dir.c_str());
+    d = OPENDIR(sysdir);
     if (d == 0) {
-        msg << "readdir: cant opendir " << dir << ", errno " << errno;
+        msg << "listdir: cant opendir " << dir << ", errno " << errno;
         goto out;
     }
 
-    struct dirent *ent;
-    while ((ent = readdir(d)) != 0) {
-        if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, "..")) {
+    struct DIRENT *ent;
+    while ((ent = READDIR(d)) != 0) {
+#ifdef _WIN32
+        string sdname;
+        if (!wchartoutf8(ent->d_name, sdname)) {
             continue;
         }
-        entries.insert(ent->d_name);
+        const char *dname = sdname.c_str();
+#else
+        const char *dname = ent->d_name;
+#endif
+        if (!strcmp(dname, ".") || !strcmp(dname, "..")) {
+            continue;
+        }
+        entries.insert(dname);
     }
 
 out:
     if (d) {
-        closedir(d);
+        CLOSEDIR(d);
     }
     reason = msg.str();
     if (reason.empty()) {
@@ -1127,8 +1114,8 @@ int Pidfile::flopen()
     if (fcntl(m_fd, F_SETLK,  &lockdata) != 0) {
         int serrno = errno;
         this->close()
-        errno = serrno;
-         m_reason = "fcntl lock failed";
+            errno = serrno;
+        m_reason = "fcntl lock failed";
         return -1;
     }
 #else

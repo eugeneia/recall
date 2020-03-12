@@ -55,7 +55,7 @@ public:
     /** Return a list of terms which matched for a specific result document */
     bool getMatchTerms(unsigned long xdocid, std::vector<std::string>& terms);
     int makeAbstract(Xapian::docid id, std::vector<Snippet>&,
-                     int maxoccs = -1, int ctxwords = -1);
+                     int maxoccs, int ctxwords, bool sortbypage);
     int getFirstMatchPage(Xapian::docid docid, std::string& term);
     void setDbWideQTermsFreqs();
     double qualityTerms(Xapian::docid docid, 
@@ -109,7 +109,8 @@ public:
         int ctxwords,
         unsigned int maxtotaloccs,
         vector<Snippet>& vabs,
-        Chrono& chron
+        Chrono& chron,
+        bool sortbypage
         );
 };
 

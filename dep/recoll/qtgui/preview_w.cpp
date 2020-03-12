@@ -99,6 +99,8 @@ static void trimwildcards(string& elt)
 void Preview::init()
 {
     LOGDEB("Preview::init\n");
+    setAttribute(Qt::WA_DeleteOnClose);
+    
     // Create the first tab (the tab widget is created with one
     // initial tab for ease of use in designer, we remove it).
     addEditorTab();
@@ -131,8 +133,6 @@ void Preview::init()
                            "RCL.SEARCH.GUI.PREVIEW");
 
     // signals and slots connections
-    connect(searchTextCMB, SIGNAL(activated(int)), 
-            this, SLOT(searchTextFromIndex(int)));
     connect(searchTextCMB, SIGNAL(editTextChanged(const QString&)), 
             this, SLOT(searchTextChanged(const QString&)));
     connect(nextPB, SIGNAL(clicked()), this, SLOT(nextPressed()));
@@ -146,8 +146,10 @@ void Preview::init()
             this, SLOT (close()));
     connect(new QShortcut(nextDocInTabKS, this), SIGNAL (activated()), 
             this, SLOT (emitShowNext()));
+    connect(nextInTabPB, SIGNAL (clicked()), this, SLOT (emitShowNext()));
     connect(new QShortcut(prevDocInTabKS, this), SIGNAL (activated()), 
             this, SLOT (emitShowPrev()));
+    connect(prevInTabPB, SIGNAL (clicked()), this, SLOT (emitShowPrev()));
     connect(new QShortcut(closeTabKS, this), SIGNAL (activated()), 
             this, SLOT (closeCurrentTab()));
     connect(new QShortcut(printTabKS, this), SIGNAL (activated()), 
@@ -259,24 +261,29 @@ bool Preview::eventFilter(QObject *target, QEvent *event)
 
 void Preview::searchTextChanged(const QString & text)
 {
-    LOGDEB1("Search line text changed. text: '" << qs2utf8s(text) << "'\n");
-    m_searchTextFromIndex = -1;
-    if (text.isEmpty()) {
-        m_dynSearchActive = false;
-        clearPB->setEnabled(false);
+    LOGDEB("Preview::searchTextChanged:(" << qs2utf8s(text) << ") current: ("<<
+            qs2utf8s(searchTextCMB->currentText()) << ") currentindex " <<
+            searchTextCMB->currentIndex() << "\n");
+    if (!searchTextCMB->itemText(searchTextCMB->currentIndex()).compare(text)) {
+        // Then we assume that the text was set by selecting in the
+        // combobox There does not seem to be another way to
+        // discriminate select and hand edit. Note that the
+        // activated() signal is called *after* the editTextChanged()
+        // one, so it is useless.
+        m_searchTextFromIndex = searchTextCMB->currentIndex();
+        doSearch("", false, false);
     } else {
-        m_dynSearchActive = true;
-        clearPB->setEnabled(true);
-        doSearch(text, false, false);
+        m_searchTextFromIndex = -1;
+        if (text.isEmpty()) {
+            m_dynSearchActive = false;
+            clearPB->setEnabled(false);
+        } else {
+            m_dynSearchActive = true;
+            clearPB->setEnabled(true);
+            doSearch(text, false, false);
+        }
     }
 }
-
-void Preview::searchTextFromIndex(int idx)
-{
-    LOGDEB1("search line from index " << idx << "\n");
-    m_searchTextFromIndex = idx;
-}
-
 
 void Preview::emitSaveDocToFile()
 {
@@ -375,7 +382,7 @@ void Preview::doSearch(const QString &_text, bool next, bool reverse,
     if (found) {
         m_canBeep = true;
     } else {
-        if (m_canBeep)
+        if (m_canBeep && !prefs.noBeeps)
             QApplication::beep();
         m_canBeep = false;
     }
@@ -894,8 +901,9 @@ bool Preview::loadDocInCurrentTab(const Rcl::Doc &idoc, int docnum)
 
     // Position the editor so that the first search term is visible
     if (searchTextCMB->currentText().length() != 0) {
-        // If there is a current search string, perform the search
-        m_canBeep = true;
+        // If there is a current search string, perform the search.
+        // Do not beep for an automatic search, this is ennoying.
+        m_canBeep = false;
         doSearch(searchTextCMB->currentText(), true, false);
     } else {
         // Position to the first query term

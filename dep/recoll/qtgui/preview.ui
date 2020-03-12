@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>611</width>
-    <height>300</height>
+    <width>777</width>
+    <height>432</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -101,6 +101,54 @@
         <enum>Qt::Vertical</enum>
        </property>
       </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="prevInTabPB">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="toolTip">
+         <string>Previous result document</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>:/images/prevpage.png</normaloff>images/prevpage.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="nextInTabPB">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="toolTip">
+         <string>Next result document</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>:/images/nextpage.png</normaloff>images/nextpage.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
      <item>
       <widget class="QPushButton" name="editPB">

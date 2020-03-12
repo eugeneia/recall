@@ -28,6 +28,7 @@ class RclDynConf:
 class RclConfig:
     def __init__(self, argcnf = None):
         self.config = None
+        self.mimemap = None
         platsys = platform.system()
         # Find configuration directory
         if argcnf is not None:
@@ -88,6 +89,28 @@ class RclConfig:
         if not self.config:
             self.config = conftree.ConfStack("recoll.conf", self.cdirs, "tree")
         return self.config.get(nm, self.keydir)
+
+    # This is a simplified version of the c++ code, intended mostly for the
+    # test mode of rclexecm.py. We don't attempt to check the data, so this
+    # will not work on extension-less paths (e.g. mbox/mail/etc.)
+    def mimeType(self, path):
+        if not self.mimemap:
+            self.mimemap = conftree.ConfStack("mimemap", self.cdirs, "tree")
+        if os.path.exists(path):
+            if os.path.isdir(path):
+                return "inode/directory"
+            if os.path.islink(path):
+                return "inode/symlink"
+            if not os.path.isfile(path):
+                return "inode/x-fsspecial"
+            try:
+                size = os.path.getsize(path)
+                if size == 0:
+                    return "inode/x-empty"
+            except:
+                pass
+        ext = os.path.splitext(path)[1]
+        return self.mimemap.get(ext, self.keydir)
         
 class RclExtraDbs:
     def __init__(self, config):

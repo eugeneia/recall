@@ -44,7 +44,8 @@ class PrefsPack {
     // toolbar+combobox or as a button group under simple search
     enum FilterCtlStyle {FCS_BT, FCS_CMB, FCS_MN};
     int filterCtlStyle;
-    int respagesize;
+    int respagesize{8};
+    int historysize{0};
     int maxhltextmbs;
     QString reslistfontfamily;
     // Not saved in prefs for now. Computed from qt defaults and used to
@@ -57,16 +58,12 @@ class PrefsPack {
     QString reslistformat;
     string  creslistformat;
     QString reslistheadertext;
-    // Abstract snippet separator
-    QString abssep;
     // Date strftime format
     QString reslistdateformat;
     string creslistdateformat;
     QString qssFile;
     QString snipCssFile;
     QString queryStemLang;
-    int mainwidth;
-    int mainheight;
     enum ShowMode {SHOW_NORMAL, SHOW_MAX, SHOW_FULL};
     int showmode{SHOW_NORMAL};
     int pvwidth; // Preview window geom
@@ -75,7 +72,7 @@ class PrefsPack {
     int resArea; // Area for "results" toolbar
     bool ssearchTypSav; // Remember last search mode (else always
 			// start with same)
-    int ssearchTyp;
+    int ssearchTyp{0};
     // Use single app (default: xdg-open), instead of per-mime settings
     bool useDesktopOpen; 
     // Remember sort state between invocations ?
@@ -84,9 +81,18 @@ class PrefsPack {
     bool sortActive; 
     bool sortDesc; 
     // Abstract preferences. Building abstracts can slow result display
-    bool queryBuildAbstract;
-    bool queryReplaceAbstract;
-    bool startWithAdvSearchOpen;
+    bool queryBuildAbstract{true};
+    bool queryReplaceAbstract{false};
+    // Synthetized abstract length (chars) and word context size (words)
+    int syntAbsLen;
+    int syntAbsCtx;
+    // Abstract snippet separator
+    QString abssep;
+    // Snippets window max list size
+    int snipwMaxLength;
+    // Snippets window sort by page (dflt: by weight)
+    bool snipwSortByPage;
+    bool startWithAdvSearchOpen{false};
     // Try to display html if it exists in the internfile stack.
     bool previewHtml;
     bool previewActiveLinks;
@@ -122,20 +128,20 @@ class PrefsPack {
     QStringList restableFields;
     vector<int> restableColWidths;
 
-    // Synthetized abstract length and word context size
-    int syntAbsLen;
-    int syntAbsCtx;
-
     // Remembered term match mode
-    int termMatchType;
+    int termMatchType{0};
 
     // Program version that wrote this. Not used for now, in prevision
     // of the case where we might need an incompatible change
-    int rclVersion;
-
-    bool showTrayIcon;
-    bool closeToTray;
-
+    int rclVersion{1505};
+    // Suppress all noises
+    bool noBeeps;
+    
+    bool showTrayIcon{false};
+    bool closeToTray{false};
+    bool trayMessages{false};
+    
+    // See qxtconfirmationmessage. Needs to be -1 for the dialog to show
     int showTempFileWarning;
     
     // Advanced search window clause list state
@@ -146,18 +152,6 @@ class PrefsPack {
 
     std::string stemlang();
 
-    PrefsPack() :
-	respagesize(8), 
-	reslistfontsize(10),
-	ssearchTyp(0),
-	queryBuildAbstract(true),
-	queryReplaceAbstract(false),
-	startWithAdvSearchOpen(false),
-	termMatchType(0),
-	rclVersion(1505),
-        showTrayIcon(false),
-        closeToTray(false)
-        {}
 };
 
 /** Global preferences record */

@@ -39,7 +39,7 @@ struct ResListEntry {
 
 /** Sort specification. */
 class DocSeqSortSpec {
- public:
+public:
     DocSeqSortSpec() : desc(false) {}
     bool isNotNull() const {return !field.empty();}
     void reset() {field.erase();}
@@ -50,12 +50,12 @@ class DocSeqSortSpec {
 /** Filtering spec. This is only used to filter by doc category for now, hence
     the rather specialized interface */
 class DocSeqFiltSpec {
- public:
+public:
     DocSeqFiltSpec() {}
     enum Crit {DSFS_MIMETYPE, DSFS_QLANG, DSFS_PASSALL};
     void orCrit(Crit crit, const std::string& value) {
-	crits.push_back(crit);
-	values.push_back(value);
+        crits.push_back(crit);
+        values.push_back(value);
     }
     std::vector<Crit> crits;
     std::vector<std::string> values;
@@ -75,7 +75,7 @@ class DocSeqFiltSpec {
     the current one will have to do for now.
 */
 class DocSequence {
- public:
+public:
     DocSequence(const std::string &t) : m_title(t) {}
     virtual ~DocSequence() {}
 
@@ -92,29 +92,26 @@ class DocSequence {
     /** Get next page of documents. This accumulates entries into the result
      *  list parameter (doesn't reset it). */
     virtual int getSeqSlice(int offs, int cnt, 
-			    std::vector<ResListEntry>& result);
+                            std::vector<ResListEntry>& result);
 
     /** Get abstract for document. This is special because it may take time.
      *  The default is to return the input doc's abstract fields, but some 
      *  sequences can compute a better value (ie: docseqdb) */
     virtual bool getAbstract(Rcl::Doc& doc, std::vector<std::string>& abs) {
-	abs.push_back(doc.meta[Rcl::Doc::keyabs]);
-	return true;
+        abs.push_back(doc.meta[Rcl::Doc::keyabs]);
+        return true;
     }
-    virtual bool getAbstract(Rcl::Doc& doc, 
-			     std::vector<Rcl::Snippet>& abs) 
-    {
-	abs.push_back(Rcl::Snippet(0, doc.meta[Rcl::Doc::keyabs]));
-	return true;
+    virtual bool getAbstract(Rcl::Doc& doc, std::vector<Rcl::Snippet>& abs, 
+                             int, bool) {
+        abs.push_back(Rcl::Snippet(0, doc.meta[Rcl::Doc::keyabs]));
+        return true;
     }
-    virtual int getFirstMatchPage(Rcl::Doc&, std::string&) 
-    {
-	return -1;
+    virtual int getFirstMatchPage(Rcl::Doc&, std::string&) {
+        return -1;
     }
     /** Get duplicates. */
-    virtual bool docDups(const Rcl::Doc&, std::vector<Rcl::Doc>&)
-    {
-	return false;
+    virtual bool docDups(const Rcl::Doc&, std::vector<Rcl::Doc>&) {
+        return false;
     }
 
     virtual bool getEnclosing(Rcl::Doc&, Rcl::Doc&);
@@ -124,43 +121,44 @@ class DocSequence {
 
     /** Get title for result list */
     virtual std::string title() 
-    {
-	return m_title;
-    }
+        {
+            return m_title;
+        }
 
     /** Can do snippets ? */
     virtual bool snippetsCapable()
-    {
-	return false;
-    }
+        {
+            return false;
+        }
     /** Get description for underlying query */
     virtual std::string getDescription() = 0;
 
     /** Get search terms (for highlighting abstracts). Some sequences
      * may have no associated search terms. Implement this for them. */
-    virtual void getTerms(HighlightData& hld)			  
-    {
-	hld.clear();
-    }
+    virtual void getTerms(HighlightData& hld)                     
+        {
+            hld.clear();
+        }
     virtual std::list<std::string> expand(Rcl::Doc &) 
-    {
-	return std::list<std::string>();
-    }
+        {
+            return std::list<std::string>();
+        }
     virtual std::string getReason() 
-    {
-	return m_reason;
-    }
+        {
+            return m_reason;
+        }
     /** Optional functionality. */
     virtual bool canFilter() {return false;}
     virtual bool canSort() {return false;}
     virtual bool setFiltSpec(const DocSeqFiltSpec &) {return false;}
     virtual bool setSortSpec(const DocSeqSortSpec &) {return false;}
-    virtual std::shared_ptr<DocSequence> getSourceSeq() {return std::shared_ptr<DocSequence>();}
+    virtual std::shared_ptr<DocSequence> getSourceSeq() {
+        return std::shared_ptr<DocSequence>();}
 
-    static void set_translations(const std::string& sort, const std::string& filt)
-    {
-	o_sort_trans = sort;
-	o_filt_trans = filt;
+    static void set_translations(const std::string& sort,
+                                 const std::string& filt) {
+        o_sort_trans = sort;
+        o_filt_trans = filt;
     }
 
 
@@ -172,7 +170,7 @@ protected:
     static std::string o_filt_trans;
     std::string          m_reason;
 
- private:
+private:
     std::string          m_title;
 };
 
@@ -182,75 +180,67 @@ protected:
 class DocSeqModifier : public DocSequence {
 public:
     DocSeqModifier(std::shared_ptr<DocSequence> iseq) 
-	: DocSequence(""), m_seq(iseq) 
-    {}
+        : DocSequence(""), m_seq(iseq) 
+        {}
     virtual ~DocSeqModifier() {}
 
-    virtual bool getAbstract(Rcl::Doc& doc, std::vector<std::string>& abs) 
-    {
-	if (!m_seq)
-	    return false;
-	return m_seq->getAbstract(doc, abs);
+    virtual bool getAbstract(Rcl::Doc& doc, std::vector<std::string>& abs)
+        override{
+        if (!m_seq)
+            return false;
+        return m_seq->getAbstract(doc, abs);
     }
-    virtual bool getAbstract(Rcl::Doc& doc, 
-			     std::vector<Rcl::Snippet>& abs) 
-    {
-	if (!m_seq)
-	    return false;
-	return m_seq->getAbstract(doc, abs);
+    virtual bool getAbstract(Rcl::Doc& doc, std::vector<Rcl::Snippet>& abs,
+                             int maxlen, bool bypage) override {
+        if (!m_seq)
+            return false;
+        return m_seq->getAbstract(doc, abs, maxlen, bypage);
     }
     /** Get duplicates. */
     virtual bool docDups(const Rcl::Doc& doc, std::vector<Rcl::Doc>& dups)
-    {
-	if (!m_seq)
-	    return false;
-	return m_seq->docDups(doc, dups);
+        override {
+        if (!m_seq)
+            return false;
+        return m_seq->docDups(doc, dups);
     }
 
-    virtual bool snippetsCapable()
-    {
-	if (!m_seq)
-	    return false;
-	return m_seq->snippetsCapable();
+    virtual bool snippetsCapable() override {
+        if (!m_seq)
+            return false;
+        return m_seq->snippetsCapable();
     }
-    virtual std::string getDescription() 
-    {
-	if (!m_seq)
-	    return "";
-	return m_seq->getDescription();
+    virtual std::string getDescription() override {
+        if (!m_seq)
+            return "";
+        return m_seq->getDescription();
     }
-    virtual void getTerms(HighlightData& hld)
-    {
-	if (!m_seq)
-	    return;
-	m_seq->getTerms(hld);
+    virtual void getTerms(HighlightData& hld) override {
+        if (!m_seq)
+            return;
+        m_seq->getTerms(hld);
     }
-    virtual bool getEnclosing(Rcl::Doc& doc, Rcl::Doc& pdoc) 
-    {
-	if (!m_seq)
-	    return false;
-	return m_seq->getEnclosing(doc, pdoc);
+    virtual bool getEnclosing(Rcl::Doc& doc, Rcl::Doc& pdoc) override {
+        if (!m_seq)
+            return false;
+        return m_seq->getEnclosing(doc, pdoc);
     }
-    virtual std::string getReason() 
-    {
-	if (!m_seq)
-	    return string();
-	return m_seq->getReason();
+    virtual std::string getReason() override {
+        if (!m_seq)
+            return string();
+        return m_seq->getReason();
     }
-    virtual std::string title() 
-    {
-	return m_seq->title();
+    virtual std::string title() override {
+        return m_seq->title();
     }
-    virtual std::shared_ptr<DocSequence> getSourceSeq() 
-    {
-	return m_seq;
+    virtual std::shared_ptr<DocSequence> getSourceSeq() override {
+        return m_seq;
     }
 
 protected:
-    virtual std::shared_ptr<Rcl::Db> getDb() {
-	if (!m_seq)
-	    return 0;
-	return m_seq->getDb();
+    virtual std::shared_ptr<Rcl::Db> getDb() override {
+        if (!m_seq)
+            return 0;
+        return m_seq->getDb();
     }
 
     std::shared_ptr<DocSequence>    m_seq;
@@ -263,23 +253,21 @@ class RclConfig;
 class DocSource : public DocSeqModifier {
 public:
     DocSource(RclConfig *config, std::shared_ptr<DocSequence> iseq) 
-	: DocSeqModifier(iseq), m_config(config)
-    {}
+        : DocSeqModifier(iseq), m_config(config)
+        {}
     virtual bool canFilter() {return true;}
     virtual bool canSort() {return true;}
     virtual bool setFiltSpec(const DocSeqFiltSpec &);
     virtual bool setSortSpec(const DocSeqSortSpec &);
-    virtual bool getDoc(int num, Rcl::Doc &doc, std::string *sh = 0)
-    {
-	if (!m_seq)
-	    return false;
-	return m_seq->getDoc(num, doc, sh);
+    virtual bool getDoc(int num, Rcl::Doc &doc, std::string *sh = 0) {
+        if (!m_seq)
+            return false;
+        return m_seq->getDoc(num, doc, sh);
     }
-    virtual int getResCnt()
-    {
-	if (!m_seq)
-	    return 0;
-	return m_seq->getResCnt();
+    virtual int getResCnt() {
+        if (!m_seq)
+            return 0;
+        return m_seq->getResCnt();
     }
     virtual std::string title();
 private:
@@ -290,4 +278,4 @@ private:
     DocSeqSortSpec  m_sspec;
 };
 
-#endif /* _DOCSEQ_H_INCLUDED_ */
+#endif /* _DOCSEQ_H_ */

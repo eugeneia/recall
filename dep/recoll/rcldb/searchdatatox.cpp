@@ -493,7 +493,7 @@ bool SearchDataClauseSimple::expandTerm(Rcl::Db &db,
     }
 
 
-    if (noexpansion) {
+    if (!m_exclude && noexpansion) {
 	oexp.push_back(prefix + term);
 	m_hldata.terms[term] = term;
 	LOGDEB("ExpandTerm: noexpansion: final: "<<stringsToString(oexp)<< "\n");
@@ -533,45 +533,13 @@ bool SearchDataClauseSimple::expandTerm(Rcl::Db &db,
 	oexp.push_back(prefix + term);
 
     // Remember the uterm-to-expansion links
-    for (const auto& entry : oexp) {
-	m_hldata.terms[strip_prefix(entry)] = term;
+    if (!m_exclude) {
+        for (const auto& entry : oexp) {
+            m_hldata.terms[strip_prefix(entry)] = term;
+        }
     }
     LOGDEB("ExpandTerm: final: " << stringsToString(oexp) << "\n");
     return true;
-}
-
-// Do distribution of string vectors: a,b c,d -> a,c a,d b,c b,d
-void multiply_groups(vector<vector<string> >::const_iterator vvit,
-		     vector<vector<string> >::const_iterator vvend, 
-		     vector<string>& comb,
-		     vector<vector<string> >&allcombs)
-{
-    // Remember my string vector and compute next, for recursive calls.
-    vector<vector<string> >::const_iterator myvit = vvit++;
-
-    // Walk the string vector I'm called upon and, for each string,
-    // add it to current result, an call myself recursively on the
-    // next string vector. The last call (last element of the vector of
-    // vectors), adds the elementary result to the output
-
-    // Walk my string vector
-    for (vector<string>::const_iterator strit = (*myvit).begin();
-	 strit != (*myvit).end(); strit++) {
-
-	// Add my current value to the string vector we're building
-	comb.push_back(*strit);
-
-	if (vvit == vvend) {
-	    // Last call: store current result
-	    allcombs.push_back(comb);
-	} else {
-	    // Call recursively on next string vector
-	    multiply_groups(vvit, vvend, comb, allcombs);
-	}
-	// Pop the value I just added (make room for the next element in my
-	// vector)
-	comb.pop_back();
-    }
 }
 
 static void prefix_vector(vector<string>& v, const string& prefix)
@@ -603,13 +571,15 @@ void SearchDataClauseSimple::processSimpleSpan(
 	return;
     
     // Set up the highlight data. No prefix should go in there
-    for (vector<string>::const_iterator it = exp.begin(); 
-	 it != exp.end(); it++) {
-	m_hldata.groups.push_back(vector<string>(1, it->substr(prefix.size())));
-	m_hldata.slacks.push_back(0);
-	m_hldata.grpsugidx.push_back(m_hldata.ugroups.size() - 1);
+    if (!m_exclude) {
+        for (const auto& term : exp) {
+            HighlightData::TermGroup tg;
+            tg.term = term.substr(prefix.size());
+            tg.grpsugidx =  m_hldata.ugroups.size() - 1;
+            m_hldata.index_term_groups.push_back(tg);
+        }
     }
-
+    
     // Push either term or OR of stem-expanded set
     Xapian::Query xq(Xapian::Query::OP_OR, exp.begin(), exp.end());
     m_curcl += exp.size();
@@ -729,24 +699,24 @@ void SearchDataClauseSimple::processPhraseOrNear(Rcl::Db &db, string& ermsg,
     LOGDEB2("PHRASE/NEAR:  alltermcount " << splitData->alltermcount() <<
             " lastpos " << splitData->lastpos() << "\n");
     Xapian::Query xq(op, orqueries.begin(), orqueries.end(),
-		     splitData->lastpos() + 1 + slack);
+		     orqueries.size() + slack);
     if (op == Xapian::Query::OP_PHRASE)
 	xq = Xapian::Query(Xapian::Query::OP_SCALE_WEIGHT, xq, 
 			   original_term_wqf_booster);
     pqueries.push_back(xq);
 
-    // Add all combinations of NEAR/PHRASE groups to the highlighting data. 
-    vector<vector<string> > allcombs;
-    vector<string> comb;
-    multiply_groups(groups.begin(), groups.end(), comb, allcombs);
-    
     // Insert the search groups and slacks in the highlight data, with
     // a reference to the user entry that generated them:
-    m_hldata.groups.insert(m_hldata.groups.end(), 
-			   allcombs.begin(), allcombs.end());
-    m_hldata.slacks.insert(m_hldata.slacks.end(), allcombs.size(), slack);
-    m_hldata.grpsugidx.insert(m_hldata.grpsugidx.end(), allcombs.size(), 
-			      m_hldata.ugroups.size() - 1);
+    if (!m_exclude) {
+        HighlightData::TermGroup tg;
+        tg.orgroups = groups;
+        tg.slack = slack;
+        tg.grpsugidx =  m_hldata.ugroups.size() - 1;
+        tg.kind = (op == Xapian::Query::OP_PHRASE) ?
+            HighlightData::TermGroup::TGK_PHRASE :
+            HighlightData::TermGroup::TGK_NEAR;
+        m_hldata.index_term_groups.push_back(tg);
+    }
 }
 
 // Trim string beginning with ^ or ending with $ and convert to flags
@@ -864,13 +834,17 @@ bool SearchDataClauseSimple::processUserString(Rcl::Db &db, const string &iq,
 		int lmods = mods;
 		if (tpq.nostemexps().front())
 		    lmods |= SearchDataClause::SDCM_NOSTEMMING;
-		m_hldata.ugroups.push_back(tpq.terms());
+                if (!m_exclude) {
+                    m_hldata.ugroups.push_back(tpq.terms());
+                }
 		processSimpleSpan(db, ermsg, tpq.terms().front(),
 				  lmods, &pqueries);
 	    }
 		break;
 	    default:
-		m_hldata.ugroups.push_back(tpq.terms());
+                if (!m_exclude) {
+                    m_hldata.ugroups.push_back(tpq.terms());
+                }
 		processPhraseOrNear(db, ermsg, &tpq, mods, &pqueries,
 				    useNear, slack);
 	    }

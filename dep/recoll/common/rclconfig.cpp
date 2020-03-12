@@ -264,7 +264,11 @@ RclConfig::RclConfig(const string *argcnf)
     // is called from the main thread at once, by constructing a config
     // from recollinit
     if (o_localecharset.empty()) {
-#ifndef _WIN32
+#ifdef _WIN32
+        o_localecharset = winACPName();
+#elif defined(__APPLE__)
+        o_localecharset = "UTF-8";
+#else
         const char *cp;
         cp = nl_langinfo(CODESET);
         // We don't keep US-ASCII. It's better to use a superset
@@ -282,8 +286,6 @@ RclConfig::RclConfig(const string *argcnf)
             // Use cp1252 instead of iso-8859-1, it's a superset.
             o_localecharset = string(cstr_cp1252);
         }
-#else
-        o_localecharset = winACPName();
 #endif
         LOGDEB1("RclConfig::getDefCharset: localecharset ["  <<
                 o_localecharset << "]\n");
@@ -308,16 +310,19 @@ RclConfig::RclConfig(const string *argcnf)
     m_cdirs.push_back(path_cat(m_datadir, "examples"));
 
     string cnferrloc;
-    for (vector<string>::const_iterator it = m_cdirs.begin();
-         it != m_cdirs.end(); it++) {
-        if (it != m_cdirs.begin())
-            cnferrloc += string(" or ");
-        cnferrloc += *it;
+    for (const auto& dir : m_cdirs) {
+        cnferrloc += "[" + dir + "] or ";
+    }
+    if (cnferrloc.size() > 4) {
+        cnferrloc.erase(cnferrloc.size()-4);
     }
 
     // Read and process "recoll.conf"
-    if (!updateMainConfig())
+    if (!updateMainConfig()) {
+        m_reason = string("No/bad main configuration file in: ") + cnferrloc;
         return;
+    }
+
     // Other files
     mimemap = new ConfStack<ConfTree>("mimemap", m_cdirs, true);
     if (mimemap == 0 || !mimemap->ok()) {
@@ -380,9 +385,6 @@ bool RclConfig::updateMainConfig()
     if (newconf == 0 || !newconf->ok()) {
         if (m_conf)
             return false;
-        string where;
-        stringsToString(m_cdirs, where);
-        m_reason = string("No/bad main configuration file in: ") + where;
         m_ok = false;
         initParamStale(0, 0);
         return false;
@@ -968,15 +970,10 @@ bool RclConfig::readFieldsConfig(const string& cnferrloc)
                    "]: [" << val << "]\n");
             return 0;
         }
-        string tval;
-        if (attrs.get("wdfinc", tval))
-            ft.wdfinc = atoi(tval.c_str());
-        if (attrs.get("boost", tval))
-            ft.boost = atof(tval.c_str());
-        if (attrs.get("pfxonly", tval))
-            ft.pfxonly = stringToBool(tval);
-        if (attrs.get("noterms", tval))
-            ft.noterms = stringToBool(tval);
+        ft.wdfinc = attrs.getInt("wdfinc", 1);
+        ft.boost = attrs.getFloat("boost", 1.0);
+        ft.pfxonly = attrs.getBool("pfxonly", false);
+        ft.noterms = attrs.getBool("noterms", false);
         m_fldtotraits[stringtolower(fieldname)] = ft;
         LOGDEB2("readFieldsConfig: ["  << fieldname << "] -> ["  << ft.pfx <<
                 "] " << ft.wdfinc << " " << ft.boost << "\n");
@@ -1016,11 +1013,7 @@ bool RclConfig::readFieldsConfig(const string& cnferrloc)
                 return 0;
             }
         }
-        int valuelen{0};
-        if (attrs.get("len", tval)) {
-            valuelen = atoi(tval.c_str());
-        }
-        
+        int valuelen = attrs.getInt("len", 0);
         // Find or insert traits entry
         const auto pit =
             m_fldtotraits.insert(
@@ -1524,8 +1517,13 @@ bool RclConfig::sourceChanged() const
 string RclConfig::getWebQueueDir() const
 {
     string webqueuedir;
-    if (!getConfParam("webqueuedir", webqueuedir))
+    if (!getConfParam("webqueuedir", webqueuedir)) {
+#ifdef _WIN32
+        webqueuedir = "~/AppData/Local/RecollWebQueue";
+#else
         webqueuedir = "~/.recollweb/ToIndex/";
+#endif
+    }
     webqueuedir = path_tildexpand(webqueuedir);
     return webqueuedir;
 }
@@ -1719,7 +1717,7 @@ static const char german_ex[] = "unac_except_trans = \303\244\303\244 \303\204\3
 
 // Create initial user config by creating commented empty files
 static const char *configfiles[] = {"recoll.conf", "mimemap", "mimeconf", 
-                                    "mimeview"};
+                                    "mimeview", "fields"};
 static int ncffiles = sizeof(configfiles) / sizeof(char *);
 bool RclConfig::initUserConfig()
 {
