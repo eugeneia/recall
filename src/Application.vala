@@ -311,22 +311,27 @@ public class Recall : Gtk.Application {
         results = search_results;
         results_view.model = search_results.model;
 
-        /* Run recoll query, consume asynchronously results as they become
+        /* Run recoll query, consume results asynchronously as they become
            available until output is complete or the search is superseded. */
         IOChannel output;
         var pid = run_recoll (query, out output);
-        output.add_watch (IOCondition.IN, (channel, condition) => {
-            string line;
-            if (search_results == results)
+        output.add_watch (
+            IOCondition.IN | IOCondition.HUP,
+            (channel, condition) => {
+                if (search_results != results) return false;
+                if (condition == IOCondition.HUP) return false;
+                string line = "";
+                IOStatus status = IOStatus.EOF;
 		        try {
-		            channel.read_line (out line, null, null);
-		            search_results.parse (line);
-		            return true;
+                    status = channel.read_line (out line, null, null);
 		        } catch (Error e) {
 		            critical ("Failed to read recoll output: %s", e.message);
 		        }
-		    return false;
-        });
+		        if (status == IOStatus.EOF) return false;
+		        search_results.parse (line);
+		        return true;
+		    }
+        );
         /* On completion, indicate total results in info overlay unless the
            search has been superseded. */
         ChildWatch.add (pid, (pid, status) => {
