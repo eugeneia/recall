@@ -1,4 +1,4 @@
-com.github.eugeneia.recall (0.9.0ubuntu1) UNRELEASED; urgency=low
+com.github.eugeneia.recall (0.9.1ubuntu4) UNRELEASED; urgency=low
 
   [ Max Rottenkolber ]
   * Initial Release.
@@ -11,4 +11,10 @@ com.github.eugeneia.recall (0.9.0ubuntu1) UNRELEASED; urgency=low
   [ Max Rottenkolber ]
   * Vendor recollq
 
- -- Max Rottenkolber <max@mr.gy>  Tue, 27 Aug 2019 12:18:48 +0200
+  [ Max Rottenkolber ]
+  * Fix bug where CPU thrashing due to uncancelled IOCondition.IN watches for previous searches
+  * Increase fs.inotify.max_user_watches further for recollindex -m
+  * Fix typo in autostart entry
+  * Automatically Select search entry on startup
+
+ -- Max Rottenkolber <max@mr.gy>  Tue, 13 Mar 2020 13:30:00 +0100
