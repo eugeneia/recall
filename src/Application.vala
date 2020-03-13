@@ -425,7 +425,7 @@ public class Recall : Gtk.Application {
             "[Desktop Entry]\n" +
             "Name=Recall Indexer\n" +
             "GenericName=%s\n".printf(_("Document Search Indexing")) +
-            "Comment=%s\n".printf(_("Automatically index docments in real-time")) +
+            "Comment=%s\n".printf(_("Automatically index documents in real-time")) +
             "Categories=Utility;FileTools;\n" +
             "Exec=recollindex -c %s -D -x -m\n".printf(confdir_path) +
             "Icon=%s\n".printf(APP_ID) +
