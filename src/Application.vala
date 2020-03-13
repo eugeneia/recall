@@ -493,6 +493,7 @@ public class Recall : Gtk.Application {
         main_window = main_window_init ();
 
         main_window.show_all ();
+        search.grab_focus_without_selecting ();
     }
 
     string? initial_prefix;
